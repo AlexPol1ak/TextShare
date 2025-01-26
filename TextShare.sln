@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextShare.API", "TextShare.API\TextShare.API.csproj", "{D392FDB2-2BF5-4EE7-8A03-C7E266E8C035}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextShare.Domain", "TextShare.Domain\TextShare.Domain.csproj", "{3D6B8654-1D48-496A-8E12-3DF90B4416BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextShare.DAL", "TextShare.DAL\TextShare.DAL.csproj", "{72E1258B-A804-4D47-8EFE-2D9363BA4064}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D392FDB2-2BF5-4EE7-8A03-C7E266E8C035}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D392FDB2-2BF5-4EE7-8A03-C7E266E8C035}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D392FDB2-2BF5-4EE7-8A03-C7E266E8C035}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D392FDB2-2BF5-4EE7-8A03-C7E266E8C035}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D6B8654-1D48-496A-8E12-3DF90B4416BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D6B8654-1D48-496A-8E12-3DF90B4416BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D6B8654-1D48-496A-8E12-3DF90B4416BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D6B8654-1D48-496A-8E12-3DF90B4416BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72E1258B-A804-4D47-8EFE-2D9363BA4064}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72E1258B-A804-4D47-8EFE-2D9363BA4064}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72E1258B-A804-4D47-8EFE-2D9363BA4064}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72E1258B-A804-4D47-8EFE-2D9363BA4064}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
