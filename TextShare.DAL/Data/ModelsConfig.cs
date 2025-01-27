@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TextShare.DAL.Converters;
+using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.DAL.Data
@@ -47,6 +48,67 @@ namespace TextShare.DAL.Data
                 .WithMany(u => u.FriendRequests)
                 .HasForeignKey(f => f.FriendId)
                 .OnDelete(DeleteBehavior.Restrict);
+        }
+
+        /// <summary>
+        /// Конфигурация таблицы группы.
+        /// </summary>
+        /// <param name="builder"></param>
+        static public void GroupConfig(EntityTypeBuilder<Group> builder)
+        {
+            builder.ToTable("Groups");
+
+            builder.HasKey(g => g.GroupId);
+
+            builder.Property(g => g.Name)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            builder.Property(g => g.Description)
+                .HasColumnType("TEXT")
+                .IsRequired(false)
+                .HasMaxLength(500);
+
+            builder.Property(g => g.CreatedAt)
+                .HasColumnType("DATETIME")
+                .IsRequired();
+
+            builder.Property(g => g.ImageUri)
+                .HasMaxLength(255);
+
+            // Связь с создателем группы (User)
+            builder.HasOne(g => g.Creator)
+                .WithMany(u => u.Groups)
+                .HasForeignKey(g => g.CreatorId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+
+        /// <summary>
+        /// Конфигурация таблицы участников группы.
+        /// </summary>
+        /// <param name="builder"></param>
+        static public void GroupMemberConfig(EntityTypeBuilder<GroupMember> builder)
+        {
+            builder.ToTable("GroupMembers");
+
+            // Составной ключ для связи (GroupId, UserId)
+            builder.HasKey(gm => new { gm.GroupId, gm.UserId });
+
+            // Связь с группой
+            builder.HasOne(gm => gm.Group)
+                .WithMany(g => g.Members)
+                .HasForeignKey(gm => gm.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Связь с пользователем
+            builder.HasOne(gm => gm.User)
+                .WithMany(u => u.GroupMemberships)
+                .HasForeignKey(gm => gm.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(gm => gm.JoinedAt)
+                .HasColumnType("DATETIME")
+                .IsRequired();
         }
     }
 }
