@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TextShare.DAL.Converters;
 using TextShare.Domain.Entities.Groups;
+using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.DAL.Data
@@ -110,5 +111,35 @@ namespace TextShare.DAL.Data
                 .HasColumnType("DATETIME")
                 .IsRequired();
         }
+
+        /// <summary>
+        /// Конфигурация таблицы полок.
+        /// </summary>
+        /// <param name="builder"></param>
+        static public void ShelfConfig(EntityTypeBuilder<Shelf> builder)
+        {
+            builder.ToTable("Shelves");
+
+            builder.HasKey(s => s.ShelfId);
+
+            builder.Property(s => s.Name)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            builder.Property(s => s.Description)
+                .HasColumnType("TEXT")
+                .IsRequired(false)
+                .HasMaxLength(500);
+
+            builder.Property(s => s.CreatedAt)
+                .HasColumnType("DATETIME")
+                .IsRequired();
+            // Связь с пользователем
+            builder.HasOne(s => s.Creator)
+                .WithMany(u => u.Shelves)  // Один пользователь может иметь много полок
+                .HasForeignKey(s => s.CreatorId)
+                .OnDelete(DeleteBehavior.Cascade);  // При удалении пользователя удаляются и его полки
+        }
+
     }
 }

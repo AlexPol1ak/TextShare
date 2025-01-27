@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TextShare.Domain.Entities.Groups;
+using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.DAL.Data
@@ -12,6 +13,7 @@ namespace TextShare.DAL.Data
         public DbSet<Friendship> Friendships { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupMember> GroupMembers { get; set; }
+        public DbSet<Shelf> Shelves { get; set; }
 
         public TextShareContext(DbContextOptions<TextShareContext> options) : base(options)
         {
@@ -27,6 +29,7 @@ namespace TextShare.DAL.Data
             modelBuilder.Entity<Friendship>(ModelsConfig.FriendShipsConfig);
             modelBuilder.Entity<Group>(ModelsConfig.GroupConfig);
             modelBuilder.Entity<GroupMember>(ModelsConfig.GroupMemberConfig);
+            modelBuilder.Entity<Shelf>(ModelsConfig.ShelfConfig);
             base.OnModelCreating(modelBuilder);
         }
     }
