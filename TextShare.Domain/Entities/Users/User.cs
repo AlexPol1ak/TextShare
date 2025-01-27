@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using TextShare.Domain.Entities.Groups;
 
 
 namespace TextShare.Domain.Entities.Users
@@ -19,6 +20,10 @@ namespace TextShare.Domain.Entities.Users
         // Коллекции для исходящих и входящих запросов дружбы
         public ICollection<Friendship> Friendships { get; set; } = new List<Friendship>();
         public ICollection<Friendship> FriendRequests { get; set; } = new List<Friendship>();
+
+        //Коллекции для созданных групп и участия в группах
+        public ICollection<Group> Groups { get; set; } = new List<Group>();
+        public ICollection<GroupMember> GroupMemberships { get; set; } = new List<GroupMember>();
 
         public override string ToString()
         {
