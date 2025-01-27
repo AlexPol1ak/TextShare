@@ -3,6 +3,9 @@
 
 namespace TextShare.Domain.Entities.Users
 {
+    /// <summary>
+    /// Класс пользователя
+    /// </summary>
     public class User : IdentityUser<int>
     {
         public string FirstName { get; set; }
@@ -12,6 +15,10 @@ namespace TextShare.Domain.Entities.Users
         public DateTime RegisteredAt { get; set; } = DateTime.UtcNow;
         public string? AvatarUri { get; set; }
         public string? SelfDescription { get; set; }
+
+        // Коллекции для исходящих и входящих запросов дружбы
+        public ICollection<Friendship> Friendships { get; set; } = new List<Friendship>();
+        public ICollection<Friendship> FriendRequests { get; set; } = new List<Friendship>();
 
         public override string ToString()
         {

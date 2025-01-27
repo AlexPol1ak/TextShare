@@ -2,6 +2,9 @@
 
 namespace TextShare.DAL.Converters
 {
+    /// <summary>
+    /// Конвертер DateOnly - DateTime для столбцов базы данных.
+    /// </summary>
     public class DateOnlyConverter : ValueConverter<DateOnly, DateTime>
     {
         public DateOnlyConverter() :

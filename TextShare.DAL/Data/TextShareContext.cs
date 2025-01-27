@@ -7,7 +7,8 @@ namespace TextShare.DAL.Data
 {
     public class TextShareContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; } 
+        public DbSet<Friendship> Friendships { get; set; }
 
         public TextShareContext(DbContextOptions<TextShareContext> options) : base(options)
         {
@@ -20,6 +21,7 @@ namespace TextShare.DAL.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(ModelsConfig.UserConfig);
+            modelBuilder.Entity<Friendship>(ModelsConfig.FriendShipsConfig);
             base.OnModelCreating(modelBuilder);
         }
     }
