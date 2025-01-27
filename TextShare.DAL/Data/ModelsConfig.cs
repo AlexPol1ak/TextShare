@@ -168,6 +168,49 @@ namespace TextShare.DAL.Data
             builder.HasOne(t => t.Shelf)  // Файл находится на одной полке
                 .WithMany(s => s.TextFiles)  // Одна полка может содержать много файлов
                 .HasForeignKey(t => t.ShelfId);  // Внешний ключ для связи
+
+            // Связь с категорией
+            builder.HasMany(t => t.TextFileCategories)
+                .WithOne(tf => tf.TextFile)
+                .HasForeignKey(tf => tf.TextFileId);
+           
+        }
+
+        /// <summary>
+        /// Конфигурация таблицы категорий
+        /// </summary>
+        /// <param name="builder"></param>
+        static public void CategoryConfig(EntityTypeBuilder<Category> builder)
+        {
+            builder.ToTable("Categories");
+
+            builder.HasKey(c => c.CategoryId);
+            builder.Property(c => c.Name).HasMaxLength(100).IsRequired();
+            builder.Property(c => c.Description).HasColumnType("TEXT").IsRequired(false);
+
+            // Связь многие ко многим с TextFile через промежуточную таблицу
+            builder.HasMany(c => c.TextFileCategories)
+                .WithOne(tf => tf.Category)
+                .HasForeignKey(tf => tf.CategoryId);
+        }
+
+        /// <summary>
+        /// Конфигурация для связи между текстовым файлом и категориями.
+        /// </summary>
+        /// <param name="builder"></param>
+        static public void TextFileCategoryConfig(EntityTypeBuilder<TextFileCategory> builder)
+        {
+            builder.HasKey(tf => new { tf.TextFileId, tf.CategoryId }); // Составной ключ для связи
+
+            builder.HasOne(tf => tf.TextFile)
+                .WithMany(t => t.TextFileCategories)
+                .HasForeignKey(tf => tf.TextFileId)
+                .OnDelete(DeleteBehavior.Cascade); // Прописываем каскадное удаление для правильной работы
+
+            builder.HasOne(tf => tf.Category)
+                .WithMany(c => c.TextFileCategories)
+                .HasForeignKey(tf => tf.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade); // Прописываем каскадное удаление для правильной работы
         }
 
     }

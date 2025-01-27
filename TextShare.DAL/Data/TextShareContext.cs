@@ -18,6 +18,9 @@ namespace TextShare.DAL.Data
         public DbSet<GroupMember> GroupMembers { get; set; } //Участники групп
         public DbSet<Shelf> Shelves { get; set; } //Полки
         public DbSet<TextFile> TextFiles { get; set; } //Текстовые файлы пользователей
+        public DbSet<Category> Categories { get; set; } // Категории
+        // Промежут. таблица для связи файлов и категорий
+        public DbSet<TextFileCategory> TextFileCategories { get; set; } 
 
         public TextShareContext(DbContextOptions<TextShareContext> options) : base(options)
         {
@@ -35,6 +38,8 @@ namespace TextShare.DAL.Data
             modelBuilder.Entity<GroupMember>(ModelsConfig.GroupMemberConfig);
             modelBuilder.Entity<Shelf>(ModelsConfig.ShelfConfig);
             modelBuilder.Entity<TextFile>(ModelsConfig.TextFileConfig);
+            modelBuilder.Entity<Category>(ModelsConfig.CategoryConfig);
+            modelBuilder.Entity<TextFileCategory>(ModelsConfig.TextFileCategoryConfig);
             base.OnModelCreating(modelBuilder);
         }
     }
