@@ -19,7 +19,17 @@ namespace TextShare.Domain.Entities.TextFiles
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? ImageUri { get; set; }
 
+        // Создатель
         public int CreatorId { get; set; }
         public User Creator { get; set; }
+
+        // Размещенные файлы
+        public ICollection<TextFile> TextFiles { get; set; } = new List<TextFile>();
+
+        public override string ToString()
+        {
+            return $"Id: {ShelfId}. Name: {Name}. Creator: {Creator.ToString()}." +
+                $" Number files: {TextFiles.Count.ToString()}";
+        }
     }
 }

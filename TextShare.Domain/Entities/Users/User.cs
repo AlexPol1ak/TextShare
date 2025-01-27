@@ -26,11 +26,38 @@ namespace TextShare.Domain.Entities.Users
         public ICollection<Group> Groups { get; set; } = new List<Group>();
         public ICollection<GroupMember> GroupMemberships { get; set; } = new List<GroupMember>();
 
+        // Коллекция полок.
         public ICollection<Shelf> Shelves { get; set; } = new List<Shelf>();
+
+        // Коллекция файлов
+        public ICollection<TextFile> TextFiles { get; set; } = new List<TextFile>();
 
         public override string ToString()
         {
-            return $"Id: {Id}. First Name: {FirstName}. Last Name {LastName}";
+            return $"Id: {Id}. First Name: {FirstName}. Last Name {LastName}.";
+        }
+
+        /// <summary>
+        /// Полная информация о пользователе.
+        /// </summary>
+        /// <returns></returns>
+        public string GetFullInfo()
+        {
+            string info = string.Empty;
+            info += ToString() + " ";
+            info += $"BirthDate: {BirthDate.ToShortDateString()}. " +
+                $"RegisteredAt: {RegisteredAt.ToString()}\n";
+
+            info += $"Number friends: {Friendships.Count.ToString()}. " +
+                $"Number friend requests: {FriendRequests.Count.ToString()}\n";
+
+            info += $"Number groups: {Groups.Count.ToString()}. " +
+                $"Group member number: {GroupMemberships.Count.ToString()}\n";
+
+            info += $"Number Shelves: {Shelves.Count.ToString()}. ";
+            info += $"Number text files: {TextFiles.Count.ToString()}.\n";
+
+            return info ;
         }
     }
 

@@ -22,5 +22,11 @@ namespace TextShare.Domain.Entities.Groups
         public User Creator { get; set; }
 
         public ICollection<GroupMember> Members { get; set; } = new List<GroupMember>();
+
+        public override string ToString()
+        {
+            return $"Id: {GroupId}. Name: {Name}. Creator: {Creator.ToString()}. " +
+                $"Number members: {Members.Count.ToString()}";
+        }
     }
 }
