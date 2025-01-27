@@ -28,5 +28,8 @@ namespace TextShare.Domain.Entities.TextFiles
         // Полка
         public int ShelfId { get; set; }
         public Shelf Shelf { get; set; }
+
+        // Категории
+        public ICollection<TextFileCategory> TextFileCategories { get; set; } = new List<TextFileCategory>();
     }
 }
