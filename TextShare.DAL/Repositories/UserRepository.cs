@@ -16,44 +16,61 @@ namespace TextShare.DAL.Repositories
             _users = context.Users;
         }
 
-        public Task<bool> Contains(User entity)
+        public async Task<bool> ContainsAsync(User entity)
         {
-            throw new NotImplementedException();
+            return await _users.ContainsAsync(entity);
         }
 
-        public Task<int> Count()
+        public async Task<int> CountAsync()
         {
-            throw new NotImplementedException();
+            return await _users.CountAsync();
         }
 
-        public Task<User> Create(User entity)
+        public async Task<User> CreateAsync(User entity)
         {
-            throw new NotImplementedException();
+            var res = await _users.AddAsync(entity);
+            return res.Entity;
         }
 
-        public Task<bool> Delete(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var user = await _users.FindAsync(id);
+            if (user == null) return false;
+            _users.Remove(user);
+            return true;
         }
 
-        public Task<IQueryable<User>> Find(Expression<Func<User, bool>> predicate)
+        public async Task<List<User>> FindAsync(Expression<Func<User, bool>> predicate)
         {
-            throw new NotImplementedException();
+            return await _users.Where(predicate).ToListAsync();
         }
 
-        public Task<IQueryable<User>> GetAllAsync()
+        public async Task<List<User>> GetAllAsync(params string[] includes)
         {
-            throw new NotImplementedException();
+            IQueryable<User> query = _users.AsQueryable();
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query.ToListAsync();
         }
 
-        public Task<User> GetAsync(int id, params string[] includes)
+        public async Task<User?> GetAsync(int id, params string[] includes)
         {
-            throw new NotImplementedException();
+            IQueryable<User> query = _users.AsQueryable();
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            var user = await query.FirstOrDefaultAsync(u => u.Id == id);
+            return user;
         }
 
-        public Task<User> Update(User entity)
+        public async Task<User> UpdateAsync(User entity)
         {
-            throw new NotImplementedException();
+            var res = _users.Update(entity);
+            await Task.CompletedTask;
+            return res.Entity;
         }
     }
 }

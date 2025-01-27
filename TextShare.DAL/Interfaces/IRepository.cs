@@ -5,14 +5,14 @@ namespace TextShare.DAL.Interfaces
     public interface IRepository<TEntity> where TEntity : class
     {
 
-        Task<IQueryable<TEntity>> GetAllAsync();
-        Task<TEntity> GetAsync(int id, params string[] includes);
-        Task<IQueryable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate);
-        Task<TEntity> Create(TEntity entity);
-        Task<TEntity> Update(TEntity entity);
-        Task<bool> Delete(int id);
-        Task<bool> Contains(TEntity entity);
-        Task<int> Count();
+        Task<List<TEntity>> GetAllAsync(params string[] includes);
+        Task<TEntity?> GetAsync(int id, params string[] includes);
+        Task<List<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
+        Task<TEntity> CreateAsync(TEntity entity);
+        Task<TEntity> UpdateAsync(TEntity entity);
+        Task<bool> DeleteAsync(int id);
+        Task<bool> ContainsAsync(TEntity entity);
+        Task<int> CountAsync();
 
     }
 }

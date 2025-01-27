@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TextShare.DAL.Data;
 
@@ -11,9 +12,11 @@ using TextShare.DAL.Data;
 namespace TextShare.API.Migrations
 {
     [DbContext(typeof(TextShareContext))]
-    partial class TextShareContextModelSnapshot : ModelSnapshot
+    [Migration("20250127014524_AddUser")]
+    partial class AddUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -211,8 +214,7 @@ namespace TextShare.API.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("Patronymic")
-                        .HasMaxLength(45)
-                        .HasColumnType("varchar(45)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("longtext");

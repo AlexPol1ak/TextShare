@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.DAL.Data
 {
-    public class TextShareContext : IdentityDbContext<User>
+    public class TextShareContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
         public DbSet<User> Users { get; set; }
 
