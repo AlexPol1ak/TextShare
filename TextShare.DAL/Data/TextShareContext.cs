@@ -7,13 +7,17 @@ using TextShare.Domain.Entities.Users;
 
 namespace TextShare.DAL.Data
 {
+    /// <summary>
+    /// Класс контекста базы данных.
+    /// </summary>
     public class TextShareContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
-        public DbSet<User> Users { get; set; } 
-        public DbSet<Friendship> Friendships { get; set; }
-        public DbSet<Group> Groups { get; set; }
-        public DbSet<GroupMember> GroupMembers { get; set; }
-        public DbSet<Shelf> Shelves { get; set; }
+        public DbSet<User> Users { get; set; } // Пользователи 
+        public DbSet<Friendship> Friendships { get; set; } // Друзья
+        public DbSet<Group> Groups { get; set; } // Группы
+        public DbSet<GroupMember> GroupMembers { get; set; } //Участники групп
+        public DbSet<Shelf> Shelves { get; set; } //Полки
+        public DbSet<TextFile> TextFiles { get; set; } //Текстовые файлы пользователей
 
         public TextShareContext(DbContextOptions<TextShareContext> options) : base(options)
         {
@@ -30,6 +34,7 @@ namespace TextShare.DAL.Data
             modelBuilder.Entity<Group>(ModelsConfig.GroupConfig);
             modelBuilder.Entity<GroupMember>(ModelsConfig.GroupMemberConfig);
             modelBuilder.Entity<Shelf>(ModelsConfig.ShelfConfig);
+            modelBuilder.Entity<TextFile>(ModelsConfig.TextFileConfig);
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -141,5 +141,34 @@ namespace TextShare.DAL.Data
                 .OnDelete(DeleteBehavior.Cascade);  // При удалении пользователя удаляются и его полки
         }
 
+        /// <summary>
+        /// Конфигурация таблицы текстовых файлов.
+        /// </summary>
+        /// <param name="builder"></param>
+        static public void TextFileConfig(EntityTypeBuilder<TextFile> builder)
+        {
+            builder.ToTable("TextFiles");
+
+            builder.HasKey(t => t.TextFileId);
+            builder.Property(t => t.OriginalName).HasMaxLength(45).IsRequired();
+            builder.Property(t=>t.UniqueName).HasMaxLength(100).IsRequired();
+            builder.Property(t=>t.Description).HasColumnType("TEXT")
+                .IsRequired(false)
+                .HasMaxLength(500);
+            builder.Property(t=>t.Extention).HasMaxLength(10).IsRequired();
+            builder.Property(t => t.Uri).HasMaxLength(255).IsRequired();
+            //builder.Property(t=>t.Size).HasColumnType("BIGINT").IsRequired();
+
+            // Связь с владельцем (пользователем)
+            builder.HasOne(t => t.Owner)  // У файла есть один владелец
+                .WithMany(u => u.TextFiles)  // Один пользователь может иметь много файлов
+                .HasForeignKey(t => t.OwnerId);  // Внешний ключ для связи
+
+            // Связь с полкой
+            builder.HasOne(t => t.Shelf)  // Файл находится на одной полке
+                .WithMany(s => s.TextFiles)  // Одна полка может содержать много файлов
+                .HasForeignKey(t => t.ShelfId);  // Внешний ключ для связи
+        }
+
     }
 }
