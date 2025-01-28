@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TextShare.DAL.Converters;
+using TextShare.Domain.Entities.Complaints;
 using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
@@ -212,6 +213,52 @@ namespace TextShare.DAL.Data
                 .HasForeignKey(tf => tf.CategoryId)
                 .OnDelete(DeleteBehavior.Cascade); // Прописываем каскадное удаление для правильной работы
         }
+
+        /// <summary>
+        /// Конфигурация таблицы Жалоб
+        /// </summary>
+        /// <param name="builder"></param>
+        static public void ComplainsConfig(EntityTypeBuilder<Complaint> builder)
+        {
+            builder.HasKey(c=> c.ComplaintId);
+
+            builder.HasOne(c => c.TextFile)
+                .WithMany(t => t.Complaints)
+                .HasForeignKey(c => c.TextFileId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Связь с ComplaintReasons (обязательная)
+            builder.HasOne(c => c.ComplaintReasons)
+                .WithMany(cr => cr.Complaints)
+                .HasForeignKey(c => c.ComplaintReasonsId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Связь с Author (обязательная)
+            builder.HasOne(c => c.Author)
+                .WithMany(u => u.MyComplaints)
+                .HasForeignKey(c => c.AuthorId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+        }
+
+        /// <summary>
+        /// Конфигурация таблицы причин жалоб
+        /// </summary>
+        /// <param name="builder"></param>
+        static public void ComplainsReasonsConfig(EntityTypeBuilder<ComplaintReasons> builder)
+        {
+            builder.HasKey(c => c.ComplaintReasonsId);
+            builder.Property(c => c.Name).HasMaxLength(45).IsRequired();
+            builder.Property(c => c.Description).HasColumnType("TEXT")
+                .HasMaxLength(300)
+                .IsRequired();
+
+        }
+
+
 
     }
 }

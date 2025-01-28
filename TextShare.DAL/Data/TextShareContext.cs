@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using TextShare.Domain.Entities.Complaints;
 using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
@@ -21,6 +22,8 @@ namespace TextShare.DAL.Data
         public DbSet<Category> Categories { get; set; } // Категории
         // Промежут. таблица для связи файлов и категорий
         public DbSet<TextFileCategory> TextFileCategories { get; set; } 
+        public DbSet<Complaint> Complaints { get; set; } // Жалобы на файл
+        public DbSet<ComplaintReasons> ComplaintReasons { get; set; }  // Причина жалоб
 
         public TextShareContext(DbContextOptions<TextShareContext> options) : base(options)
         {
@@ -40,6 +43,10 @@ namespace TextShare.DAL.Data
             modelBuilder.Entity<TextFile>(ModelsConfig.TextFileConfig);
             modelBuilder.Entity<Category>(ModelsConfig.CategoryConfig);
             modelBuilder.Entity<TextFileCategory>(ModelsConfig.TextFileCategoryConfig);
+            modelBuilder.Entity<Complaint>(ModelsConfig.ComplainsConfig);
+            modelBuilder.Entity<ComplaintReasons>(ModelsConfig.ComplainsReasonsConfig);
+
+
             base.OnModelCreating(modelBuilder);
         }
     }
