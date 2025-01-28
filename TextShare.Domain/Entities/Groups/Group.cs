@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Domain.Entities.Groups
@@ -22,6 +23,9 @@ namespace TextShare.Domain.Entities.Groups
         public User Creator { get; set; }
 
         public ICollection<GroupMember> Members { get; set; } = new List<GroupMember>();
+
+        // Доступ к файлам
+        public ICollection<AccessRule> AccessRules { get; set; } = new List<AccessRule>();
 
         public override string ToString()
         {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.Complaints;
 using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.TextFiles;
@@ -32,6 +33,9 @@ namespace TextShare.Domain.Entities.Users
 
         // Коллекция файлов
         public ICollection<TextFile> TextFiles { get; set; } = new List<TextFile>();
+
+        // Доступ к файлам
+        public ICollection<AccessRule> AccessRules { get; set; } = new List<AccessRule>();
 
         // Жалобы
         public ICollection<Complaint> MyComplaints {  get; set; } = new  List<Complaint>(); 

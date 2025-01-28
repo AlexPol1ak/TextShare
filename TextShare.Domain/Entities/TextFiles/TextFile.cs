@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.Complaints;
 using TextShare.Domain.Entities.Users;
 
@@ -29,6 +30,10 @@ namespace TextShare.Domain.Entities.TextFiles
         // Полка
         public int ShelfId { get; set; }
         public Shelf Shelf { get; set; }
+
+        // Правило доступа
+        public int AccessRuleId { get; set; }
+        public AccessRule AccessRule { get; set; }
 
         // Категории
         public ICollection<TextFileCategory> TextFileCategories { get; set; } = new List<TextFileCategory>();
