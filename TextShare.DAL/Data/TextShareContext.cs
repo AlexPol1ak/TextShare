@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.Complaints;
 using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.TextFiles;
@@ -19,6 +20,7 @@ namespace TextShare.DAL.Data
         public DbSet<GroupMember> GroupMembers { get; set; } //Участники групп
         public DbSet<Shelf> Shelves { get; set; } //Полки
         public DbSet<TextFile> TextFiles { get; set; } //Текстовые файлы пользователей
+        public DbSet<AccessRule> AccessRules {  get; set; } //  Правила доступа к файлам.
         public DbSet<Category> Categories { get; set; } // Категории
         // Промежут. таблица для связи файлов и категорий
         public DbSet<TextFileCategory> TextFileCategories { get; set; } 
@@ -45,7 +47,7 @@ namespace TextShare.DAL.Data
             modelBuilder.Entity<TextFileCategory>(ModelsConfig.TextFileCategoryConfig);
             modelBuilder.Entity<Complaint>(ModelsConfig.ComplainsConfig);
             modelBuilder.Entity<ComplaintReasons>(ModelsConfig.ComplainsReasonsConfig);
-
+            modelBuilder.Entity<AccessRule>(ModelsConfig.AccessRulesConfig);
 
             base.OnModelCreating(modelBuilder);
         }

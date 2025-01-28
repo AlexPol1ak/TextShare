@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TextShare.DAL.Converters;
+using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.Complaints;
 using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.TextFiles;
@@ -174,7 +175,14 @@ namespace TextShare.DAL.Data
             builder.HasMany(t => t.TextFileCategories)
                 .WithOne(tf => tf.TextFile)
                 .HasForeignKey(tf => tf.TextFileId);
-           
+
+            //Связь с правилом доступа
+            builder.HasOne(t => t.AccessRule)  // У файла есть одно правило доступа
+                .WithOne(ar => ar.TextFile)   // У правила доступа привязан один файл
+                .HasForeignKey<AccessRule>(ar => ar.TextFileId)  //
+                .IsRequired()                 
+                .OnDelete(DeleteBehavior.Cascade);
+
         }
 
         /// <summary>
@@ -255,7 +263,34 @@ namespace TextShare.DAL.Data
             builder.Property(c => c.Description).HasColumnType("TEXT")
                 .HasMaxLength(300)
                 .IsRequired();
+        }
 
+        /// <summary>
+        /// Конфигурация таблицы правил доступа.
+        /// </summary>
+        /// <param name="builder"></param>
+        static public void AccessRulesConfig(EntityTypeBuilder<AccessRule> builder)
+        {
+            builder.HasKey(a => a.AccessRuleId);
+
+            // Связь один к одному с файлом.
+            builder.HasOne(ar => ar.TextFile)
+                   .WithOne(tf => tf.AccessRule) 
+                   .HasForeignKey<AccessRule>(ar => ar.TextFileId)
+                   .IsRequired()
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            // Связь многие ко многим с пользователями
+            builder.HasMany(ar => ar.AvailableUsers)
+                   .WithMany(u => u.AccessRules) 
+                   .UsingEntity(j =>
+                       j.ToTable("AccessRuleUsers")); // Промежуточная таблица для связи
+
+            // Связь многие ко многим с группами
+            builder.HasMany(ar => ar.AvailableGroups)
+                   .WithMany(g => g.AccessRules) 
+                   .UsingEntity(j =>
+                       j.ToTable("AccessRuleGroups")); // Промежуточная таблица для связи
         }
 
 
