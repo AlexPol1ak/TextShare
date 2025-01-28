@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using TextShare.Domain.Entities.Complaints;
 using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.TextFiles;
 
@@ -32,6 +33,9 @@ namespace TextShare.Domain.Entities.Users
         // Коллекция файлов
         public ICollection<TextFile> TextFiles { get; set; } = new List<TextFile>();
 
+        // Жалобы
+        public ICollection<Complaint> MyComplaints {  get; set; } = new  List<Complaint>(); 
+
         public override string ToString()
         {
             return $"Id: {Id}. First Name: {FirstName}. Last Name {LastName}.";
@@ -56,6 +60,7 @@ namespace TextShare.Domain.Entities.Users
 
             info += $"Number Shelves: {Shelves.Count.ToString()}. ";
             info += $"Number text files: {TextFiles.Count.ToString()}.\n";
+            info += $"Number complaints: {MyComplaints.Count.ToString()}.\n";
 
             return info ;
         }

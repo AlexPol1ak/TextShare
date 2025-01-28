@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextShare.Domain.Entities.Complaints;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Domain.Entities.TextFiles
@@ -31,5 +32,30 @@ namespace TextShare.Domain.Entities.TextFiles
 
         // Категории
         public ICollection<TextFileCategory> TextFileCategories { get; set; } = new List<TextFileCategory>();
+
+        // Жалобы
+        public ICollection<Complaint> Complaints { get; set; } = new List<Complaint>();
+
+        public override string ToString()
+        {
+            string info = $"Id: {TextFileId}. Original Name: {OriginalName}. " +
+                $"Owner: {Owner.ToString()}. Shelf: {Shelf.ToString()}";    
+            return info;
+        }
+
+        public string GetFullInfo()
+        {
+            string info = string.Empty ;
+
+            info += $"Id: {TextFileId}\n";
+            info += $"Original name: {OriginalName}\n";
+            info += $"Unique name: {UniqueName}\n";
+            info += $"Ext: {Extention}. Size {Size}\n";
+            info += $"URI: {Uri}";
+            info += $"Owner: {Owner.ToString()}\n";
+            info += $"Shelf: {Shelf.ToString()}. Number complaints: {Complaints.Count.ToString()}";
+
+            return info;
+        }
     }
 }
