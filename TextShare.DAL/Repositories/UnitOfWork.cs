@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using TextShare.DAL.Data;
 using TextShare.DAL.Interfaces;
+using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.Complaints;
 using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.TextFiles;
@@ -8,9 +9,11 @@ using TextShare.Domain.Entities.Users;
 
 namespace TextShare.DAL.Repositories
 {
+    /// <summary>
+    /// Класс доступа к данным.
+    /// </summary>
     public class UnitOfWork : IUnitOfWork
     {
-
         private readonly TextShareContext _context;
 
         private IRepository<User> userRepository;
@@ -21,6 +24,7 @@ namespace TextShare.DAL.Repositories
         private IRepository<Group> groupRepository;
         private IRepository<Complaint> complaintRepository;
         private IRepository<ComplaintReasons> complaintReasonsRepository;
+        private IRepository<AccessRule> accessRuleRepository;
 
         public UnitOfWork(TextShareContext context)
         {
@@ -39,20 +43,29 @@ namespace TextShare.DAL.Repositories
         public IRepository<TextFile> TextFileRepository => textFileRepository ??=
             new TextFileRepository(_context);
 
+        // Репозиторий полок
         public IRepository<Shelf> ShelfRepository => shelfRepository ??=
             new ShelfRepository(_context);
 
+        // Репозиторий категорий
         public IRepository<Category> CategoryRepository => categoryRepository ??=
             new CategoryRepository(_context);
 
+        // Репозиторий групп пользователей
         public IRepository<Group> GroupRepository => groupRepository ??=
             new GroupRepository(_context);
 
+        // Репозиторий  жалоб
         public IRepository<Complaint> ComplaintRepository => complaintRepository ??=
             new ComplaintRepository(_context);
 
+        // Репозиторий причин жалоб
         public IRepository<ComplaintReasons> ComplaintReasonsRepository =>
             complaintReasonsRepository ??= new ComplaintReasonsRepository(_context);
+
+        // Репозиторий правил доступа
+        public IRepository<AccessRule> AccessRuleRepository => accessRuleRepository ??=
+            new AccessRuleRepository(_context);
 
         /// <summary>
         /// Сохраняет изменения в базе данных.
