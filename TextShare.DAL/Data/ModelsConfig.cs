@@ -154,6 +154,7 @@ namespace TextShare.DAL.Data
             builder.HasKey(t => t.TextFileId);
             builder.Property(t => t.OriginalName).HasMaxLength(45).IsRequired();
             builder.Property(t=>t.UniqueName).HasMaxLength(100).IsRequired();
+            builder.HasIndex(t => t.UniqueName).IsUnique();
             builder.Property(t=>t.Description).HasColumnType("TEXT")
                 .IsRequired(false)
                 .HasMaxLength(500);
@@ -195,6 +196,7 @@ namespace TextShare.DAL.Data
 
             builder.HasKey(c => c.CategoryId);
             builder.Property(c => c.Name).HasMaxLength(100).IsRequired();
+            builder.HasIndex(c=>c.Name).IsUnique();
             builder.Property(c => c.Description).HasColumnType("TEXT").IsRequired(false);
 
             // Связь многие ко многим с TextFile через промежуточную таблицу
@@ -260,6 +262,7 @@ namespace TextShare.DAL.Data
         {
             builder.HasKey(c => c.ComplaintReasonsId);
             builder.Property(c => c.Name).HasMaxLength(45).IsRequired();
+            builder.HasIndex(c => c.Name).IsUnique();
             builder.Property(c => c.Description).HasColumnType("TEXT")
                 .HasMaxLength(300)
                 .IsRequired();
