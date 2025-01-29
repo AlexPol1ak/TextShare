@@ -15,6 +15,7 @@ namespace TextShare.DAL.Repositories
         private IRepository<Friendship> friendshipRepository;
         private IRepository<TextFile> textFileRepository;
         private IRepository<Shelf> shelfRepository;
+        private IRepository<Category> categoryRepository;   
 
         public UnitOfWork(TextShareContext context)
         {
@@ -35,6 +36,9 @@ namespace TextShare.DAL.Repositories
 
         public IRepository<Shelf> ShelfRepository => shelfRepository ??=
             new ShelfRepository(_context);
+
+        public IRepository<Category> CategoryRepository => categoryRepository ??=
+            new CategoryRepository(_context);
 
         /// <summary>
         /// Сохраняет изменения в базе данных.
