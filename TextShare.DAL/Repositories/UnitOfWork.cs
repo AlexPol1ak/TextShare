@@ -20,6 +20,7 @@ namespace TextShare.DAL.Repositories
         private IRepository<Category> categoryRepository; 
         private IRepository<Group> groupRepository;
         private IRepository<Complaint> complaintRepository;
+        private IRepository<ComplaintReasons> complaintReasonsRepository;
 
         public UnitOfWork(TextShareContext context)
         {
@@ -49,6 +50,9 @@ namespace TextShare.DAL.Repositories
 
         public IRepository<Complaint> ComplaintRepository => complaintRepository ??=
             new ComplaintRepository(_context);
+
+        public IRepository<ComplaintReasons> ComplaintReasonsRepository =>
+            complaintReasonsRepository ??= new ComplaintReasonsRepository(_context);
 
         /// <summary>
         /// Сохраняет изменения в базе данных.
