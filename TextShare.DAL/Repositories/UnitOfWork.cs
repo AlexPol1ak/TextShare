@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using TextShare.DAL.Data;
 using TextShare.DAL.Interfaces;
+using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 
@@ -15,7 +16,8 @@ namespace TextShare.DAL.Repositories
         private IRepository<Friendship> friendshipRepository;
         private IRepository<TextFile> textFileRepository;
         private IRepository<Shelf> shelfRepository;
-        private IRepository<Category> categoryRepository;   
+        private IRepository<Category> categoryRepository; 
+        private IRepository<Group> groupRepository;
 
         public UnitOfWork(TextShareContext context)
         {
@@ -39,6 +41,9 @@ namespace TextShare.DAL.Repositories
 
         public IRepository<Category> CategoryRepository => categoryRepository ??=
             new CategoryRepository(_context);
+
+        public IRepository<Group> GroupRepository => groupRepository ??=
+            new GroupRepository(_context);
 
         /// <summary>
         /// Сохраняет изменения в базе данных.
