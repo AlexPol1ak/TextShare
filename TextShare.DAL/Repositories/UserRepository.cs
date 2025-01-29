@@ -6,6 +6,9 @@ using TextShare.Domain.Entities.Users;
 
 namespace TextShare.DAL.Repositories
 {
+    /// <summary>
+    /// Репозиторий пользователя.
+    /// </summary>
     public class UserRepository : IRepository<User>
     {
 
@@ -18,7 +21,7 @@ namespace TextShare.DAL.Repositories
 
         public async Task<bool> ContainsAsync(User entity)
         {
-            return await _users.ContainsAsync(entity);
+            return await _users.AnyAsync(u=>u.NormalizedEmail == entity.NormalizedEmail);
         }
 
         public async Task<int> CountAsync()

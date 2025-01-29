@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using TextShare.DAL.Data;
 using TextShare.DAL.Interfaces;
+using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.DAL.Repositories
@@ -11,6 +12,8 @@ namespace TextShare.DAL.Repositories
         private readonly TextShareContext _context;
 
         private IRepository<User> userRepository;
+        private IRepository<Friendship> friendshipRepository;
+        private IRepository<TextFile> textFileRepository;
 
         public UnitOfWork(TextShareContext context)
         {
@@ -20,6 +23,14 @@ namespace TextShare.DAL.Repositories
         // Репозиторий пользователя
         public IRepository<User> UserRepository => userRepository ??=
             new UserRepository(_context);
+
+        // Репозиторий дружбы
+        public IRepository<Friendship> FriendshipRepository=> friendshipRepository ??=
+            new FriendshipRepository(_context);
+
+        // Репозиторий текстовых файлов
+        public IRepository<TextFile> TextFileRepository => textFileRepository ??=
+            new TextFileRepository(_context);
 
         /// <summary>
         /// Сохраняет изменения в базе данных.
