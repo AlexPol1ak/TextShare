@@ -15,7 +15,7 @@ namespace TextShare.Domain.Entities.Groups
         public int UserId { get; set; }
         public User User { get; set; }
 
-        public DateTime JoinedAt { get; set; }
+        public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
         public bool IsConfirmed { get; set; } = false;
     }
 }
