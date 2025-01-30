@@ -14,7 +14,7 @@ namespace TextShare.Business.Interfaces
     public interface IPhysicalFile
     {
         Task<Uri?> Get(string fileName, string? directory = null);
-        Task<Dictionary<string, string>> Save(Stream fileStream, string fileName, string? directory = null);
+        Task<Dictionary<string, string>> Save(Stream fileStream,string fileName, string? directoryName = null);
         Task<bool> Delete(string fileName, string? directory = null);
         Task<bool> FileExist(string fileName, string? directory = null);
     }

@@ -15,8 +15,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TextShare.Business\TextShare.Business.csproj" />
     <ProjectReference Include="..\TextShare.DAL\TextShare.DAL.csproj" />
     <ProjectReference Include="..\TextShare.Domain\TextShare.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\TextFiles\" />
+    <Folder Include="wwwroot\Images\" />
   </ItemGroup>
 
 </Project>
