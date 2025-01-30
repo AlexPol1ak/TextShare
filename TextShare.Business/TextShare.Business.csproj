@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TextShare.DAL\TextShare.DAL.csproj" />
+    <ProjectReference Include="..\TextShare.Domain\TextShare.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
