@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using System.Globalization;
 using System.Reflection;
 using TextShare.Business.Interfaces;
 using TextShare.Business.Services;
@@ -53,7 +55,23 @@ builder.Services.AddSwaggerGen(c =>
     c.IncludeXmlComments(xmlPath);  
 });
 
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+var supportedCultures = new[]
+{
+    new CultureInfo("ru-RU"), 
+    new CultureInfo("en-US") 
+};
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture("ru-RU");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
+
 var app = builder.Build();
+
+app.UseRequestLocalization();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

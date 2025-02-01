@@ -9,11 +9,13 @@ namespace TextShare.API.Controllers
     /// <summary>
     /// Контроллер для регистрации и авторизации пользователя
     /// </summary>
-    public class AuthControllerController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AuthController : Controller
     {
         private readonly UserManager<User> _userManager;
 
-        public AuthControllerController(UserManager<User> userManager)
+        public AuthController(UserManager<User> userManager)
         {
             _userManager = userManager;
         }
@@ -33,7 +35,13 @@ namespace TextShare.API.Controllers
 
             if (registerUserDto.Password != registerUserDto.ConfirmPassword)
             {
-                return BadRequest("Passwords do not match.");
+                return BadRequest("Пароли не совпадают.");
+            }
+
+            var existingUser = await _userManager.FindByEmailAsync(registerUserDto.Email);
+            if(existingUser != null)
+            {
+                return BadRequest($"Email {registerUserDto.Email} уже зарегистрирован.");
             }
 
             User user = registerUserDto.ToUser();
