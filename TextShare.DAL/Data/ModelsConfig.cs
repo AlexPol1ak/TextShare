@@ -31,6 +31,10 @@ namespace TextShare.DAL.Data
                 .HasColumnType("DATE")
                 .IsRequired();
             builder.Property(u => u.RegisteredAt).HasColumnType("DATETIME").IsRequired();
+            builder.HasIndex(u => u.Email).IsUnique();
+            builder.Property(u => u.Email).IsRequired();
+            builder.HasIndex(u => u.UserName).IsUnique();
+            builder.Property(u => u.UserName).IsRequired();                    
         }
 
         /// <summary>
