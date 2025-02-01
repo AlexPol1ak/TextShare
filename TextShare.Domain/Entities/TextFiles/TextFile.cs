@@ -15,10 +15,12 @@ namespace TextShare.Domain.Entities.TextFiles
     public class TextFile
     {
         public int TextFileId { get; set; }
-        public string OriginalName { get; set; }
-        public string UniqueName { get; set; }
+        public string OriginalFileName { get; set; }
+        public string UniqueFileName { get; set; }
         public string? Description { get; set; }
+        public string? Tags { get; set; }
         public string Extention { get; set; }
+        public string ContentType { get; set; }
         public long Size {  get; set; }
         public string Uri { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -43,7 +45,7 @@ namespace TextShare.Domain.Entities.TextFiles
 
         public override string ToString()
         {
-            string info = $"Id: {TextFileId}. Original Name: {OriginalName}. " +
+            string info = $"Id: {TextFileId}. Original Name: {OriginalFileName}. " +
                 $"Owner: {Owner.ToString()}. Shelf: {Shelf.ToString()}";    
             return info;
         }
@@ -53,9 +55,10 @@ namespace TextShare.Domain.Entities.TextFiles
             string info = string.Empty ;
 
             info += $"Id: {TextFileId}\n";
-            info += $"Original name: {OriginalName}\n";
-            info += $"Unique name: {UniqueName}\n";
+            info += $"Original name: {OriginalFileName}\n";
+            info += $"Unique name: {UniqueFileName}\n";
             info += $"Ext: {Extention}. Size {Size}\n";
+            info += $"Content Type: {ContentType}\n";
             info += $"URI: {Uri}";
             info += $"Owner: {Owner.ToString()}\n";
             info += $"Shelf: {Shelf.ToString()}. Number complaints: {Complaints.Count.ToString()}";

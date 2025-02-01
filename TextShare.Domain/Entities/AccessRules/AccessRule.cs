@@ -39,7 +39,7 @@ namespace TextShare.Domain.Entities.AccessRules
         {
             string info = string.Empty;
 
-            info += $"Id: {AccessRuleId}. Text file: {TextFile.OriginalName}\n";
+            info += $"Id: {AccessRuleId}. Text file: {TextFile.OriginalFileName}\n";
             info += $"Available All {AvailableAll}\n";
             info += $"Available users:\n";
             if (AvailableUsers != null && AvailableUsers.Count > 0)
