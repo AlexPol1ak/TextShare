@@ -21,9 +21,13 @@ namespace TextShare.API.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly IConfiguration _configuration;
 
-        public AuthController(UserManager<User> userManager)
+        public AuthController(UserManager<User> userManager,
+            SignInManager<User> signInManager,
+            IConfiguration configuration )
         {
             _userManager = userManager;
+            _signInManager = signInManager;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -34,7 +38,7 @@ namespace TextShare.API.Controllers
         [HttpPost("register")]
         [ProducesResponseType(typeof(ResponseData<UserDto>), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ResponseData<UserDto>>> Register([FromBody] RegisterUserDto registerUserDto)
+        public async Task<ActionResult<ResponseData<UserDto>>> Register([FromBody] UserRegisterDto registerUserDto)
         {
             if (!ModelState.IsValid)
             {
@@ -76,8 +80,13 @@ namespace TextShare.API.Controllers
 
         }
 
+        /// <summary>
+        /// Аутентификация пользователя
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto model)
+        public async Task<ActionResult<string>> Login([FromBody] UserLoginDto model)
         {
             if (!ModelState.IsValid)
             {
@@ -101,7 +110,12 @@ namespace TextShare.API.Controllers
             var token = GenerateJwtToken(user);
             return Ok(new { Token = token });
         }
-
+      
+        /// <summary>
+        /// Генерация токенов.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         private string GenerateJwtToken(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
