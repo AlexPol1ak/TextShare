@@ -8,7 +8,7 @@ using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Domain.DTOs.UsersDto
 {
-    public class RegisterUserDto : UserDto
+    public class UserRegisterDto : UserDto
     {
 
         [Required]
@@ -39,9 +39,9 @@ namespace TextShare.Domain.DTOs.UsersDto
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public new static RegisterUserDto FromUser(User user)
+        public new static UserRegisterDto FromUser(User user)
         {
-            RegisterUserDto registerUserDto = new RegisterUserDto();
+            UserRegisterDto registerUserDto = new UserRegisterDto();
             registerUserDto.FirstName = user.FirstName;
             registerUserDto.LastName = user.LastName;
             registerUserDto.Patronymic = user.Patronymic;
