@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using TextShare.Domain.DTOs;
+using TextShare.Domain.DTOs.UsersDto;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
 
@@ -26,7 +26,9 @@ namespace TextShare.API.Controllers
         /// <param name="registerUserDto"></param>
         /// <returns></returns>
         [HttpPost("register")]
-        public async Task<ActionResult> Register([FromBody] RegisterUserDto registerUserDto)
+        [ProducesResponseType(typeof(ResponseData<UserDto>), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<ResponseData<UserDto>>> Register([FromBody] RegisterUserDto registerUserDto)
         {
             if (!ModelState.IsValid)
             {
@@ -52,9 +54,11 @@ namespace TextShare.API.Controllers
             {
                 var createdUser = await _userManager.FindByEmailAsync(user.Email);
 
-                ResponseData<RegisterUserDto> response = new();
-                response.Data = RegisterUserDto.FromUser(createdUser);
-                return Ok(response);
+                ResponseData<UserDto> response = new();
+                UserDto userDto =  UserDto.FromUser(createdUser!);
+                response.Data = userDto;
+                //return CreatedAtAction(nameof(GetUser), new { id = userDto.Id }, response);
+                return Created(string.Empty, response);
             }
 
             foreach (var error in result.Errors)
