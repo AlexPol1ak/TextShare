@@ -6,6 +6,9 @@ using TextShare.Domain.Utils;
 
 namespace TextShare.API.Controllers
 {
+    /// <summary>
+    /// Контроллер для загрузки файлов
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class TextFileController : ControllerBase
@@ -18,6 +21,11 @@ namespace TextShare.API.Controllers
             _physicalFile = physicalFile;
         }
 
+        /// <summary>
+        /// Загрузить текстовый файл.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         [HttpPost("upload")]
         public async Task<ActionResult> UploadTextFile(IFormFile file)
         {
