@@ -398,7 +398,7 @@ namespace TextShare.API.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("varchar(10)");
 
-                    b.Property<string>("OriginalName")
+                    b.Property<string>("OriginalFileName")
                         .IsRequired()
                         .HasMaxLength(45)
                         .HasColumnType("varchar(45)");
@@ -412,7 +412,7 @@ namespace TextShare.API.Migrations
                     b.Property<long>("Size")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("UniqueName")
+                    b.Property<string>("UniqueFileName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");

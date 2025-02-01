@@ -71,7 +71,7 @@ namespace TextShare.DAL.Repositories
 
         public async Task<bool> ContainsAsync(TextFile entity)
         {
-            return await _textFiles.AnyAsync(tf => tf.UniqueName == entity.UniqueName);
+            return await _textFiles.AnyAsync(tf => tf.UniqueFileName == entity.UniqueFileName);
         }
 
         public async Task<int> CountAsync()

@@ -13,7 +13,7 @@ namespace TextShare.API.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_TextFiles_UniqueName",
                 table: "TextFiles",
-                column: "UniqueName",
+                column: "UniqueFileName",
                 unique: true);
 
             migrationBuilder.CreateIndex(

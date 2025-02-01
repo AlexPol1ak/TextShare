@@ -22,7 +22,7 @@ namespace TextShare.API.Controllers
         public async Task<ActionResult> UploadTextFile(IFormFile file)
         {
 
-            var res = await _physicalFile.Save(file.OpenReadStream(), file.FileName, "Images");
+            var res = await _physicalFile.Save(file.OpenReadStream(), file.FileName, "TextFiles");
 
             return Ok(res);
         }

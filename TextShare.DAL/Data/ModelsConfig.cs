@@ -152,14 +152,16 @@ namespace TextShare.DAL.Data
             builder.ToTable("TextFiles");
 
             builder.HasKey(t => t.TextFileId);
-            builder.Property(t => t.OriginalName).HasMaxLength(45).IsRequired();
-            builder.Property(t=>t.UniqueName).HasMaxLength(100).IsRequired();
-            builder.HasIndex(t => t.UniqueName).IsUnique();
+            builder.Property(t => t.OriginalFileName).HasMaxLength(45).IsRequired();
+            builder.Property(t=>t.UniqueFileName).HasMaxLength(100).IsRequired();
+            builder.HasIndex(t => t.UniqueFileName).IsUnique();
             builder.Property(t=>t.Description).HasColumnType("TEXT")
                 .IsRequired(false)
                 .HasMaxLength(500);
             builder.Property(t=>t.Extention).HasMaxLength(10).IsRequired();
             builder.Property(t => t.Uri).HasMaxLength(255).IsRequired();
+            builder.Property(t => t.Tags).HasMaxLength(255).IsRequired(false);
+            builder.Property(t=>t.ContentType).HasMaxLength(100).IsRequired();
             //builder.Property(t=>t.Size).HasColumnType("BIGINT").IsRequired();
 
             // Связь с владельцем (пользователем)
