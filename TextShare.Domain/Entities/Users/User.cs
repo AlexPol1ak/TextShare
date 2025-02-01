@@ -53,6 +53,8 @@ namespace TextShare.Domain.Entities.Users
         {
             string info = string.Empty;
             info += ToString() + " ";
+            info += $"User name: {UserName}\n";
+            info += $"Email: {Email}\n";
             info += $"BirthDate: {BirthDate.ToShortDateString()}. " +
                 $"RegisteredAt: {RegisteredAt.ToString()}\n";
 
