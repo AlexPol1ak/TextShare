@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TextShare.DAL.Data;
 
@@ -11,9 +12,11 @@ using TextShare.DAL.Data;
 namespace TextShare.API.Migrations
 {
     [DbContext(typeof(TextShareContext))]
-    partial class TextShareContextModelSnapshot : ModelSnapshot
+    [Migration("20250202082954_UserRefreshTokenExpiryTimeNull")]
+    partial class UserRefreshTokenExpiryTimeNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -558,6 +561,7 @@ namespace TextShare.API.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("RefreshToken")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<DateTime?>("RefreshTokenExpiryTime")

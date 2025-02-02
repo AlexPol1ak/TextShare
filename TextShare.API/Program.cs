@@ -32,6 +32,27 @@ builder.Services.AddScoped<IPhysicalFile>(provider =>
     return new PhysicalFileService(env.WebRootPath);
 });
 
+// Identity
+builder.Services.AddIdentity<User, IdentityRole<int>>(
+    options =>
+    {
+        options.Password.RequireDigit = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequiredLength = 1;
+        options.Password.RequiredUniqueChars = 1;
+    }
+    )
+    .AddEntityFrameworkStores<TextShareContext>()
+    .AddDefaultTokenProviders();
+
+//Tokens
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key is missing."));
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -45,26 +66,14 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ClockSkew = TimeSpan.Zero
     };
 });
 
-// Identity
-builder.Services.AddIdentity<User, IdentityRole<int>>(
-    options =>
-    {
-        options.Password.RequireDigit = false; 
-        options.Password.RequireLowercase = false; 
-        options.Password.RequireNonAlphanumeric = false; 
-        options.Password.RequireUppercase = false; 
-        options.Password.RequiredLength = 1;
-        options.Password.RequiredUniqueChars = 1;
-    }
-    )
-    .AddEntityFrameworkStores<TextShareContext>()
-    .AddDefaultTokenProviders();
+builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
 
@@ -102,9 +111,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
-app.UseAuthorization();  
+app.UseAuthorization();
 
 app.MapControllers();
 

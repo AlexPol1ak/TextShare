@@ -19,6 +19,9 @@ namespace TextShare.Domain.Entities.Users
         public DateTime RegisteredAt { get; set; } = DateTime.UtcNow;
         public string? AvatarUri { get; set; }
         public string? SelfDescription { get; set; }
+        //Token
+        public string? RefreshToken { get; set; } = string.Empty;
+        public DateTime? RefreshTokenExpiryTime { get; set; }
 
         // Коллекции для исходящих и входящих запросов дружбы
         public ICollection<Friendship> Friendships { get; set; } = new List<Friendship>();

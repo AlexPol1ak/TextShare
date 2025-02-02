@@ -14,7 +14,6 @@ namespace TextShare.API.Controllers
     public class TextFileController : ControllerBase
     {
         private readonly IPhysicalFile _physicalFile;
-        private readonly IWebHostEnvironment _env;
 
         public TextFileController(IPhysicalFile physicalFile)
         {
