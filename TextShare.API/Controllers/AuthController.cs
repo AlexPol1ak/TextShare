@@ -19,69 +19,16 @@ namespace TextShare.API.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly IConfiguration _configuration;
         private readonly ITokenService _tokenService;
 
         public AuthController(UserManager<User> userManager,
             SignInManager<User> signInManager,
-            IConfiguration configuration,
             ITokenService tokenService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _configuration = configuration;
             _tokenService = tokenService;
-        }
-
-        /// <summary>
-        /// Регистрация нового пользователя
-        /// </summary>
-        /// <param name="registerUserDto"></param>
-        /// <returns></returns>
-        [HttpPost("register")]
-        [ProducesResponseType(typeof(ResponseData<UserDto>), StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ResponseData<UserDto>>> Register([FromBody] UserRegisterDto registerUserDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (registerUserDto.Password != registerUserDto.ConfirmPassword)
-            {
-                return BadRequest("Пароли не совпадают.");
-            }
-
-            var existingUser = await _userManager.FindByEmailAsync(registerUserDto.Email);
-            if(existingUser != null)
-            {
-                return BadRequest($"Email {registerUserDto.Email} уже зарегистрирован.");
-            }
-
-            User user = registerUserDto.ToUser();
-            user.EmailConfirmed = true;
-            var result = await _userManager.CreateAsync(user, registerUserDto.Password);
-
-            if (result.Succeeded)
-            {
-                var createdUser = await _userManager.FindByEmailAsync(user.Email);
-
-                ResponseData<UserDto> response = new();
-                UserDto userDto =  UserDto.FromUser(createdUser!);
-                response.Data = userDto;
-                //return CreatedAtAction(nameof(GetUser), new { id = userDto.Id }, response);
-                return Created(string.Empty, response);
-            }
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-
-            return BadRequest(ModelState);
-
-        }
+        }    
 
         /// <summary>
         /// Аутентификация пользователя
@@ -201,6 +148,7 @@ namespace TextShare.API.Controllers
         [HttpGet("protected-endpoint")]
         public async Task<IActionResult> ProtectedEndpoint()
         {
+            await Task.CompletedTask;
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return Ok(new { Message = $"User Id {userId}" });
         }
