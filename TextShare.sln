@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextShare.DAL", "TextShare.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextShare.Business", "TextShare.Business\TextShare.Business.csproj", "{B59F4B8A-8855-4219-B4BA-758FBA12F6B3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextShare.UI", "TextShare.UI\TextShare.UI.csproj", "{0D54E2E0-265A-4CB8-A5B2-C293C990726A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{B59F4B8A-8855-4219-B4BA-758FBA12F6B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B59F4B8A-8855-4219-B4BA-758FBA12F6B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B59F4B8A-8855-4219-B4BA-758FBA12F6B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D54E2E0-265A-4CB8-A5B2-C293C990726A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D54E2E0-265A-4CB8-A5B2-C293C990726A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D54E2E0-265A-4CB8-A5B2-C293C990726A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D54E2E0-265A-4CB8-A5B2-C293C990726A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
