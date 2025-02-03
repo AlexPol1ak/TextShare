@@ -21,4 +21,11 @@
     <ProjectReference Include="..\TextShare.Domain\TextShare.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Migrations\" />
+    <Folder Include="wwwroot\Images\" />
+    <Folder Include="wwwroot\TextFiles\" />
+  </ItemGroup>
+
 </Project>

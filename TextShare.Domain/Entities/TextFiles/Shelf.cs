@@ -18,6 +18,7 @@ namespace TextShare.Domain.Entities.TextFiles
         public string Description { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? ImageUri { get; set; }
+        public bool CanDeleted { get; set; } = true;
 
         // Создатель
         public int CreatorId { get; set; }

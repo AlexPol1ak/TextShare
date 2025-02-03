@@ -1,17 +1,20 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using TextShare.UI.Data;
+using TextShare.DAL.Data;
+using TextShare.Domain.Entities.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+string mySqlConnectionLocal = "MySQLConnectionLocal";
+string mySqlConnectionBeget = "MySqlConnectionBeget";
+string connectionString = builder.Configuration.GetConnectionString(mySqlConnectionLocal)
+    ?? throw new InvalidOperationException("Connection string 'Connection string' not found.");
+builder.Services.AddDbContext<TextShareContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), d => d.MigrationsAssembly("TextShare.UI")));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<TextShareContext>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
