@@ -8,11 +8,34 @@ using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Domain.DTOs.UsersDto
 {
-    public class UserRegisterDto : UserDto
+    public class UserRegisterDto
     {
+        public int Id { get; set; }
+
+        [Required]
+        [StringLength(45, ErrorMessage = "Имя пользователя должно содержать не более 50 символов.")]
+        public string UserName { get; set; }
+
+        [Required]
+        [StringLength(45, ErrorMessage = "Имя должно содержать не более 50 символов.")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [StringLength(45, ErrorMessage = "Фамилия должна содержать не более 50 символов.")]
+        public string LastName { get; set; }
+
+        [StringLength(45, ErrorMessage = "Отчество должно содержать не более 50 символов.")]
+        public string? Patronymic { get; set; }
+
+        [Required]
+        public DateOnly BirthDate { get; set; }
+
+        [StringLength(500, ErrorMessage = "Описание не должно превышать 500 символов.")]
+        public string? SelfDescription { get; set; }
 
         [Required]
         [DataType(DataType.EmailAddress)]
+        [StringLength(100, ErrorMessage = "Email не должен превышать 100 символов.")]
         public string Email { get; set; }
 
         [Required]
@@ -27,10 +50,16 @@ namespace TextShare.Domain.DTOs.UsersDto
         /// Создает объект User из RegisterUerDto 
         /// </summary>
         /// <returns></returns>
-        public override User ToUser()
+        public User ToUser()
         {
-            User user = base.ToUser();
+            User user = new();
+            user.FirstName = FirstName;
+            user.LastName = LastName;
+            user.UserName = UserName;
+            user.Patronymic = Patronymic;
+            user.BirthDate = BirthDate;
             user.Email = Email;
+            user.SelfDescription = SelfDescription;
             return user;
         }
 
@@ -39,17 +68,18 @@ namespace TextShare.Domain.DTOs.UsersDto
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public new static UserRegisterDto FromUser(User user)
+        public static UserRegisterDto FromUser(User user)
         {
             UserRegisterDto registerUserDto = new UserRegisterDto();
             registerUserDto.FirstName = user.FirstName;
             registerUserDto.LastName = user.LastName;
+            registerUserDto.UserName = user.UserName!;
             registerUserDto.Patronymic = user.Patronymic;
             registerUserDto.BirthDate = user.BirthDate;
             registerUserDto.Email = user.Email!;
             registerUserDto.SelfDescription = user.SelfDescription;
             registerUserDto.Id = user.Id;
-            registerUserDto.UserName = user.UserName!;
+            
             return registerUserDto;
         }
     }

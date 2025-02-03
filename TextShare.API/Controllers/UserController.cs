@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using TextShare.Business.Interfaces;
 using TextShare.Domain.DTOs.UsersDto;
@@ -160,6 +159,48 @@ namespace TextShare.API.Controllers
             response.Success = true;
 
             return Ok(response);
+        }
+
+        [Authorize]
+        [HttpPut("Update")]
+        public async Task<ActionResult<UserDto>> UpdateUser([FromBody] UserUpdateDto userUpdateDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Получаем авторизованного пользователя
+            User? user = await getAuthorizedUserDb();
+            if (user == null)
+            {
+                return Unauthorized(new { message = "Пользователь не найден." });
+            }
+
+            // Обновляем данные пользователя
+            userUpdateDto.UpdateUser(user);
+
+            // Пробуем сохранить изменения
+            IdentityResult result;
+            try
+            {
+                result = await _userManager.UpdateAsync(user);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ошибка при обновлении пользователя.", error = ex.Message });
+            }
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(new
+                {
+                    message = "Не удалось обновить пользователя.",
+                    errors = result.Errors.Select(e => e.Description)
+                });
+            }
+
+            return Ok(UserDto.FromUser(user));
         }
 
         /// <summary>
