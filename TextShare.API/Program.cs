@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -12,6 +13,7 @@ using TextShare.Business.Interfaces;
 using TextShare.Business.Services;
 using TextShare.DAL.Data;
 using TextShare.Domain.Entities.Users;
+using TextShare.Domain.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,8 @@ string connectionString = builder.Configuration.GetConnectionString(mySqlConnect
     ?? throw new InvalidOperationException("Connection string 'Connection string' not found.");
 builder.Services.AddDbContext<TextShareContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), d => d.MigrationsAssembly("TextShare.API")));
+
+builder.Services.Configure<ImageUploadSettings>(builder.Configuration.GetSection("ImageUploadSettings"));
 
 // Files
 builder.Services.AddScoped<IPhysicalFile>(provider =>
@@ -136,6 +140,19 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Запретить раздавать TextFiles
+app.UseStaticFiles();
+//app.UseStaticFiles(new StaticFileOptions
+//{
+//    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "TextFiles")),
+//    RequestPath = "/TextFiles",
+//    ServeUnknownFileTypes = false,
+//    DefaultContentType = "application/octet-stream",
+//    OnPrepareResponse = ctx =>
+//    {
+//        ctx.Context.Response.StatusCode = 403; // Запрещаем доступ
+//    }
+//});
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

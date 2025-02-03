@@ -2,10 +2,14 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
+using TextShare.Business.Interfaces;
 using TextShare.Domain.DTOs.UsersDto;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
+using TextShare.Domain.Settings;
 
 namespace TextShare.API.Controllers
 {
@@ -17,10 +21,14 @@ namespace TextShare.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
+        private readonly ImageUploadSettings _imageUploadSettings;
+        private readonly IPhysicalFile _physicalFile;
 
-        public UserController(UserManager<User> userManager)
+        public UserController(UserManager<User> userManager, IOptions<ImageUploadSettings> imageUploadSettings, IPhysicalFile physicalFile)
         {
             _userManager = userManager;
+            _imageUploadSettings = imageUploadSettings.Value;
+            _physicalFile = physicalFile;
         }
 
         /// <summary>
@@ -100,5 +108,117 @@ namespace TextShare.API.Controllers
             UserDto userDto = UserDto.FromUser(user);
             return Ok(userDto);
         }
+
+        [Authorize]
+        [HttpPost("upload-avatar")]
+        public async Task<ActionResult<ResponseData<string>>> UploadAvatar(IFormFile image)
+        {
+            ResponseData<string> response = new ResponseData<string>();
+            // Проверка изображения 
+            bool result = await validateImage(image, response);
+            if (!result) return BadRequest(response);
+
+            // Получить авторизованного пользователя
+            User? user = await getAuthorizedUserDb();
+            if (user == null)
+            {
+                response.Success = false;
+                response.ErrorMessage = "Пользователь не найден.";
+                return Unauthorized(response);
+            }
+
+            // Удалить старыйб аватар если есть
+            if(user.AvatarUri != null)
+            {             
+                string fileName = Path.GetFileName(new Uri(user.AvatarUri).LocalPath);
+                await _physicalFile.Delete(fileName, "Images");
+                user.AvatarUri = null;
+                await _userManager.UpdateAsync(user);
+            }
+
+            // Загрузить новый аватар
+            Dictionary<string, string> resultDict = new();
+            try
+            {
+                resultDict = await _physicalFile.Save(image.OpenReadStream(), image.FileName, "Images");
+            }
+            catch (Exception ex)
+            {
+                response.Data = ex.Message;
+                response.Success = false;
+                response.ErrorMessage = "Ошибка загрузки файла.";
+                return StatusCode(StatusCodes.Status415UnsupportedMediaType, response);
+            }
+            // Сохранить URI
+            string baseUrl = $"{Request.Scheme}://{Request.Host.Value}";
+            string fileUri = $"{baseUrl}/Images/{resultDict["uniqueFileName"]}";
+
+            user.AvatarUri = fileUri;
+            await _userManager.UpdateAsync(user);
+
+            response.Data = "Аватар успешно сохранен.";
+            response.Success = true;
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Проверка изображения.
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        private async Task<bool> validateImage(IFormFile image, ResponseData<string> response )
+        {
+            await Task.CompletedTask;
+
+            if (image == null || image.Length == 0)
+            {
+                response.Success = false;
+                response.ErrorMessage = "Файл не загружен."; 
+                return false;
+            }
+
+            if (image.Length > _imageUploadSettings.MaxFileSize)
+            {
+                response.Success = false;
+                response.ErrorMessage = $"Файл слишком большой. Максимальный размер: {_imageUploadSettings.MaxFileSize / 1024 / 1024}MB.";
+                return false;
+            }
+
+            if (!_imageUploadSettings.AllowedMimeTypes.Contains(image.ContentType))
+            {
+                response.Success = false;
+                response.ErrorMessage = "Можно загружать только изображения (JPEG, PNG, WebP).";
+                return false;
+            }
+
+            var fileExtension = Path.GetExtension(image.FileName).ToLower();
+            if (!_imageUploadSettings.AllowedExtensions.Contains(fileExtension))
+            {
+                response.Success = false;
+                response.ErrorMessage = "Файл должен быть изображением (JPEG, PNG, GIF, WebP).";
+                return false ;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Получить авторизованного пользователя
+        /// </summary>
+        /// <returns></returns>
+        private async Task<User?> getAuthorizedUserDb()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return null;
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return null;
+
+            return user;
+        }
+
+
     }
 }
