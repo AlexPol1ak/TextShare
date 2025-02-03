@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Entities.Complaints;
 
-namespace TextShare.Domain.DTOs.ComplaintsDto
+namespace TextShare.Domain.DTOs
 {
     /// <summary>
     /// DTO-класс для причины жалобы.

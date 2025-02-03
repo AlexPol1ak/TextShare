@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Entities.TextFiles;
 
-namespace TextShare.Domain.DTOs.TextFilesDto
+namespace TextShare.Domain.DTOs
 {
     /// <summary>
     /// DTO-класс для текстового файла.

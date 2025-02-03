@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Entities.Groups;
 
-namespace TextShare.Domain.DTOs.GroupsDto
+namespace TextShare.Domain.DTOs
 {
     /// <summary>
     /// DTO-класс для группы пользователей.

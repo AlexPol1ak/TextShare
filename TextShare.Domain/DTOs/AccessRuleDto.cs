@@ -2,9 +2,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using TextShare.Domain.Entities.AccessRules;
-using TextShare.Domain.DTOs.TextFilesDto;
+using TextShare.Domain.DTOs;
 using TextShare.Domain.DTOs.UsersDto;
-using TextShare.Domain.DTOs.GroupsDto;
 
 namespace TextShare.Domain.DTOs.AccessRulesDto
 {

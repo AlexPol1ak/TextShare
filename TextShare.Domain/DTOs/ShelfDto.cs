@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 
-namespace TextShare.Domain.DTOs.TextFilesDto
+namespace TextShare.Domain.DTOs
 {
     /// <summary>
     /// DTO-класс для полки.

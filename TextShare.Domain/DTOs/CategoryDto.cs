@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TextShare.Domain.Entities.TextFiles;
 
-namespace TextShare.Domain.DTOs.TextFilesDto
+namespace TextShare.Domain.DTOs
 {
     public class CategoryDto
     {
@@ -20,7 +20,8 @@ namespace TextShare.Domain.DTOs.TextFilesDto
 
         public virtual Category ToCategory()
         {
-            Category category = new Category() {
+            Category category = new Category()
+            {
                 Name = Name,
                 Description = Description,
                 CategoryId = CategoryId
