@@ -28,6 +28,7 @@ namespace TextShare.Domain.DTOs.UsersDto
         [Required]
         public DateOnly BirthDate { get; set; }
         public string? SelfDescription { get; set; }
+        public string? AvatarUri { get; set; }
 
         /// <summary>
         /// Создает объект User из UserDto 
@@ -42,6 +43,7 @@ namespace TextShare.Domain.DTOs.UsersDto
             user.Patronymic = Patronymic;
             user.BirthDate = BirthDate;
             user.SelfDescription = SelfDescription;
+            user.AvatarUri = AvatarUri;
 
             return user;
         }
@@ -61,6 +63,7 @@ namespace TextShare.Domain.DTOs.UsersDto
             userDto.SelfDescription = user.SelfDescription;
             userDto.Id = user.Id;
             userDto.UserName = user.UserName!;
+            userDto.AvatarUri = user.AvatarUri;
             return userDto;
         }
     }
