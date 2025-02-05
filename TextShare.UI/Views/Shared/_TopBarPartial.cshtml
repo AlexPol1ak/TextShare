@@ -1,0 +1,47 @@
+﻿@{
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <li class="nav-item">
+                    <a class="nav-link" href="/Home/Index">
+                        <i class="fas fa-user"></i> Моя страница
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/Shelves/Index">
+                        <i class="fas fa-book"></i> Полки
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/Friends/Index">
+                        <i class="fas fa-users"></i> Друзья
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/Groups/Index">
+                        <i class="fas fa-users"></i> Группы
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/Account/Logout">
+                        <i class="fas fa-sign-out-alt"></i> Выход
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li class="nav-item">
+                    <a class="nav-link" href="/Account/Login">
+                        <i class="fas fa-sign-in-alt"></i> Войти
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/Account/Register">
+                        <i class="fas fa-user-plus"></i> Регистрация
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+}
