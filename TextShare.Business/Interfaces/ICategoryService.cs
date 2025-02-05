@@ -12,6 +12,7 @@ namespace TextShare.Business.Interfaces
     {
         public Task<List<Category>> GetAllCategoriesAsync();
         public Task<Category?> GetCategoryByIdAsync(int id);
+        public Task<Category?> GetCategoryByNameAsync(string categoryName);
         public Task<List<Category>> FindCategoriesAsync(Expression<Func<Category, bool>> predicate);
         public Task<Category> CreateCategoryAsync(Category category);
         public Task<bool> DeleteCategoryAsync(int id);

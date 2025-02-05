@@ -13,6 +13,7 @@ namespace TextShare.Domain.Entities.TextFiles
     {
         public int CategoryId {  get; set; }
         public string Name { get; set; }
+        public string TranslateName { get; set; }
         public string Description { get; set; }
 
         // Текстовые файлы.

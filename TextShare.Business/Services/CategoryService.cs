@@ -49,6 +49,14 @@ namespace TextShare.Business.Services
             return await _repositoryCategories.GetAsync(id);
         }
 
+        public async Task<Category?> GetCategoryByNameAsync(string categoryName)
+        {
+            List<Category> listCategory = await _repositoryCategories.
+                FindAsync(c=>c.Name == categoryName);
+            return listCategory.FirstOrDefault();
+
+        }
+
         public async Task<Category> UpdateCategoryAsync(Category category)
         {
             return await _repositoryCategories.UpdateAsync(category);
