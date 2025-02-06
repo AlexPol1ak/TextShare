@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TextShare.Business.Interfaces;
-using TextShare.Domain.DTOs.UsersDto;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
+using TextShare.Domain.Models.EntityModels.UsersDto;
 
 namespace TextShare.API.Controllers
 {
@@ -36,7 +36,7 @@ namespace TextShare.API.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] UserLoginDto model)
+        public async Task<IActionResult> Login([FromBody] UserLoginModel model)
         {
             if (!ModelState.IsValid)
             {

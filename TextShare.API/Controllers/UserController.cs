@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using TextShare.Business.Interfaces;
-using TextShare.Domain.DTOs.UsersDto;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
+using TextShare.Domain.Models.EntityModels.UsersDto;
 using TextShare.Domain.Settings;
 
 namespace TextShare.API.Controllers
@@ -36,9 +36,9 @@ namespace TextShare.API.Controllers
         /// <param name="registerUserDto"></param>
         /// <returns></returns>
         [HttpPost("register")]
-        [ProducesResponseType(typeof(ResponseData<UserDto>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ResponseData<UserModel>), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ResponseData<UserDto>>> Register([FromBody] UserRegisterDto registerUserDto)
+        public async Task<ActionResult<ResponseData<UserModel>>> Register([FromBody] UserRegisterModel registerUserDto)
         {
             if (!ModelState.IsValid)
             {
@@ -69,8 +69,8 @@ namespace TextShare.API.Controllers
             {
                 var createdUser = await _userManager.FindByEmailAsync(user.Email);
 
-                ResponseData<UserDto> response = new();
-                UserDto userDto = UserDto.FromUser(createdUser!);
+                ResponseData<UserModel> response = new();
+                UserModel userDto = UserModel.FromUser(createdUser!);
                 response.Data = userDto;
                 //return CreatedAtAction(nameof(GetUser), new { id = userDto.Id }, response);
                 return Created(string.Empty, response);
@@ -91,7 +91,7 @@ namespace TextShare.API.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet("my-profile")]
-        public async Task<ActionResult<UserDto>> MyProfile()
+        public async Task<ActionResult<UserModel>> MyProfile()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
@@ -104,7 +104,7 @@ namespace TextShare.API.Controllers
             {
                 return Unauthorized("Пользователь не найден.");
             }
-            UserDto userDto = UserDto.FromUser(user);
+            UserModel userDto = UserModel.FromUser(user);
             return Ok(userDto);
         }
 
@@ -163,7 +163,7 @@ namespace TextShare.API.Controllers
 
         [Authorize]
         [HttpPut("Update")]
-        public async Task<ActionResult<UserDto>> UpdateUser([FromBody] UserUpdateDto userUpdateDto)
+        public async Task<ActionResult<UserModel>> UpdateUser([FromBody] UserUpdateModel userUpdateDto)
         {
             if (!ModelState.IsValid)
             {
@@ -200,7 +200,7 @@ namespace TextShare.API.Controllers
                 });
             }
 
-            return Ok(UserDto.FromUser(user));
+            return Ok(UserModel.FromUser(user));
         }
 
         /// <summary>
