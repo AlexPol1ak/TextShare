@@ -6,12 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using TextShare.Domain.Entities.Users;
 
-namespace TextShare.Domain.DTOs.UsersDto
+namespace TextShare.Domain.Models.EntityModels.UserModels
 {
     /// <summary>
     /// Класс DTO для пользователя
     /// </summary>
-    public class UserDto
+    public class UserModel
     {
         public int Id { get; set; }
 
@@ -53,9 +53,9 @@ namespace TextShare.Domain.DTOs.UsersDto
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public static UserDto FromUser(User user)
+        public static UserModel FromUser(User user)
         {
-            UserDto userDto = new UserDto();
+            UserModel userDto = new UserModel();
             userDto.FirstName = user.FirstName;
             userDto.LastName = user.LastName;
             userDto.Patronymic = user.Patronymic;

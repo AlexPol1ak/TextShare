@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Entities.Groups;
 
-namespace TextShare.Domain.DTOs
+namespace TextShare.Domain.Models.EntityModels
 {
     /// <summary>
     /// DTO-класс для группы пользователей.
     /// </summary>
-    public class GroupDto
+    public class GroupModel
     {
         public int GroupId { get; set; }
 
@@ -24,9 +24,9 @@ namespace TextShare.Domain.DTOs
         [Required]
         public int CreatorId { get; set; }
 
-        public static GroupDto FromGroup(Group group)
+        public static GroupModel FromGroup(Group group)
         {
-            return new GroupDto
+            return new GroupModel
             {
                 GroupId = group.GroupId,
                 Name = group.Name,

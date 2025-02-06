@@ -4,12 +4,12 @@ using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 
-namespace TextShare.Domain.DTOs
+namespace TextShare.Domain.Models.EntityModels
 {
     /// <summary>
     /// DTO-класс для полки.
     /// </summary>
-    public class ShelfDto
+    public class ShelfModel
     {
         public int ShelfId { get; set; }
 
@@ -25,9 +25,9 @@ namespace TextShare.Domain.DTOs
         [Required]
         public int CreatorId { get; set; }
 
-        public static ShelfDto FromShelf(Shelf shelf)
+        public static ShelfModel FromShelf(Shelf shelf)
         {
-            return new ShelfDto
+            return new ShelfModel
             {
                 ShelfId = shelf.ShelfId,
                 Name = shelf.Name,

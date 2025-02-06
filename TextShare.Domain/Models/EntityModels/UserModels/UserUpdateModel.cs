@@ -2,12 +2,12 @@
 using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Entities.Users;
 
-namespace TextShare.Domain.DTOs.UsersDto
+namespace TextShare.Domain.Models.EntityModels.UserModels
 {
     /// <summary>
     /// Класс DTO для обновления пользователя.
     /// </summary>
-    public class UserUpdateDto
+    public class UserUpdateModel
     {
 
         public int Id { get; set; }
@@ -52,9 +52,9 @@ namespace TextShare.Domain.DTOs.UsersDto
         /// </summary>
         /// <param name="user">Пользователь, из которого нужно создать DTO.</param>
         /// <returns></returns>
-        public static UserUpdateDto FromUser(User user)
+        public static UserUpdateModel FromUser(User user)
         {
-            return new UserUpdateDto
+            return new UserUpdateModel
             {
                 Id = user.Id,
                 UserName = user.UserName!,

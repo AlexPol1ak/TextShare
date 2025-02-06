@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TextShare.Domain.Entities.TextFiles;
 
-namespace TextShare.Domain.DTOs
+namespace TextShare.Domain.Models.EntityModels
 {
-    public class CategoryDto
+    public class CategoryModel
     {
         public int CategoryId { get; set; }
 
@@ -29,9 +29,9 @@ namespace TextShare.Domain.DTOs
             return category;
         }
 
-        public static CategoryDto FromCategory(Category category)
+        public static CategoryModel FromCategory(Category category)
         {
-            CategoryDto dto = new CategoryDto();
+            CategoryModel dto = new CategoryModel();
             dto.CategoryId = category.CategoryId;
             dto.Name = category.Name;
             dto.Description = category.Description;

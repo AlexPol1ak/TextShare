@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TextShare.Domain.DTOs.UsersDto
+namespace TextShare.Domain.Models.EntityModels.UsersModels
 {
-    public class UserLoginDto
+    public class UserLoginModel
     {
         [Required]
         [DataType(DataType.EmailAddress)]

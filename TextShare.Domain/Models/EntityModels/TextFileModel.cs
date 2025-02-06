@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Entities.TextFiles;
 
-namespace TextShare.Domain.DTOs
+namespace TextShare.Domain.Models.EntityModels
 {
     /// <summary>
     /// DTO-класс для текстового файла.
     /// </summary>
-    public class TextFileDto
+    public class TextFileModel
     {
         public int TextFileId { get; set; }
 
@@ -43,9 +43,9 @@ namespace TextShare.Domain.DTOs
         [Required]
         public int AccessRuleId { get; set; }
 
-        public static TextFileDto FromTextFile(TextFile textFile)
+        public static TextFileModel FromTextFile(TextFile textFile)
         {
-            return new TextFileDto
+            return new TextFileModel
             {
                 TextFileId = textFile.TextFileId,
                 OriginalFileName = textFile.OriginalFileName,

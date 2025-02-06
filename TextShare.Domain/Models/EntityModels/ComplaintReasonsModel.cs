@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Entities.Complaints;
 
-namespace TextShare.Domain.DTOs
+namespace TextShare.Domain.Models.EntityModels
 {
     /// <summary>
     /// DTO-класс для причины жалобы.
     /// </summary>
-    public class ComplaintReasonsDto
+    public class ComplaintReasonsModel
     {
         public int ComplaintReasonsId { get; set; }
 
@@ -16,9 +16,9 @@ namespace TextShare.Domain.DTOs
         [Required]
         public string Description { get; set; }
 
-        public static ComplaintReasonsDto FromComplaintReasons(ComplaintReasons complaintReasons)
+        public static ComplaintReasonsModel FromComplaintReasons(ComplaintReasons complaintReasons)
         {
-            return new ComplaintReasonsDto
+            return new ComplaintReasonsModel
             {
                 ComplaintReasonsId = complaintReasons.ComplaintReasonsId,
                 Name = complaintReasons.Name,

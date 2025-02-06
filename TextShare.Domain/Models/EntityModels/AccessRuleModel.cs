@@ -2,15 +2,15 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using TextShare.Domain.Entities.AccessRules;
-using TextShare.Domain.DTOs;
-using TextShare.Domain.DTOs.UsersDto;
+using TextShare.Domain.Models.EntityModels.UserModels;
 
-namespace TextShare.Domain.DTOs.AccessRulesDto
+
+namespace TextShare.Domain.Models.EntityModels
 {
     /// <summary>
     /// DTO-класс для правила доступа.
     /// </summary>
-    public class AccessRuleDto
+    public class AccessRuleModel
     {
         public int AccessRuleId { get; set; }
         public bool AvailableAll { get; set; }
@@ -18,18 +18,18 @@ namespace TextShare.Domain.DTOs.AccessRulesDto
         [Required]
         public int TextFileId { get; set; }
 
-        public List<UserDto> AvailableUsers { get; set; } = new();
-        public List<GroupDto> AvailableGroups { get; set; } = new();
+        public List<UserModel> AvailableUsers { get; set; } = new();
+        public List<GroupModel> AvailableGroups { get; set; } = new();
 
-        public static AccessRuleDto FromAccessRule(AccessRule accessRule)
+        public static AccessRuleModel FromAccessRule(AccessRule accessRule)
         {
-            return new AccessRuleDto
+            return new AccessRuleModel
             {
                 AccessRuleId = accessRule.AccessRuleId,
                 AvailableAll = accessRule.AvailableAll,
                 TextFileId = accessRule.TextFileId,
-                AvailableUsers = accessRule.AvailableUsers.Select(UserDto.FromUser).ToList(),
-                AvailableGroups = accessRule.AvailableGroups.Select(GroupDto.FromGroup).ToList()
+                AvailableUsers = accessRule.AvailableUsers.Select(UserModel.FromUser).ToList(),
+                AvailableGroups = accessRule.AvailableGroups.Select(GroupModel.FromGroup).ToList()
             };
         }
 
