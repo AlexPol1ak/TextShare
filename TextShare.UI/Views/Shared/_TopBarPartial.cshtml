@@ -4,27 +4,27 @@
             @if (User.Identity.IsAuthenticated)
             {
                 <li class="nav-item">
-                    <a class="nav-link" href="/Home/Index">
+                    <a class="nav-link" asp-controller="User" asp-action="DetailsUser">
                         <i class="fas fa-user"></i> Моя страница
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/Shelves/Index">
+                    <a class="nav-link" href="">
                         <i class="fas fa-book"></i> Полки
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/Friends/Index">
+                    <a class="nav-link" href="">
                         <i class="fas fa-users"></i> Друзья
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/Groups/Index">
+                    <a class="nav-link" href="">
                         <i class="fas fa-users"></i> Группы
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/Account/Logout">
+                    <a class="nav-link" asp-controller="Account" asp-action="Logout">
                         <i class="fas fa-sign-out-alt"></i> Выход
                     </a>
                 </li>
@@ -32,12 +32,12 @@
             else
             {
                 <li class="nav-item">
-                    <a class="nav-link" href="/Account/Login">
+                    <a class="nav-link" asp-controller="Account" asp-action="Login">
                         <i class="fas fa-sign-in-alt"></i> Войти
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/Account/Register">
+                    <a class="nav-link" asp-controller="Account" asp-action="Register">
                         <i class="fas fa-user-plus"></i> Регистрация
                     </a>
                 </li>

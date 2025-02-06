@@ -53,14 +53,22 @@ namespace TextShare.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(UserRegisterModel model)
         {
-            if (await _userManager.FindByNameAsync(model.UserName) != null)
-            {
-                ModelState.AddModelError("UserName", "Этот имя пользователя уже занято. Попробуйте другое.");
-                return View(model); // Вернем форму с сообщением об ошибке
-            }
-
+            
             if (!ModelState.IsValid)
             {
+                
+                if (await _userManager.FindByNameAsync(model.UserName) != null)
+                {
+                    ModelState.AddModelError("UserName", "Этот имя пользователя уже занято. Попробуйте другое.");
+                    return View(model); 
+                }
+
+                return View(model);
+            }
+
+            if(model.BirthDate > DateTime.Now.AddDays(3))
+            {
+                ModelState.AddModelError("BirthDate", "Не корректная дата рождения");
                 return View(model);
             }
                          
@@ -70,7 +78,7 @@ namespace TextShare.UI.Controllers
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("DetailsUser", "User");
             }
 
             foreach (var error in result.Errors)

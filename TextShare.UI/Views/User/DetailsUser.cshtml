@@ -1,5 +1,8 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Home Page";
+    User user = Model.Data;
 }
 <h1>Детальная информация пользователя</h1>
+<h2>@user.UserName</h2>
+<h2>@user.Email</h2>
+<h2>@user.FirstName</h2>
