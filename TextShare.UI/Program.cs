@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using TextShare.DAL.Data;
 using TextShare.Domain.Entities.Users;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,14 +10,30 @@ string mySqlConnectionLocal = "MySQLConnectionLocal";
 string mySqlConnectionBeget = "MySqlConnectionBeget";
 string connectionString = builder.Configuration.GetConnectionString(mySqlConnectionLocal)
     ?? throw new InvalidOperationException("Connection string 'Connection string' not found.");
+
 builder.Services.AddDbContext<TextShareContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), d => d.MigrationsAssembly("TextShare.UI")));
 
+builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = true;
+    options.Password.RequireDigit = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+})
+.AddEntityFrameworkStores<TextShareContext>()
+.AddDefaultTokenProviders();
+
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy("admin", p => p.RequireClaim(ClaimTypes.Role, "admin"));
+});
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<TextShareContext>();
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
@@ -33,10 +51,9 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
-app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization(); ;
 
 app.MapControllerRoute(
     name: "default",
