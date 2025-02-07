@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using TextShare.Business.Interfaces;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.TextFiles;
+using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Business.Services
 {
@@ -14,6 +15,18 @@ namespace TextShare.Business.Services
         public ShelfService(IUnitOfWork unitOfWork)
         {
             _repositoryShelves = unitOfWork.ShelfRepository;
+        }
+
+        public async Task<Shelf> AddCreatorShelfAsync(Shelf shelf, User user)
+        {
+            bool shelfExist = await ContainsShelfAsync(shelf);
+            Shelf responseShelf;
+
+            shelf.Creator = user;
+            if(shelfExist) responseShelf =  await UpdateShelfAsync(shelf);
+            else responseShelf = await CreateShelfAsync(shelf);
+
+            return responseShelf;
         }
 
         public async Task<bool> ContainsShelfAsync(Shelf shelf)

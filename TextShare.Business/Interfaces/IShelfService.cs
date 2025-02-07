@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using TextShare.Domain.Entities.TextFiles;
+using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Business.Interfaces
 {
@@ -11,6 +12,7 @@ namespace TextShare.Business.Interfaces
         Task<Shelf?> GetShelfByIdAsync(int id);
         Task<List<Shelf>> FindShelvesAsync(Expression<Func<Shelf, bool>> predicate);
         Task<Shelf> CreateShelfAsync(Shelf shelf);
+        Task<Shelf> AddCreatorShelfAsync(Shelf shelf, User user);
         Task<bool> DeleteShelfAsync(int id);
         Task<Shelf> UpdateShelfAsync(Shelf shelf);
         Task<bool> ContainsShelfAsync(Shelf shelf);
