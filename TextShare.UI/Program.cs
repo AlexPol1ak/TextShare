@@ -51,7 +51,7 @@ builder.Services.AddRazorPages();
 // Business Services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IShelfService, ShelfService>();
-
+builder.Services.AddScoped<IAccessRuleService, AccessRuleService>();
 
 var app = builder.Build();
 
