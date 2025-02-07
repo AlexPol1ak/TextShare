@@ -40,14 +40,14 @@ namespace TextShare.Business.Services
             return await _repositoryGroups.FindAsync(predicate);
         }
 
-        public async Task<List<Group>> GetAllGroupsAsync()
+        public async Task<List<Group>> GetAllGroupsAsync(params string[] includes)
         {
-            return await _repositoryGroups.GetAllAsync();
+            return await _repositoryGroups.GetAllAsync(includes);
         }
 
-        public async Task<Group?> GetGroupByIdAsync(int id)
+        public async Task<Group?> GetGroupByIdAsync(int id, params string[] includes)
         {
-            return await _repositoryGroups.GetAsync(id);
+            return await _repositoryGroups.GetAsync(id, includes);
         }
 
         public async Task<Group> UpdateGroupAsync(Group group)

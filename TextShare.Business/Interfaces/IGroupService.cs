@@ -14,14 +14,14 @@ namespace TextShare.Business.Interfaces
         /// Возвращает список всех групп.
         /// </summary>
         /// <returns>Список групп</returns>
-        Task<List<Group>> GetAllGroupsAsync();
+        Task<List<Group>> GetAllGroupsAsync(params string[] includes);
 
         /// <summary>
         /// Возвращает группу по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор группы</param>
         /// <returns>Объект группы, если найден, иначе null</returns>
-        Task<Group?> GetGroupByIdAsync(int id);
+        Task<Group?> GetGroupByIdAsync(int id, params string[] includes);
 
         /// <summary>
         /// Поиск групп по указанному условию.

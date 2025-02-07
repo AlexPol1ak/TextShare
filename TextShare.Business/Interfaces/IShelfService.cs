@@ -16,14 +16,14 @@ namespace TextShare.Business.Interfaces
         /// Возвращает все полки.
         /// </summary>
         /// <returns>Список полок</returns>
-        Task<List<Shelf>> GetAllShelvesAsync();
+        Task<List<Shelf>> GetAllShelvesAsync(params string[] includes);
 
         /// <summary>
         /// Возвращает полку по идентификатору
         /// </summary>
         /// <param name="id">Идентификатор полки</param>
         /// <returns>Возвращает полку, если найдено, иначе null</returns>
-        Task<Shelf?> GetShelfByIdAsync(int id);
+        Task<Shelf?> GetShelfByIdAsync(int id, params string[] includes);
 
         /// <summary>
         /// Поиск полки по условию
@@ -39,15 +39,6 @@ namespace TextShare.Business.Interfaces
         /// <returns></returns>
         Task<Shelf> CreateShelfAsync(Shelf shelf);
         
-        /// <summary>
-        /// Добавляет полке владельца.
-        /// Если полка существует - обновляет полку, если не существует- создает новую.
-        /// </summary>
-        /// <param name="shelf">Полка</param>
-        /// <param name="user">Владелец</param>
-        /// <returns>Полка с установленным владельцем</returns>
-        Task<Shelf> AddCreatorShelfAsync(Shelf shelf, User user);
-
         /// <summary>
         ///  Удаляет полку по идентификатору.
         /// </summary>

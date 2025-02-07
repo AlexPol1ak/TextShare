@@ -14,14 +14,14 @@ namespace TextShare.Business.Interfaces
         /// Возвращает все причины жалоб.
         /// </summary>
         /// <returns>Список причин жалоб</returns>
-        Task<List<ComplaintReasons>> GetAllComplaintReasonsAsync();
+        Task<List<ComplaintReasons>> GetAllComplaintReasonsAsync(params string[] includes);
 
         /// <summary>
         /// Возвращает причину жалобы по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор причины жалобы</param>
         /// <returns>Возвращает причину жалобы, если найдена, иначе null</returns>
-        Task<ComplaintReasons?> GetComplaintReasonByIdAsync(int id);
+        Task<ComplaintReasons?> GetComplaintReasonByIdAsync(int id, params string[] includes);
 
         /// <summary>
         /// Выполняет поиск причин жалоб по заданному условию.

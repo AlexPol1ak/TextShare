@@ -14,14 +14,14 @@ namespace TextShare.Business.Interfaces
         /// Возвращает список всех текстовых файлов.
         /// </summary>
         /// <returns>Список текстовых файлов</returns>
-        Task<List<TextFile>> GetAllTextFilesAsync();
+        Task<List<TextFile>> GetAllTextFilesAsync(params string[] includes);
 
         /// <summary>
         /// Возвращает текстовый файл по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор файла</param>
         /// <returns>Объект текстового файла, если найден, иначе null</returns>
-        Task<TextFile?> GetTextFileByIdAsync(int id);
+        Task<TextFile?> GetTextFileByIdAsync(int id, params string[] includes);
 
         /// <summary>
         /// Поиск текстовых файлов по указанному условию.

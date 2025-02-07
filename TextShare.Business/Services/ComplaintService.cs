@@ -40,14 +40,14 @@ namespace TextShare.Business.Services
             return await _repositoryComplaints.FindAsync(predicate);
         }
 
-        public async Task<List<Complaint>> GetAllComplaintsAsync()
+        public async Task<List<Complaint>> GetAllComplaintsAsync(params string[] includes)
         {
-            return await _repositoryComplaints.GetAllAsync();
+            return await _repositoryComplaints.GetAllAsync(includes);
         }
 
-        public async Task<Complaint?> GetComplaintByIdAsync(int id)
+        public async Task<Complaint?> GetComplaintByIdAsync(int id, params string[] includes)
         {
-            return await _repositoryComplaints.GetAsync(id);
+            return await _repositoryComplaints.GetAsync(id, includes);
         }
 
         public async Task<Complaint> UpdateComplaintAsync(Complaint complaint)

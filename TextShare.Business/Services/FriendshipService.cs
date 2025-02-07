@@ -35,14 +35,14 @@ namespace TextShare.Business.Services
             return await _repositoryFriendships.DeleteAsync(id);
         }
 
-        public async Task<List<Friendship>> GetAllFriendshipsAsync()
+        public async Task<List<Friendship>> GetAllFriendshipsAsync(params string[] includes)
         {
-            return await _repositoryFriendships.GetAllAsync();
+            return await _repositoryFriendships.GetAllAsync(includes);
         }
 
-        public async Task<Friendship?> GetFriendshipByIdAsync(int id)
+        public async Task<Friendship?> GetFriendshipByIdAsync(int id, params string[] includes)
         {
-            return await _repositoryFriendships.GetAsync(id);
+            return await _repositoryFriendships.GetAsync(id, includes);
         }
 
         public async Task<List<Friendship>> GetFriendshipsByUserIdAsync(int userId)

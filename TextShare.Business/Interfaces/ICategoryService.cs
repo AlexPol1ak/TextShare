@@ -15,21 +15,21 @@ namespace TextShare.Business.Interfaces
         /// Возвращает все категории.
         /// </summary>
         /// <returns>Список категорий</returns>
-        Task<List<Category>> GetAllCategoriesAsync();
+        Task<List<Category>> GetAllCategoriesAsync(params string[] includes);
 
         /// <summary>
         /// Возвращает категорию по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор категории</param>
         /// <returns>Возвращает категорию, если найдена, иначе null</returns>
-        Task<Category?> GetCategoryByIdAsync(int id);
+        Task<Category?> GetCategoryByIdAsync(int id, params string[] includes);
 
         /// <summary>
         /// Возвращает категорию по названию.
         /// </summary>
         /// <param name="categoryName">Название категории</param>
         /// <returns>Возвращает категорию, если найдена, иначе null</returns>
-        Task<Category?> GetCategoryByNameAsync(string categoryName);
+        Task<Category?> GetCategoryByNameAsync(string categoryName, params string[] includes);
 
         /// <summary>
         /// Поиск категорий по условию.

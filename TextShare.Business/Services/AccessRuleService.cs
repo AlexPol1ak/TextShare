@@ -39,14 +39,14 @@ namespace TextShare.Business.Services
             return await _repositoryAccessRules.FindAsync(predicate);
         }
 
-        public async Task<List<AccessRule>> GetAllAccessRulesAsync()
+        public async Task<List<AccessRule>> GetAllAccessRulesAsync(params string[] includes)
         {
-            return await _repositoryAccessRules.GetAllAsync();
+            return await _repositoryAccessRules.GetAllAsync( includes);
         }
 
-        public async Task<AccessRule?> GetAccessRuleByIdAsync(int id)
+        public async Task<AccessRule?> GetAccessRuleByIdAsync(int id, params string[] includes)
         {
-            return await _repositoryAccessRules.GetAsync(id);
+            return await _repositoryAccessRules.GetAsync(id, includes);
         }
 
         public async Task<AccessRule> UpdateAccessRuleAsync(AccessRule accessRule)

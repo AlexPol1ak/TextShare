@@ -14,14 +14,14 @@ namespace TextShare.Business.Interfaces
         /// Возвращает все правила доступа.
         /// </summary>
         /// <returns>Список правил доступа</returns>
-        Task<List<AccessRule>> GetAllAccessRulesAsync();
+        Task<List<AccessRule>> GetAllAccessRulesAsync(params string[] includes);
 
         /// <summary>
         /// Возвращает правило доступа по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор правила доступа</param>
         /// <returns>Возвращает правило доступа, если найдено, иначе null</returns>
-        Task<AccessRule?> GetAccessRuleByIdAsync(int id);
+        Task<AccessRule?> GetAccessRuleByIdAsync(int id, params string[] includes);
 
         /// <summary>
         /// Поиск правил доступа по условию.

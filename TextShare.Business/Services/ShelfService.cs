@@ -19,19 +19,7 @@ namespace TextShare.Business.Services
         public ShelfService(IUnitOfWork unitOfWork) :base(unitOfWork)
         {
             _repositoryShelves = unitOfWork.ShelfRepository;          
-        }
-
-        public async Task<Shelf> AddCreatorShelfAsync(Shelf shelf, User user)
-        {
-            bool shelfExist = await ContainsShelfAsync(shelf);
-            Shelf responseShelf;
-            
-            shelf.Creator = user;
-            if(shelfExist) responseShelf =  await UpdateShelfAsync(shelf);
-            else responseShelf = await CreateShelfAsync(shelf);
-
-            return responseShelf;
-        }
+        }      
 
         public async Task<bool> ContainsShelfAsync(Shelf shelf)
         {
@@ -53,14 +41,14 @@ namespace TextShare.Business.Services
             return await _repositoryShelves.FindAsync(predicate);
         }
 
-        public async Task<List<Shelf>> GetAllShelvesAsync()
+        public async Task<List<Shelf>> GetAllShelvesAsync(params string[] includes)
         {
-            return await _repositoryShelves.GetAllAsync();
+            return await _repositoryShelves.GetAllAsync(includes);
         }
 
-        public async Task<Shelf?> GetShelfByIdAsync(int id)
+        public async Task<Shelf?> GetShelfByIdAsync(int id, params string[] includes)
         {
-            return await _repositoryShelves.GetAsync(id);
+            return await _repositoryShelves.GetAsync(id, includes);
         }
 
         public async Task<Shelf> UpdateShelfAsync(Shelf shelf)

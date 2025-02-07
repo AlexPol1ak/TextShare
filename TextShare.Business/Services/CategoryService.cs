@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -43,20 +44,28 @@ namespace TextShare.Business.Services
             return await _repositoryCategories.FindAsync(predicate);
         }
 
-        public async Task<List<Category>> GetAllCategoriesAsync()
+        public async Task<List<Category>> GetAllCategoriesAsync(params string[] includes)
         {
-            return await _repositoryCategories.GetAllAsync();
+            return await _repositoryCategories.GetAllAsync(includes);
         }
 
-        public async Task<Category?> GetCategoryByIdAsync(int id)
+        public async Task<Category?> GetCategoryByIdAsync(int id, params string[] includes)
         {
-            return await _repositoryCategories.GetAsync(id);
+            return await _repositoryCategories.GetAsync(id, includes);
         }
 
-        public async Task<Category?> GetCategoryByNameAsync(string categoryName)
+        public async Task<Category?> GetCategoryByNameAsync(string categoryName, params string[] includes)
         {
-            List<Category> listCategory = await _repositoryCategories.
-                FindAsync(c=>c.Name == categoryName);
+            IQueryable<Category> categories = (await _repositoryCategories.
+                FindAsync(c=>c.Name == categoryName)).AsQueryable();
+            if(includes.Length > 0)
+            {
+                foreach(string include in includes)
+                {
+                    categories.Include(include);
+                }
+            }
+            List<Category> listCategory = categories.ToList();
             return listCategory.FirstOrDefault();
 
         }

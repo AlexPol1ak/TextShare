@@ -15,14 +15,14 @@ namespace TextShare.Business.Interfaces
         /// Возвращает все записи о дружбе.
         /// </summary>
         /// <returns>Список всех дружеских связей</returns>
-        Task<List<Friendship>> GetAllFriendshipsAsync();
+        Task<List<Friendship>> GetAllFriendshipsAsync(params string[] includes);
 
         /// <summary>
         /// Возвращает запись о дружбе по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор дружбы</param>
         /// <returns>Объект дружбы, если найден, иначе null</returns>
-        Task<Friendship?> GetFriendshipByIdAsync(int id);
+        Task<Friendship?> GetFriendshipByIdAsync(int id, params string[] includes);
 
         /// <summary>
         /// Возвращает список дружеских связей для конкретного пользователя.

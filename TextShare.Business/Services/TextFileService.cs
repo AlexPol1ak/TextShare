@@ -39,14 +39,14 @@ namespace TextShare.Business.Services
             return await _repositoryTextFiles.FindAsync(predicate);
         }
 
-        public async Task<List<TextFile>> GetAllTextFilesAsync()
+        public async Task<List<TextFile>> GetAllTextFilesAsync(params string[] includes)
         {
-            return await _repositoryTextFiles.GetAllAsync();
+            return await _repositoryTextFiles.GetAllAsync(includes);
         }
 
-        public async Task<TextFile?> GetTextFileByIdAsync(int id)
+        public async Task<TextFile?> GetTextFileByIdAsync(int id, params string[] includes)
         {
-            return await _repositoryTextFiles.GetAsync(id);
+            return await _repositoryTextFiles.GetAsync(id, includes);
         }
 
         public async Task<TextFile> UpdateTextFileAsync(TextFile textFile)
