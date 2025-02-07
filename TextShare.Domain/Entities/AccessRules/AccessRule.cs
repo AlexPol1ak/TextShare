@@ -17,8 +17,13 @@ namespace TextShare.Domain.Entities.AccessRules
         public int AccessRuleId { get; set; }
         public bool AvailableAll { get; set; } = false;
 
-        public int TextFileId { get; set; }
-        public TextFile TextFile { get; set; }
+        // Правило доступа для файла (если есть)
+        public int? TextFileId { get; set; }
+        public TextFile? TextFile { get; set; }
+
+        // Правило доступа для полки (если есть)
+        public int? ShelfId { get; set; }
+        public Shelf? Shelf { get; set; }
 
         // Доступно пользователям.
         public ICollection<User> AvailableUsers { get; set; } = new List<User>();
@@ -27,41 +32,68 @@ namespace TextShare.Domain.Entities.AccessRules
 
         public override string ToString()
         {
-            return $"Id: {AccessRuleId}. File: {TextFile.ToString()}. Available all: {AvailableAll}. " +
-                $"Number users: {AvailableUsers.Count.ToString()}. Number groups: {AvailableGroups.Count.ToString()}";
+            string target = TextFile != null
+                ? $"File: {TextFile.OriginalFileName}"
+                : Shelf != null
+                    ? $"Shelf: {Shelf.Name}"
+                    : "Unknown";
+
+            return $"Id: {AccessRuleId}. {target}. Available all: {AvailableAll}. " +
+                   $"Number users: {AvailableUsers.Count}. Number groups: {AvailableGroups.Count}";
         }
 
         /// <summary>
-        /// Полная информация о правиле.
+        /// Полная информация о правиле доступа.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Строка с детальной информацией.</returns>
         public string GetFullInfo()
         {
-            string info = string.Empty;
+            StringBuilder info = new StringBuilder();
+            info.AppendLine($"Id: {AccessRuleId}");
 
-            info += $"Id: {AccessRuleId}. Text file: {TextFile.OriginalFileName}\n";
-            info += $"Available All {AvailableAll}\n";
-            info += $"Available users:\n";
-            if (AvailableUsers != null && AvailableUsers.Count > 0)
+            if (TextFile != null)
+            {
+                info.AppendLine($"Text file: {TextFile.OriginalFileName}");
+            }
+            else if (Shelf != null)
+            {
+                info.AppendLine($"Shelf: {Shelf.Name}");
+            }
+
+            info.AppendLine($"Available All: {AvailableAll}");
+
+            info.AppendLine("Available users:");
+            if (AvailableUsers.Count > 0)
             {
                 int i = 1;
-                foreach(var user in AvailableUsers)
+                foreach (var user in AvailableUsers)
                 {
-                    info += $"{i}.{user.ToString()}\n";
+                    info.AppendLine($"{i}. {user}");
                     i++;
                 }
             }
-            info += $"Available groups:\n";
-            if (AvailableGroups != null && AvailableGroups.Count > 0)
+            else
+            {
+                info.AppendLine("No users have access.");
+            }
+
+            info.AppendLine("Available groups:");
+            if (AvailableGroups.Count > 0)
             {
                 int i = 1;
                 foreach (var group in AvailableGroups)
                 {
-                    info += $"{i}.{group.ToString()}\n";
+                    info.AppendLine($"{i}. {group}");
                     i++;
                 }
             }
-            return info;
+            else
+            {
+                info.AppendLine("No groups have access.");
+            }
+
+            return info.ToString();
         }
+
     }
 }

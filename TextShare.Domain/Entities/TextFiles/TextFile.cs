@@ -45,25 +45,45 @@ namespace TextShare.Domain.Entities.TextFiles
 
         public override string ToString()
         {
-            string info = $"Id: {TextFileId}. Original Name: {OriginalFileName}. " +
-                $"Owner: {Owner.ToString()}. Shelf: {Shelf.ToString()}";    
-            return info;
+            return $"Id: {TextFileId}. Original Name: {OriginalFileName}. " +
+                   $"Owner: {Owner}. Shelf: {Shelf}. " +
+                   $"Access Rule: {AccessRule?.AccessRuleId ?? 0}";
         }
 
+        /// <summary>
+        /// Полная информация о полке
+        /// </summary>
+        /// <returns></returns>
         public string GetFullInfo()
         {
-            string info = string.Empty ;
+            var info = new StringBuilder();
 
-            info += $"Id: {TextFileId}\n";
-            info += $"Original name: {OriginalFileName}\n";
-            info += $"Unique name: {UniqueFileName}\n";
-            info += $"Ext: {Extention}. Size {Size}\n";
-            info += $"Content Type: {ContentType}\n";
-            info += $"URI: {Uri}";
-            info += $"Owner: {Owner.ToString()}\n";
-            info += $"Shelf: {Shelf.ToString()}. Number complaints: {Complaints.Count.ToString()}";
+            info.AppendLine($"Id: {TextFileId}");
+            info.AppendLine($"Original Name: {OriginalFileName}");
+            info.AppendLine($"Unique Name: {UniqueFileName}");
+            info.AppendLine($"Extension: {Extention}");
+            info.AppendLine($"Size: {Size} bytes");
+            info.AppendLine($"Content Type: {ContentType}");
+            info.AppendLine($"URI: {Uri}");
+            info.AppendLine($"Created At: {CreatedAt}");
+            info.AppendLine($"Owner: {Owner}");
+            info.AppendLine($"Shelf: {Shelf}");
+            info.AppendLine($"Number of Complaints: {Complaints.Count}");
 
-            return info;
+            if (AccessRule != null)
+            {
+                info.AppendLine("Access Rule:");
+                info.AppendLine($"  Id: {AccessRule.AccessRuleId}");
+                info.AppendLine($"  Available to All: {AccessRule.AvailableAll}");
+                info.AppendLine($"  Available Users: {AccessRule.AvailableUsers.Count}");
+                info.AppendLine($"  Available Groups: {AccessRule.AvailableGroups.Count}");
+            }
+            else
+            {
+                info.AppendLine("Access Rule: None");
+            }
+
+            return info.ToString();
         }
     }
 }

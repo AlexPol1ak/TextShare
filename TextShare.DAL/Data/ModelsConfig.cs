@@ -140,11 +140,22 @@ namespace TextShare.DAL.Data
             builder.Property(s => s.CreatedAt)
                 .HasColumnType("DATETIME")
                 .IsRequired();
-            // Связь с пользователем
+
+            // Жёсткая связь с создателем (обязательный пользователь)
             builder.HasOne(s => s.Creator)
-                .WithMany(u => u.Shelves)  // Один пользователь может иметь много полок
+                .WithMany(u => u.Shelves)
                 .HasForeignKey(s => s.CreatorId)
-                .OnDelete(DeleteBehavior.Cascade);  // При удалении пользователя удаляются и его полки
+                .IsRequired()  // Полка не может существовать без создателя
+                .OnDelete(DeleteBehavior.Cascade);  // Если пользователь удаляется, удаляются и его полки
+
+            // Жёсткая связь с AccessRule (обязательное правило доступа)
+            builder.HasOne(s => s.AccessRule)
+                .WithOne()
+                .HasForeignKey<Shelf>(s => s.AccessRuleId)
+                .IsRequired()  // Полка не может существовать без правила доступа
+                .OnDelete(DeleteBehavior.Cascade);
+
+
         }
 
         /// <summary>
@@ -157,38 +168,41 @@ namespace TextShare.DAL.Data
 
             builder.HasKey(t => t.TextFileId);
             builder.Property(t => t.OriginalFileName).HasMaxLength(45).IsRequired();
-            builder.Property(t=>t.UniqueFileName).HasMaxLength(100).IsRequired();
+            builder.Property(t => t.UniqueFileName).HasMaxLength(100).IsRequired();
             builder.HasIndex(t => t.UniqueFileName).IsUnique();
-            builder.Property(t=>t.Description).HasColumnType("TEXT")
+            builder.Property(t => t.Description).HasColumnType("TEXT")
                 .IsRequired(false)
                 .HasMaxLength(500);
-            builder.Property(t=>t.Extention).HasMaxLength(10).IsRequired();
+            builder.Property(t => t.Extention).HasMaxLength(10).IsRequired();
             builder.Property(t => t.Uri).HasMaxLength(255).IsRequired();
             builder.Property(t => t.Tags).HasMaxLength(255).IsRequired(false);
-            builder.Property(t=>t.ContentType).HasMaxLength(100).IsRequired();
-            //builder.Property(t=>t.Size).HasColumnType("BIGINT").IsRequired();
+            builder.Property(t => t.ContentType).HasMaxLength(100).IsRequired();
 
-            // Связь с владельцем (пользователем)
-            builder.HasOne(t => t.Owner)  // У файла есть один владелец
-                .WithMany(u => u.TextFiles)  // Один пользователь может иметь много файлов
-                .HasForeignKey(t => t.OwnerId);  // Внешний ключ для связи
+            // Связь с владельцем (Пользователь обязателен)
+            builder.HasOne(t => t.Owner)
+                .WithMany(u => u.TextFiles)
+                .HasForeignKey(t => t.OwnerId)
+                .IsRequired()  // Владелец обязателен
+                .OnDelete(DeleteBehavior.Cascade);  // При удалении владельца удаляются и файлы
 
-            // Связь с полкой
-            builder.HasOne(t => t.Shelf)  // Файл находится на одной полке
-                .WithMany(s => s.TextFiles)  // Одна полка может содержать много файлов
-                .HasForeignKey(t => t.ShelfId);  // Внешний ключ для связи
+            // Связь с полкой (Полка обязательна)
+            builder.HasOne(t => t.Shelf)
+                .WithMany(s => s.TextFiles)
+                .HasForeignKey(t => t.ShelfId)
+                .IsRequired()  // Полка обязательна
+                .OnDelete(DeleteBehavior.Cascade);  // При удалении полки удаляются и файлы
 
-            // Связь с категорией
+            // Связь с категориями
             builder.HasMany(t => t.TextFileCategories)
                 .WithOne(tf => tf.TextFile)
                 .HasForeignKey(tf => tf.TextFileId);
 
-            //Связь с правилом доступа
-            builder.HasOne(t => t.AccessRule)  // У файла есть одно правило доступа
-                .WithOne(ar => ar.TextFile)   // У правила доступа привязан один файл
-                .HasForeignKey<AccessRule>(ar => ar.TextFileId)  //
-                .IsRequired()                 
-                .OnDelete(DeleteBehavior.Cascade);
+            // Связь с правилом доступа (Файл обязан иметь правило доступа)
+            builder.HasOne(t => t.AccessRule)
+                .WithOne(ar => ar.TextFile)
+                .HasForeignKey<AccessRule>(ar => ar.TextFileId)
+                .IsRequired()  // Правило доступа обязательно
+                .OnDelete(DeleteBehavior.Cascade);  // При удалении файла удаляется и его правило доступа
 
         }
 
@@ -284,24 +298,29 @@ namespace TextShare.DAL.Data
         {
             builder.HasKey(a => a.AccessRuleId);
 
-            // Связь один к одному с файлом.
+            // Связь 1 к 1 с файлом (опциональная)
             builder.HasOne(ar => ar.TextFile)
-                   .WithOne(tf => tf.AccessRule) 
+                   .WithOne(tf => tf.AccessRule)
                    .HasForeignKey<AccessRule>(ar => ar.TextFileId)
-                   .IsRequired()
+                   .IsRequired(false)  //  не обязательная
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            // Связь 1 к 1 с полкой (опциональная)
+            builder.HasOne(ar => ar.Shelf)
+                   .WithOne(s => s.AccessRule)
+                   .HasForeignKey<AccessRule>(ar => ar.ShelfId)
+                   .IsRequired(false)  // не обязательная
                    .OnDelete(DeleteBehavior.Cascade);
 
             // Связь многие ко многим с пользователями
             builder.HasMany(ar => ar.AvailableUsers)
-                   .WithMany(u => u.AccessRules) 
-                   .UsingEntity(j =>
-                       j.ToTable("AccessRuleUsers")); // Промежуточная таблица для связи
+                   .WithMany(u => u.AccessRules)
+                   .UsingEntity(j => j.ToTable("AccessRuleUsers"));
 
             // Связь многие ко многим с группами
             builder.HasMany(ar => ar.AvailableGroups)
-                   .WithMany(g => g.AccessRules) 
-                   .UsingEntity(j =>
-                       j.ToTable("AccessRuleGroups")); // Промежуточная таблица для связи
+                   .WithMany(g => g.AccessRules)
+                   .UsingEntity(j => j.ToTable("AccessRuleGroups"));
         }
 
 

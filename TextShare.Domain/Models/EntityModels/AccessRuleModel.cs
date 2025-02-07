@@ -15,8 +15,9 @@ namespace TextShare.Domain.Models.EntityModels
         public int AccessRuleId { get; set; }
         public bool AvailableAll { get; set; }
 
-        [Required]
-        public int TextFileId { get; set; }
+        
+        public int? TextFileId { get; set; }
+        public int? ShelfId { get; set; }
 
         public List<UserModel> AvailableUsers { get; set; } = new();
         public List<GroupModel> AvailableGroups { get; set; } = new();
@@ -28,6 +29,7 @@ namespace TextShare.Domain.Models.EntityModels
                 AccessRuleId = accessRule.AccessRuleId,
                 AvailableAll = accessRule.AvailableAll,
                 TextFileId = accessRule.TextFileId,
+                ShelfId = accessRule.ShelfId,
                 AvailableUsers = accessRule.AvailableUsers.Select(UserModel.FromUser).ToList(),
                 AvailableGroups = accessRule.AvailableGroups.Select(GroupModel.FromGroup).ToList()
             };

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Domain.Entities.TextFiles
@@ -24,13 +25,52 @@ namespace TextShare.Domain.Entities.TextFiles
         public int CreatorId { get; set; }
         public User Creator { get; set; }
 
+        // Правило доступа для полки
+        public int AccessRuleId { get; set; }
+        public AccessRule AccessRule { get; set; }
+
         // Размещенные файлы
         public ICollection<TextFile> TextFiles { get; set; } = new List<TextFile>();
 
         public override string ToString()
         {
-            return $"Id: {ShelfId}. Name: {Name}. Creator: {Creator.ToString()}." +
-                $" Number files: {TextFiles.Count.ToString()}";
+            return $"Id: {ShelfId}. Name: {Name}. " +
+                   $"Creator: {Creator}. " +
+                   $"Files: {TextFiles.Count}. " +
+                   $"Access Rule: {AccessRule?.AccessRuleId ?? 0}";
+        }
+
+        /// <summary>
+        /// Полная информация о полке
+        /// </summary>
+        /// <returns></returns>
+        public string GetFullInfo()
+        {
+            var info = new StringBuilder();
+
+            info.AppendLine($"Id: {ShelfId}");
+            info.AppendLine($"Name: {Name}");
+            info.AppendLine($"Description: {Description}");
+            info.AppendLine($"Created At: {CreatedAt}");
+            info.AppendLine($"Image URI: {ImageUri ?? "None"}");
+            info.AppendLine($"Can Be Deleted: {CanDeleted}");
+            info.AppendLine($"Creator: {Creator}");
+            info.AppendLine($"Number of Files: {TextFiles.Count}");
+
+            if (AccessRule != null)
+            {
+                info.AppendLine("Access Rule:");
+                info.AppendLine($"  Id: {AccessRule.AccessRuleId}");
+                info.AppendLine($"  Available to All: {AccessRule.AvailableAll}");
+                info.AppendLine($"  Available Users: {AccessRule.AvailableUsers.Count}");
+                info.AppendLine($"  Available Groups: {AccessRule.AvailableGroups.Count}");
+            }
+            else
+            {
+                info.AppendLine("Access Rule: None");
+            }
+
+            return info.ToString();
         }
     }
 }

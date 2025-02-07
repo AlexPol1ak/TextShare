@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-TextShare.UI-04bc9d80-7c5a-4f13-b810-4b0bb8cd33cd</UserSecretsId>
+	 <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	 <NoWarn>1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
