@@ -25,7 +25,7 @@ namespace TextShare.DAL.Interfaces
 
         public Task<int> SaveChangesAsync();
 
-        public Task LoadRelatedEntities<T, TProperty>(T entity, Expression<Func<T, IEnumerable<TProperty>>> navigationProperty)
+        public Task LoadRelatedEntitiesAsync<T, TProperty>(T entity, Expression<Func<T, IEnumerable<TProperty>>> navigationProperty)
           where T : class
           where TProperty : class;
     }
