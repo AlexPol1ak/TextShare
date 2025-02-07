@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models.EntityModels.UserModels;
 using TextShare.Domain.Utils;
-using TextShare.UI.ViewModels;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TextShare.UI.Controllers
 {
@@ -25,18 +25,34 @@ namespace TextShare.UI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login(UserLoginModel model)
         {
             
             if (!ModelState.IsValid)
+            {               
                 return View(model);
+            }
 
-            var user = await _userManager.FindByNameAsync(model.Username);
+            var user = await _userManager.FindByEmailAsync(model.Email);
             if (user != null)
             {
-                var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
+                bool passwordValid = await _userManager.CheckPasswordAsync(user, model.Password);
+                if (!passwordValid)
+                {
+                    ModelState.AddModelError("Password", "Неверный пароль!");
+                    return View(model);
+                }
+                if (!user.EmailConfirmed)
+                {
+                    ModelState.AddModelError("Email", "Email не подтвержден!");
+                    return View(model);
+
+                }
+               
+                // Вход
+                var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);                 
                 if (result.Succeeded)
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("DetailsUser", "User");
             }
 
             ModelState.AddModelError("", "Неверные учетные данные.");
@@ -73,6 +89,7 @@ namespace TextShare.UI.Controllers
             }
                          
             var user = model.ToUser();
+            user.EmailConfirmed = true; // Подтверждение Email
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)

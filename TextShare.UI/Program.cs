@@ -3,6 +3,7 @@ using System.Security.Claims;
 using TextShare.DAL.Data;
 using TextShare.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,9 +26,17 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
 .AddEntityFrameworkStores<TextShareContext>()
 .AddDefaultTokenProviders();
 
+builder.Services.AddSingleton<IEmailSender, NoOpEmailSender>();
+
 builder.Services.AddAuthorization(opt =>
 {
     opt.AddPolicy("admin", p => p.RequireClaim(ClaimTypes.Role, "admin"));
+});
+
+builder.Services.AddLogging(logging =>
+{
+    logging.AddConsole();
+    logging.SetMinimumLevel(LogLevel.Debug);
 });
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
