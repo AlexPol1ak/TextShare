@@ -4,6 +4,10 @@ using TextShare.DAL.Data;
 using TextShare.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using TextShare.Business.Interfaces;
+using TextShare.Business.Services;
+using TextShare.DAL.Interfaces;
+using TextShare.DAL.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +47,10 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+// Business Services
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IShelfService, ShelfService>();
+
 
 var app = builder.Build();
 

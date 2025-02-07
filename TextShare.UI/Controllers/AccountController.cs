@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using TextShare.Business.Interfaces;
+using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models.EntityModels.UserModels;
 using TextShare.Domain.Utils;
@@ -11,11 +13,13 @@ namespace TextShare.UI.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly IShelfService _shelfService;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IShelfService shelfService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _shelfService = shelfService;
         }
 
         public async Task<IActionResult> Login()
@@ -91,6 +95,17 @@ namespace TextShare.UI.Controllers
             var user = model.ToUser();
             user.EmailConfirmed = true; // Подтверждение Email
             var result = await _userManager.CreateAsync(user, model.Password);
+
+            Shelf baseShelf = new Shelf()
+            {
+                Name = $"{user.UserName}_1",
+                Description = "Моя первая полка",
+                CanDeleted = false,
+
+            };
+
+            await _shelfService.AddCreatorShelfAsync(baseShelf, user);
+            await _shelfService.SaveAsync();
 
             if (result.Succeeded)
             {
