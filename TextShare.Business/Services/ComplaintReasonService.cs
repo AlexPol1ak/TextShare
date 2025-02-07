@@ -7,11 +7,15 @@ using TextShare.Domain.Entities.Complaints;
 
 namespace TextShare.Business.Services
 {
-    public class ComplaintReasonService : IComplaintReasonService
+
+    /// <summary> 
+    ///  Сервис для управления  причинами жалоб
+    /// </summary>
+    public class ComplaintReasonService : BaseService, IComplaintReasonService
     {
         private readonly IRepository<ComplaintReasons> _repositoryComplaintReasons;
 
-        public ComplaintReasonService(IUnitOfWork unitOfWork)
+        public ComplaintReasonService(IUnitOfWork unitOfWork) :base(unitOfWork)
         {
             _repositoryComplaintReasons = unitOfWork.ComplaintReasonsRepository;
         }

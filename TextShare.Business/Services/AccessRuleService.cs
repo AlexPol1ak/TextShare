@@ -7,11 +7,14 @@ using TextShare.Domain.Entities.AccessRules;
 
 namespace TextShare.Business.Services
 {
-    public class AccessRuleService : IAccessRuleService
+    /// <summary> 
+    ///  Сервис для управления правилами доступа.
+    /// </summary>
+    public class AccessRuleService : BaseService,  IAccessRuleService
     {
         private readonly IRepository<AccessRule> _repositoryAccessRules;
 
-        public AccessRuleService(IUnitOfWork unitOfWork)
+        public AccessRuleService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _repositoryAccessRules = unitOfWork.AccessRuleRepository;
         }

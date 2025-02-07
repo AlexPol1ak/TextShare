@@ -7,11 +7,15 @@ using TextShare.Domain.Entities.Groups;
 
 namespace TextShare.Business.Services
 {
-    public class GroupService : IGroupService
+
+    /// <summary> 
+    ///  Сервис для управления группами
+    /// </summary>
+    public class GroupService : BaseService, IGroupService
     {
         private readonly IRepository<Group> _repositoryGroups;
 
-        public GroupService(IUnitOfWork unitOfWork)
+        public GroupService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _repositoryGroups = unitOfWork.GroupRepository;
         }

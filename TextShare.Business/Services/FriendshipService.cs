@@ -8,11 +8,14 @@ using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Business.Services
 {
-    public class FriendshipService : IFriendshipService
+    /// <summary> 
+    ///  Сервис для управления дружбой между пользователями
+    /// </summary>
+    public class FriendshipService : BaseService, IFriendshipService
     {
         private readonly IRepository<Friendship> _repositoryFriendships;
 
-        public FriendshipService(IUnitOfWork unitOfWork)
+        public FriendshipService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _repositoryFriendships = unitOfWork.FriendshipRepository;
         }

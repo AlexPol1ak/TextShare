@@ -10,11 +10,15 @@ using TextShare.Domain.Entities.TextFiles;
 
 namespace TextShare.Business.Services
 {
-    public class CategoryService : ICategoryService
+
+    /// <summary> 
+    ///  Сервис для управления категориями
+    /// </summary>
+    public class CategoryService : BaseService, ICategoryService
     {
         private readonly IRepository<Category> _repositoryCategories;
 
-        public CategoryService(IUnitOfWork unitOfWork)
+        public CategoryService(IUnitOfWork unitOfWork) : base(unitOfWork) 
         {
             _repositoryCategories = unitOfWork.CategoryRepository;
         }

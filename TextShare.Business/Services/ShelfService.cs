@@ -8,20 +8,24 @@ using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Business.Services
 {
-    public class ShelfService : IShelfService
+
+    /// <summary> 
+    ///  Сервис для управления полками
+    /// </summary>
+    public class ShelfService : BaseService,  IShelfService
     {
         private readonly IRepository<Shelf> _repositoryShelves;
 
-        public ShelfService(IUnitOfWork unitOfWork)
+        public ShelfService(IUnitOfWork unitOfWork) :base(unitOfWork)
         {
-            _repositoryShelves = unitOfWork.ShelfRepository;
+            _repositoryShelves = unitOfWork.ShelfRepository;          
         }
 
         public async Task<Shelf> AddCreatorShelfAsync(Shelf shelf, User user)
         {
             bool shelfExist = await ContainsShelfAsync(shelf);
             Shelf responseShelf;
-
+            
             shelf.Creator = user;
             if(shelfExist) responseShelf =  await UpdateShelfAsync(shelf);
             else responseShelf = await CreateShelfAsync(shelf);

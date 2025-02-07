@@ -14,7 +14,7 @@ using static System.Net.Mime.MediaTypeNames;
 namespace TextShare.Business.Services
 {
     /// <summary>
-    /// Класс физического управления файлом.
+    /// Сервис физического управления файлом.
     /// </summary>
     public class PhysicalFileService : IPhysicalFile
     {

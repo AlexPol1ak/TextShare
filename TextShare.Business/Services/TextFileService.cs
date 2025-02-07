@@ -7,11 +7,14 @@ using TextShare.Domain.Entities.TextFiles;
 
 namespace TextShare.Business.Services
 {
-    public class TextFileService : ITextFileService
+    /// <summary> 
+    ///  Сервис для управления файлами
+    /// </summary>
+    public class TextFileService : BaseService, ITextFileService
     {
         private readonly IRepository<TextFile> _repositoryTextFiles;
 
-        public TextFileService(IUnitOfWork unitOfWork)
+        public TextFileService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _repositoryTextFiles = unitOfWork.TextFileRepository;
         }

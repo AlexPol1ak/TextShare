@@ -11,6 +11,9 @@ using System.Security.Cryptography;
 
 namespace TextShare.Business.Services
 {
+    /// <summary> 
+    /// Сервис для управления  токенами
+    /// </summary>
     public class TokenService : ITokenService
     {
         private readonly IConfiguration _configuration;
