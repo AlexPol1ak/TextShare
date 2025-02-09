@@ -1,0 +1,18 @@
+﻿@{
+    List<Shelf> shelves = Model.Data.Items;
+}
+<h2>Мои полки</h2>
+
+@if (shelves.Count > 0)
+{
+    int counter = 1;
+    foreach (Shelf shelf in shelves)
+    {
+        <p>@counter. <a asp-controller="Shelves" asp-action="DetailShelf" asp-route-id="@shelf.ShelfId">@shelf.Name</a></p>
+        counter++;
+    }
+}
+else
+{
+    <p>У вас пока нет полок</p>
+}

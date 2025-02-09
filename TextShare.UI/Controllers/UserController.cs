@@ -7,6 +7,9 @@ using TextShare.Domain.Models.EntityModels.UserModels;
 
 namespace TextShare.UI.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления пользователями
+    /// </summary>
     [Route("profile")]
     public class UserController : Controller
     {
@@ -17,6 +20,11 @@ namespace TextShare.UI.Controllers
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// Страница пользователя
+        /// </summary>
+        /// <returns>Страница с личной информацией о пользователе</returns>
+        /// <remarks>GET /profile/my </remarks>
         [HttpGet("my")]
         [Authorize]
         public async Task<IActionResult> DetailsUser()
