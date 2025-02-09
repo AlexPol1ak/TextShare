@@ -60,5 +60,12 @@ namespace TextShare.Business.Interfaces
         /// <param name="shelf">Полка для проверки</param>
         /// <returns>true- если существует, иначе false.</returns>
         Task<bool> ContainsShelfAsync(Shelf shelf);
+
+        /// <summary>
+        /// Возвращает все созданные полки  пользователя.
+        /// </summary>
+        /// <param name="userId">Id пользователя</param>
+        /// <returns>Полки пользователя</returns>
+        Task<List<Shelf>> GetAllUserShelvesAsync(int userId, params string[] includes);
     }
 }

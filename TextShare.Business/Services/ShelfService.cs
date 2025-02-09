@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using TextShare.Business.Interfaces;
@@ -44,6 +46,15 @@ namespace TextShare.Business.Services
         public async Task<List<Shelf>> GetAllShelvesAsync(params string[] includes)
         {
             return await _repositoryShelves.GetAllAsync(includes);
+        }
+
+        public async Task<List<Shelf>> GetAllUserShelvesAsync(int userId, params string[] includes)
+        {
+            IQueryable<Shelf> userShelves = (await FindShelvesAsync(u=> u.CreatorId == userId)).AsQueryable();
+            foreach(string include in includes) userShelves.Include(include);
+
+            return userShelves.ToList();
+
         }
 
         public async Task<Shelf?> GetShelfByIdAsync(int id, params string[] includes)
