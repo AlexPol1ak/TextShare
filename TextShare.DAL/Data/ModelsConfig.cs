@@ -34,7 +34,7 @@ namespace TextShare.DAL.Data
             builder.HasIndex(u => u.Email).IsUnique();
             builder.Property(u => u.Email).IsRequired();
             builder.HasIndex(u => u.UserName).IsUnique();
-            builder.Property(u => u.UserName).IsRequired();                    
+            builder.Property(u => u.UserName).IsRequired();
         }
 
         /// <summary>
@@ -216,9 +216,9 @@ namespace TextShare.DAL.Data
 
             builder.HasKey(c => c.CategoryId);
             builder.Property(c => c.Name).HasMaxLength(100).IsRequired();
-            builder.HasIndex(c=>c.Name).IsUnique();
+            builder.HasIndex(c => c.Name).IsUnique();
             builder.Property(c => c.TranslateName).HasMaxLength(100).IsRequired();
-            builder.HasIndex(c=>c.TranslateName).IsUnique();
+            builder.HasIndex(c => c.TranslateName).IsUnique();
             builder.Property(c => c.Description).HasColumnType("TEXT").IsRequired(false);
 
             // Связь многие ко многим с TextFile через промежуточную таблицу
@@ -252,7 +252,7 @@ namespace TextShare.DAL.Data
         /// <param name="builder"></param>
         static public void ComplainsConfig(EntityTypeBuilder<Complaint> builder)
         {
-            builder.HasKey(c=> c.ComplaintId);
+            builder.HasKey(c => c.ComplaintId);
 
             builder.HasOne(c => c.TextFile)
                 .WithMany(t => t.Complaints)
