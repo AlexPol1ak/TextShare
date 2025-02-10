@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using TextShare.Business.Interfaces;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.Groups;
@@ -40,12 +38,12 @@ namespace TextShare.Business.Services
             return await _repositoryGroups.FindAsync(predicate);
         }
 
-        public async Task<List<Group>> GetAllGroupsAsync(params string[] includes)
+        public async Task<List<Group>> GetAllGroupsAsync(params Expression<Func<Group, object>>[] includes)
         {
             return await _repositoryGroups.GetAllAsync(includes);
         }
 
-        public async Task<Group?> GetGroupByIdAsync(int id, params string[] includes)
+        public async Task<Group?> GetGroupByIdAsync(int id, params Expression<Func<Group, object>>[] includes)
         {
             return await _repositoryGroups.GetAsync(id, includes);
         }

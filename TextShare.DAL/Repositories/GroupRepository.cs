@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using TextShare.DAL.Data;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.Groups;
@@ -23,7 +18,7 @@ namespace TextShare.DAL.Repositories
             _groups = context.Groups;
         }
 
-        public async Task<List<Group>> GetAllAsync(params string[] includes)
+        public async Task<List<Group>> GetAllAsync(params Expression<Func<Group, object>>[] includes)
         {
             IQueryable<Group> query = _groups.AsQueryable();
             foreach (var include in includes)
@@ -33,7 +28,7 @@ namespace TextShare.DAL.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<Group?> GetAsync(int id, params string[] includes)
+        public async Task<Group?> GetAsync(int id, params Expression<Func<Group, object>>[] includes)
         {
             IQueryable<Group> query = _groups.AsQueryable();
             foreach (var include in includes)
@@ -73,7 +68,7 @@ namespace TextShare.DAL.Repositories
         {
             return await _groups.AnyAsync(g => g.Name == entity.Name &&
             g.Description == entity.Description &&
-            g.CreatedAt ==entity.CreatedAt);
+            g.CreatedAt == entity.CreatedAt);
         }
 
         public async Task<int> CountAsync()

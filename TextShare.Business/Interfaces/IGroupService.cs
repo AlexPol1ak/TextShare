@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using TextShare.Domain.Entities.Groups;
 
 namespace TextShare.Business.Interfaces
@@ -14,14 +12,14 @@ namespace TextShare.Business.Interfaces
         /// Возвращает список всех групп.
         /// </summary>
         /// <returns>Список групп</returns>
-        Task<List<Group>> GetAllGroupsAsync(params string[] includes);
+        Task<List<Group>> GetAllGroupsAsync(params Expression<Func<Group, object>>[] includes);
 
         /// <summary>
         /// Возвращает группу по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор группы</param>
         /// <returns>Объект группы, если найден, иначе null</returns>
-        Task<Group?> GetGroupByIdAsync(int id, params string[] includes);
+        Task<Group?> GetGroupByIdAsync(int id, params Expression<Func<Group, object>>[] includes);
 
         /// <summary>
         /// Поиск групп по указанному условию.

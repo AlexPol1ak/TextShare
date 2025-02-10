@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using TextShare.Domain.Entities.Complaints;
 
 namespace TextShare.Business.Interfaces
@@ -14,14 +12,15 @@ namespace TextShare.Business.Interfaces
         /// Возвращает все причины жалоб.
         /// </summary>
         /// <returns>Список причин жалоб</returns>
-        Task<List<ComplaintReasons>> GetAllComplaintReasonsAsync(params string[] includes);
+        Task<List<ComplaintReasons>> GetAllComplaintReasonsAsync(params Expression<Func<ComplaintReasons, object>>[] includes);
 
         /// <summary>
         /// Возвращает причину жалобы по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор причины жалобы</param>
         /// <returns>Возвращает причину жалобы, если найдена, иначе null</returns>
-        Task<ComplaintReasons?> GetComplaintReasonByIdAsync(int id, params string[] includes);
+        Task<ComplaintReasons?> GetComplaintReasonByIdAsync(int id,
+            params Expression<Func<ComplaintReasons, object>>[] includes);
 
         /// <summary>
         /// Выполняет поиск причин жалоб по заданному условию.

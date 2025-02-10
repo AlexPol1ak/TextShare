@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using TextShare.Domain.Entities.TextFiles;
 
 namespace TextShare.Business.Interfaces
@@ -14,14 +12,14 @@ namespace TextShare.Business.Interfaces
         /// Возвращает список всех текстовых файлов.
         /// </summary>
         /// <returns>Список текстовых файлов</returns>
-        Task<List<TextFile>> GetAllTextFilesAsync(params string[] includes);
+        Task<List<TextFile>> GetAllTextFilesAsync(params Expression<Func<TextFile, object>>[] includes);
 
         /// <summary>
         /// Возвращает текстовый файл по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор файла</param>
         /// <returns>Объект текстового файла, если найден, иначе null</returns>
-        Task<TextFile?> GetTextFileByIdAsync(int id, params string[] includes);
+        Task<TextFile?> GetTextFileByIdAsync(int id, params Expression<Func<TextFile, object>>[] includes);
 
         /// <summary>
         /// Поиск текстовых файлов по указанному условию.

@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using TextShare.DAL.Data;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.TextFiles;
@@ -23,7 +18,7 @@ namespace TextShare.DAL.Repositories
             _textFiles = context.TextFiles;
         }
 
-        public async Task<List<TextFile>> GetAllAsync(params string[] includes)
+        public async Task<List<TextFile>> GetAllAsync(params Expression<Func<TextFile, object>>[] includes)
         {
             IQueryable<TextFile> query = _textFiles.AsQueryable();
             foreach (var include in includes)
@@ -33,7 +28,7 @@ namespace TextShare.DAL.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<TextFile?> GetAsync(int id, params string[] includes)
+        public async Task<TextFile?> GetAsync(int id, params Expression<Func<TextFile, object>>[] includes)
         {
             IQueryable<TextFile> query = _textFiles.AsQueryable();
             foreach (var include in includes)

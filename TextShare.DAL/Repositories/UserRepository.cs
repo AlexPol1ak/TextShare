@@ -21,7 +21,7 @@ namespace TextShare.DAL.Repositories
 
         public async Task<bool> ContainsAsync(User entity)
         {
-            return await _users.AnyAsync(u=>u.NormalizedEmail == entity.NormalizedEmail);
+            return await _users.AnyAsync(u => u.NormalizedEmail == entity.NormalizedEmail);
         }
 
         public async Task<int> CountAsync()
@@ -48,7 +48,7 @@ namespace TextShare.DAL.Repositories
             return await _users.Where(predicate).ToListAsync();
         }
 
-        public async Task<List<User>> GetAllAsync(params string[] includes)
+        public async Task<List<User>> GetAllAsync(params Expression<Func<User, object>>[] includes)
         {
             IQueryable<User> query = _users.AsQueryable();
             foreach (var include in includes)
@@ -58,7 +58,7 @@ namespace TextShare.DAL.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<User?> GetAsync(int id, params string[] includes)
+        public async Task<User?> GetAsync(int id, params Expression<Func<User, object>>[] includes)
         {
             IQueryable<User> query = _users.AsQueryable();
             foreach (var include in includes)

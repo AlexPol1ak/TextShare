@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using TextShare.Business.Interfaces;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.TextFiles;
@@ -19,7 +14,7 @@ namespace TextShare.Business.Services
     {
         private readonly IRepository<Category> _repositoryCategories;
 
-        public CategoryService(IUnitOfWork unitOfWork) : base(unitOfWork) 
+        public CategoryService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _repositoryCategories = unitOfWork.CategoryRepository;
         }
@@ -36,7 +31,7 @@ namespace TextShare.Business.Services
 
         public async Task<bool> DeleteCategoryAsync(int id)
         {
-           return await _repositoryCategories.DeleteAsync(id);
+            return await _repositoryCategories.DeleteAsync(id);
         }
 
         public async Task<List<Category>> FindCategoriesAsync(Expression<Func<Category, bool>> predicate)
@@ -44,23 +39,23 @@ namespace TextShare.Business.Services
             return await _repositoryCategories.FindAsync(predicate);
         }
 
-        public async Task<List<Category>> GetAllCategoriesAsync(params string[] includes)
+        public async Task<List<Category>> GetAllCategoriesAsync(params Expression<Func<Category, object>>[] includes)
         {
             return await _repositoryCategories.GetAllAsync(includes);
         }
 
-        public async Task<Category?> GetCategoryByIdAsync(int id, params string[] includes)
+        public async Task<Category?> GetCategoryByIdAsync(int id, params Expression<Func<Category, object>>[] includes)
         {
             return await _repositoryCategories.GetAsync(id, includes);
         }
 
-        public async Task<Category?> GetCategoryByNameAsync(string categoryName, params string[] includes)
+        public async Task<Category?> GetCategoryByNameAsync(string categoryName, params Expression<Func<Category, object>>[] includes)
         {
             IQueryable<Category> categories = (await _repositoryCategories.
-                FindAsync(c=>c.Name == categoryName)).AsQueryable();
-            if(includes.Length > 0)
+                FindAsync(c => c.Name == categoryName)).AsQueryable();
+            if (includes.Length > 0)
             {
-                foreach(string include in includes)
+                foreach (var include in includes)
                 {
                     categories.Include(include);
                 }

@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using TextShare.DAL.Data;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.TextFiles;
@@ -23,7 +18,7 @@ namespace TextShare.DAL.Repositories
             _shelves = context.Shelves;
         }
 
-        public async Task<List<Shelf>> GetAllAsync(params string[] includes)
+        public async Task<List<Shelf>> GetAllAsync(params Expression<Func<Shelf, object>>[] includes)
         {
             IQueryable<Shelf> query = _shelves.AsQueryable();
             foreach (var include in includes)
@@ -33,7 +28,7 @@ namespace TextShare.DAL.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<Shelf?> GetAsync(int id, params string[] includes)
+        public async Task<Shelf?> GetAsync(int id, params Expression<Func<Shelf, object>>[] includes)
         {
             IQueryable<Shelf> query = _shelves.AsQueryable();
             foreach (var include in includes)
@@ -72,7 +67,7 @@ namespace TextShare.DAL.Repositories
         public async Task<bool> ContainsAsync(Shelf entity)
         {
             return await _shelves.AnyAsync(s => s.ShelfId == entity.ShelfId ||
-            (s.Name == entity.Name && s.CreatedAt ==entity.CreatedAt));
+            (s.Name == entity.Name && s.CreatedAt == entity.CreatedAt));
         }
 
         public async Task<int> CountAsync()

@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using TextShare.DAL.Data;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.Complaints;
@@ -23,7 +18,7 @@ namespace TextShare.DAL.Repositories
             _complaints = context.Complaints;
         }
 
-        public async Task<List<Complaint>> GetAllAsync(params string[] includes)
+        public async Task<List<Complaint>> GetAllAsync(params Expression<Func<Complaint, object>>[] includes)
         {
             IQueryable<Complaint> query = _complaints.AsQueryable();
             foreach (var include in includes)
@@ -33,7 +28,7 @@ namespace TextShare.DAL.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<Complaint?> GetAsync(int id, params string[] includes)
+        public async Task<Complaint?> GetAsync(int id, params Expression<Func<Complaint, object>>[] includes)
         {
             IQueryable<Complaint> query = _complaints.AsQueryable();
             foreach (var include in includes)

@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using TextShare.Business.Interfaces;
-using TextShare.Domain.Entities.TextFiles;
-using TextShare.Domain.Utils;
-using static System.Net.Mime.MediaTypeNames;
+﻿using TextShare.Business.Interfaces;
 
 namespace TextShare.Business.Services
 {
@@ -39,7 +28,7 @@ namespace TextShare.Business.Services
         /// <returns></returns>
         public async Task<Dictionary<string, string>> Save(Stream fileStream, string fileName, string? directoryName = null)
         {
-            Dictionary<string, string> result = new ();
+            Dictionary<string, string> result = new();
 
             // Директория хранения
             string fileDir = string.Empty; // Полный путь
@@ -51,7 +40,7 @@ namespace TextShare.Business.Services
                 fileDir = Path.Combine(this._root, directoryName);
                 relativePath = Path.Combine(directoryName);
             }
-                
+
             //Новое уникальное имя
             string newName = await _getRandomUniqueFileName(fileName, directoryName);
             // Новый полный путь
@@ -63,7 +52,7 @@ namespace TextShare.Business.Services
                 await fileStream.CopyToAsync(stream);
                 size = stream.Length;
             }
-                        
+
             result.Add("originalFileName", fileName);
             result.Add("uniqueFileName", newName);
             result.Add("type", $"{Path.GetExtension(newName)}");
@@ -87,8 +76,8 @@ namespace TextShare.Business.Services
             var extension = Path.GetExtension(fileName);
             newName = Path.ChangeExtension(randomName, extension);
 
-            if(await FileExist(newName, directoryName))
-               newName = await  _getRandomUniqueFileName(fileName, directoryName);
+            if (await FileExist(newName, directoryName))
+                newName = await _getRandomUniqueFileName(fileName, directoryName);
 
             return newName;
         }
@@ -115,7 +104,7 @@ namespace TextShare.Business.Services
 
             File.Delete(filePath);
             return true;
-   
+
         }
 
         /// <summary>
@@ -138,6 +127,6 @@ namespace TextShare.Business.Services
             return File.Exists(path);
         }
 
-        
+
     }
 }

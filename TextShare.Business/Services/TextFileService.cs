@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using TextShare.Business.Interfaces;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.TextFiles;
@@ -39,12 +37,12 @@ namespace TextShare.Business.Services
             return await _repositoryTextFiles.FindAsync(predicate);
         }
 
-        public async Task<List<TextFile>> GetAllTextFilesAsync(params string[] includes)
+        public async Task<List<TextFile>> GetAllTextFilesAsync(params Expression<Func<TextFile, object>>[] includes)
         {
             return await _repositoryTextFiles.GetAllAsync(includes);
         }
 
-        public async Task<TextFile?> GetTextFileByIdAsync(int id, params string[] includes)
+        public async Task<TextFile?> GetTextFileByIdAsync(int id, params Expression<Func<TextFile, object>>[] includes)
         {
             return await _repositoryTextFiles.GetAsync(id, includes);
         }

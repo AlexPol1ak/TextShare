@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using TextShare.DAL.Data;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.AccessRules;
@@ -23,7 +18,7 @@ namespace TextShare.DAL.Repositories
             _accessRules = context.AccessRules;
         }
 
-        public async Task<List<AccessRule>> GetAllAsync(params string[] includes)
+        public async Task<List<AccessRule>> GetAllAsync(params Expression<Func<AccessRule, object>>[] includes)
         {
             IQueryable<AccessRule> query = _accessRules.AsQueryable();
             foreach (var include in includes)
@@ -33,7 +28,7 @@ namespace TextShare.DAL.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<AccessRule?> GetAsync(int id, params string[] includes)
+        public async Task<AccessRule?> GetAsync(int id, params Expression<Func<AccessRule, object>>[] includes)
         {
             IQueryable<AccessRule> query = _accessRules.AsQueryable();
             foreach (var include in includes)

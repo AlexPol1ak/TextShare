@@ -1,12 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using TextShare.Business.Interfaces;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.TextFiles;
-using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Business.Services
 {
@@ -14,14 +10,14 @@ namespace TextShare.Business.Services
     /// <summary> 
     ///  Сервис для управления полками
     /// </summary>
-    public class ShelfService : BaseService,  IShelfService
+    public class ShelfService : BaseService, IShelfService
     {
         private readonly IRepository<Shelf> _repositoryShelves;
 
-        public ShelfService(IUnitOfWork unitOfWork) :base(unitOfWork)
+        public ShelfService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
-            _repositoryShelves = unitOfWork.ShelfRepository;          
-        }      
+            _repositoryShelves = unitOfWork.ShelfRepository;
+        }
 
         public async Task<bool> ContainsShelfAsync(Shelf shelf)
         {
@@ -43,21 +39,21 @@ namespace TextShare.Business.Services
             return await _repositoryShelves.FindAsync(predicate);
         }
 
-        public async Task<List<Shelf>> GetAllShelvesAsync(params string[] includes)
+        public async Task<List<Shelf>> GetAllShelvesAsync(params Expression<Func<Shelf, object>>[] includes)
         {
             return await _repositoryShelves.GetAllAsync(includes);
         }
 
-        public async Task<List<Shelf>> GetAllUserShelvesAsync(int userId, params string[] includes)
+        public async Task<List<Shelf>> GetAllUserShelvesAsync(int userId, params Expression<Func<Shelf, object>>[] includes)
         {
-            IQueryable<Shelf> userShelves = (await FindShelvesAsync(u=> u.CreatorId == userId)).AsQueryable();
-            foreach(string include in includes) userShelves.Include(include);
+            IQueryable<Shelf> userShelves = (await FindShelvesAsync(u => u.CreatorId == userId)).AsQueryable();
+            foreach (var include in includes) userShelves.Include(include);
 
             return userShelves.ToList();
 
         }
 
-        public async Task<Shelf?> GetShelfByIdAsync(int id, params string[] includes)
+        public async Task<Shelf?> GetShelfByIdAsync(int id, params Expression<Func<Shelf, object>>[] includes)
         {
             return await _repositoryShelves.GetAsync(id, includes);
         }

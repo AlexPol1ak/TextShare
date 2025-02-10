@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using TextShare.Domain.Entities.TextFiles;
 
 namespace TextShare.Business.Interfaces
@@ -15,21 +12,21 @@ namespace TextShare.Business.Interfaces
         /// Возвращает все категории.
         /// </summary>
         /// <returns>Список категорий</returns>
-        Task<List<Category>> GetAllCategoriesAsync(params string[] includes);
+        Task<List<Category>> GetAllCategoriesAsync(params Expression<Func<Category, object>>[] includes);
 
         /// <summary>
         /// Возвращает категорию по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор категории</param>
         /// <returns>Возвращает категорию, если найдена, иначе null</returns>
-        Task<Category?> GetCategoryByIdAsync(int id, params string[] includes);
+        Task<Category?> GetCategoryByIdAsync(int id, params Expression<Func<Category, object>>[] includes);
 
         /// <summary>
         /// Возвращает категорию по названию.
         /// </summary>
         /// <param name="categoryName">Название категории</param>
         /// <returns>Возвращает категорию, если найдена, иначе null</returns>
-        Task<Category?> GetCategoryByNameAsync(string categoryName, params string[] includes);
+        Task<Category?> GetCategoryByNameAsync(string categoryName, params Expression<Func<Category, object>>[] includes);
 
         /// <summary>
         /// Поиск категорий по условию.

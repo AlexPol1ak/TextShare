@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using TextShare.Domain.Entities.TextFiles;
-using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Business.Interfaces
 {
@@ -16,14 +13,14 @@ namespace TextShare.Business.Interfaces
         /// Возвращает все полки.
         /// </summary>
         /// <returns>Список полок</returns>
-        Task<List<Shelf>> GetAllShelvesAsync(params string[] includes);
+        Task<List<Shelf>> GetAllShelvesAsync(params Expression<Func<Shelf, object>>[] includes);
 
         /// <summary>
         /// Возвращает полку по идентификатору
         /// </summary>
         /// <param name="id">Идентификатор полки</param>
         /// <returns>Возвращает полку, если найдено, иначе null</returns>
-        Task<Shelf?> GetShelfByIdAsync(int id, params string[] includes);
+        Task<Shelf?> GetShelfByIdAsync(int id, params Expression<Func<Shelf, object>>[] includes);
 
         /// <summary>
         /// Поиск полки по условию
@@ -38,7 +35,7 @@ namespace TextShare.Business.Interfaces
         /// <param name="shelf">Созданная полка</param>
         /// <returns></returns>
         Task<Shelf> CreateShelfAsync(Shelf shelf);
-        
+
         /// <summary>
         ///  Удаляет полку по идентификатору.
         /// </summary>
@@ -66,6 +63,6 @@ namespace TextShare.Business.Interfaces
         /// </summary>
         /// <param name="userId">Id пользователя</param>
         /// <returns>Полки пользователя</returns>
-        Task<List<Shelf>> GetAllUserShelvesAsync(int userId, params string[] includes);
+        Task<List<Shelf>> GetAllUserShelvesAsync(int userId, params Expression<Func<Shelf, object>>[] includes);
     }
 }

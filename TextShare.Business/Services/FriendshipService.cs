@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using TextShare.Business.Interfaces;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.Users;
@@ -35,12 +32,13 @@ namespace TextShare.Business.Services
             return await _repositoryFriendships.DeleteAsync(id);
         }
 
-        public async Task<List<Friendship>> GetAllFriendshipsAsync(params string[] includes)
+        public async Task<List<Friendship>> GetAllFriendshipsAsync(params Expression<Func<Friendship, object>>[] includes)
         {
             return await _repositoryFriendships.GetAllAsync(includes);
         }
 
-        public async Task<Friendship?> GetFriendshipByIdAsync(int id, params string[] includes)
+        public async Task<Friendship?> GetFriendshipByIdAsync(int id,
+            params Expression<Func<Friendship, object>>[] includes)
         {
             return await _repositoryFriendships.GetAsync(id, includes);
         }

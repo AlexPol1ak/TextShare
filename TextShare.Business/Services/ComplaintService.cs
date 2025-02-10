@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using TextShare.Business.Interfaces;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.Complaints;
@@ -15,7 +13,7 @@ namespace TextShare.Business.Services
     {
         private readonly IRepository<Complaint> _repositoryComplaints;
 
-        public ComplaintService(IUnitOfWork unitOfWork) : base(unitOfWork) 
+        public ComplaintService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _repositoryComplaints = unitOfWork.ComplaintRepository;
         }
@@ -40,12 +38,12 @@ namespace TextShare.Business.Services
             return await _repositoryComplaints.FindAsync(predicate);
         }
 
-        public async Task<List<Complaint>> GetAllComplaintsAsync(params string[] includes)
+        public async Task<List<Complaint>> GetAllComplaintsAsync(params Expression<Func<Complaint, object>>[] includes)
         {
             return await _repositoryComplaints.GetAllAsync(includes);
         }
 
-        public async Task<Complaint?> GetComplaintByIdAsync(int id, params string[] includes)
+        public async Task<Complaint?> GetComplaintByIdAsync(int id, params Expression<Func<Complaint, object>>[] includes)
         {
             return await _repositoryComplaints.GetAsync(id, includes);
         }

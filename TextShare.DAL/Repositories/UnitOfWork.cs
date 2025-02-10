@@ -20,7 +20,7 @@ namespace TextShare.DAL.Repositories
         private IRepository<Friendship> friendshipRepository;
         private IRepository<TextFile> textFileRepository;
         private IRepository<Shelf> shelfRepository;
-        private IRepository<Category> categoryRepository; 
+        private IRepository<Category> categoryRepository;
         private IRepository<Group> groupRepository;
         private IRepository<Complaint> complaintRepository;
         private IRepository<ComplaintReasons> complaintReasonsRepository;
@@ -36,7 +36,7 @@ namespace TextShare.DAL.Repositories
             new UserRepository(_context);
 
         // Репозиторий дружбы
-        public IRepository<Friendship> FriendshipRepository=> friendshipRepository ??=
+        public IRepository<Friendship> FriendshipRepository => friendshipRepository ??=
             new FriendshipRepository(_context);
 
         // Репозиторий текстовых файлов

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using TextShare.Business.Interfaces;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.AccessRules;
@@ -10,7 +8,7 @@ namespace TextShare.Business.Services
     /// <summary> 
     ///  Сервис для управления правилами доступа.
     /// </summary>
-    public class AccessRuleService : BaseService,  IAccessRuleService
+    public class AccessRuleService : BaseService, IAccessRuleService
     {
         private readonly IRepository<AccessRule> _repositoryAccessRules;
 
@@ -39,12 +37,12 @@ namespace TextShare.Business.Services
             return await _repositoryAccessRules.FindAsync(predicate);
         }
 
-        public async Task<List<AccessRule>> GetAllAccessRulesAsync(params string[] includes)
+        public async Task<List<AccessRule>> GetAllAccessRulesAsync(params Expression<Func<AccessRule, object>>[] includes)
         {
-            return await _repositoryAccessRules.GetAllAsync( includes);
+            return await _repositoryAccessRules.GetAllAsync(includes);
         }
 
-        public async Task<AccessRule?> GetAccessRuleByIdAsync(int id, params string[] includes)
+        public async Task<AccessRule?> GetAccessRuleByIdAsync(int id, params Expression<Func<AccessRule, object>>[] includes)
         {
             return await _repositoryAccessRules.GetAsync(id, includes);
         }
