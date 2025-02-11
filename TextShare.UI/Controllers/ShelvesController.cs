@@ -21,12 +21,18 @@ namespace TextShare.UI.Controllers
         private readonly IShelfService _shelfService;
         private readonly IAccessRuleService _accessRuleService;
         private readonly UserManager<User> _userManager;
+        private readonly IUserService _userService;
 
-        public ShelvesController(IShelfService shelfService, UserManager<User> userManager, IAccessRuleService accessRuleService)
+        public ShelvesController(IShelfService shelfService, 
+            UserManager<User> userManager,
+            IAccessRuleService accessRuleService,
+            IUserService userService
+            )
         {
             _shelfService = shelfService;
             _userManager = userManager;
             _accessRuleService = accessRuleService; 
+            _userService = userService;
         }
 
         [Authorize]
@@ -96,11 +102,18 @@ namespace TextShare.UI.Controllers
             if (shelf.AccessRule.AvailableAll == true) return View(shelfDetailModel);
 
             if (!User.Identity.IsAuthenticated) return Challenge();
+            User userDb = await _userService.GetUserByIdAsync((await _userManager.GetUserAsync(User)).Id,
+                u=>u.GroupMemberships);
 
-            //User user = await _userManager.;
+            if(shelf.CreatorId == userDb.Id) return View(shelfDetailModel);
+            if(shelf.AccessRule.AvailableUsers.Any(u=>u.Id == userDb.Id)) return View(shelfDetailModel);
 
+            var ids = new HashSet<int>((shelf.AccessRule.AvailableGroups.Select(g => g.GroupId)));
+            bool hasIntersection = userDb.GroupMemberships.Any(g => ids.Contains(g.GroupId));
+            if (hasIntersection) return View(shelfDetailModel);
 
-            return Content("");
+            return RedirectToAction("Login", "Account");
+
         }
 
         [Authorize]
