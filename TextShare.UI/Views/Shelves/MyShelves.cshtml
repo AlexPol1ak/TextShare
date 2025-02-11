@@ -1,18 +1,34 @@
 ﻿@{
-    List<Shelf> shelves = Model.Data.Items;
+    List<Shelf> shelves = Model.Items;
 }
-<h2>Мои полки</h2>
 
-@if (shelves.Count > 0)
-{
-    int counter = 1;
-    foreach (Shelf shelf in shelves)
-    {
-        <p>@counter. <a asp-controller="Shelves" asp-action="DetailShelf" asp-route-id="@shelf.ShelfId">@shelf.Name</a></p>
-        counter++;
-    }
-}
-else
-{
-    <p>У вас пока нет полок</p>
-}
+<div class="d-flex align-items-start">
+    <!-- Ссылки слева -->
+    <div class="w-20 ms-0 ps-2">
+        <partial name="_ShelvesLinksPartial" />
+    </div>
+
+    <!-- Полки справа -->
+    <div class="w-80 ms-5">
+        <h2>Мои полки</h2>
+
+        @if (shelves.Count > 0)
+        {
+            int shelfCounter = 1; 
+            @foreach (var shelf in shelves) 
+            {
+                <p>@shelfCounter. <a asp-controller="Shelves" 
+                                   asp-action="DetailShelf" 
+                                   asp-route-id="@shelf.ShelfId">
+                                    @shelf.Name
+                                  </a>
+                </p>
+                shelfCounter++; 
+            }
+        }
+        else
+        {
+            <p>У вас пока нет полок</p>
+        }
+    </div>
+</div>

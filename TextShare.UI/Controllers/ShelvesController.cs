@@ -1,12 +1,17 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Net;
 using System.Runtime.CompilerServices;
 using TextShare.Business.Interfaces;
+using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
-using TextShare.Domain.Models.EntityModels;
+using TextShare.Domain.Models.EntityModels.ShelfModels;
+using TextShare.Domain.Utils;
 
 namespace TextShare.UI.Controllers
 {
@@ -14,28 +19,28 @@ namespace TextShare.UI.Controllers
     public class ShelvesController : Controller
     {
         private readonly IShelfService _shelfService;
+        private readonly IAccessRuleService _accessRuleService;
         private readonly UserManager<User> _userManager;
 
-        public ShelvesController(IShelfService shelfService, UserManager<User> userManager)
+        public ShelvesController(IShelfService shelfService, UserManager<User> userManager, IAccessRuleService accessRuleService)
         {
             _shelfService = shelfService;
             _userManager = userManager;
+            _accessRuleService = accessRuleService; 
         }
 
         [Authorize]
         [HttpGet("my")]
         public async Task<IActionResult> MyShelves()
         {
-            ResponseData<ListModel<Shelf>> responseData = new();
             ListModel<Shelf> listModel = new ListModel<Shelf>();
 
             User user = (await _userManager.GetUserAsync(User))!;
             List<Shelf> userSheles = await _shelfService.GetAllUserShelvesAsync(user.Id);
 
             listModel.Items = userSheles;
-            responseData.Data = listModel;
             
-            return View(responseData);
+            return View(listModel);
         }
 
         [Authorize]
@@ -67,7 +72,7 @@ namespace TextShare.UI.Controllers
 
         [Authorize]
         [HttpPost("create-shelf")]
-        public async Task<IActionResult> CreateShelf(ShelfModel shelfModel)
+        public async Task<IActionResult> CreateShelf(ShelfDetailModel shelfModel)
         {
             return Content("Create Shelf Post");
         }
@@ -76,7 +81,26 @@ namespace TextShare.UI.Controllers
         [HttpGet("detail/{id}")]
         public async Task<IActionResult> DetailShelf(int id)
         {
-            return Content("DetailShelf");
+
+            Shelf? shelf = await _shelfService.GetShelfByIdAsync(id,
+                s => s.Creator,
+                s => s.TextFiles,
+                s => s.AccessRule.AvailableGroups,
+                s=>s.AccessRule.AvailableUsers);
+            
+            // Если полка не найдена
+            if (shelf == null) return NotFound();
+            ShelfDetailModel shelfDetailModel = ShelfDetailModel.FromShelf(shelf);
+
+            // Если доступна всем
+            if (shelf.AccessRule.AvailableAll == true) return View(shelfDetailModel);
+
+            if (!User.Identity.IsAuthenticated) return Challenge();
+
+            //User user = await _userManager.;
+
+
+            return Content("");
         }
 
         [Authorize]
@@ -88,7 +112,7 @@ namespace TextShare.UI.Controllers
 
         [Authorize]
         [HttpPost("edit/{id}")]
-        public async Task<IActionResult> EditShelf(int id, ShelfModel shelfModel)
+        public async Task<IActionResult> EditShelf(int id, ShelfDetailModel shelfModel)
         {
             return Content("EditShelf Post");
         }
@@ -109,7 +133,7 @@ namespace TextShare.UI.Controllers
 
         [Authorize]
         [HttpPost("access-control/{id}")]
-        public async Task<IActionResult> AccessControl(int id, ShelfModel shelfModel)
+        public async Task<IActionResult> AccessControl(int id, ShelfDetailModel shelfModel)
         {
             return Content("EditShelf Post");
         }

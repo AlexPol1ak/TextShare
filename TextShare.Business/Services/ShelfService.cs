@@ -19,6 +19,7 @@ namespace TextShare.Business.Services
             _repositoryShelves = unitOfWork.ShelfRepository;
         }
 
+
         public async Task<bool> ContainsShelfAsync(Shelf shelf)
         {
             return await _repositoryShelves.ContainsAsync(shelf);

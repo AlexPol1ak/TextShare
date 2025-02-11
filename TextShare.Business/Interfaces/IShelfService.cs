@@ -64,5 +64,6 @@ namespace TextShare.Business.Interfaces
         /// <param name="userId">Id пользователя</param>
         /// <returns>Полки пользователя</returns>
         Task<List<Shelf>> GetAllUserShelvesAsync(int userId, params Expression<Func<Shelf, object>>[] includes);
+
     }
 }
