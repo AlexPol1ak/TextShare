@@ -33,9 +33,10 @@ namespace TextShare.Business.Services
             return await _repositoryComplaintReasons.DeleteAsync(id);
         }
 
-        public async Task<List<ComplaintReasons>> FindComplaintReasonsAsync(Expression<Func<ComplaintReasons, bool>> predicate)
+        public async Task<List<ComplaintReasons>> FindComplaintReasonsAsync(Expression<Func<ComplaintReasons, bool>> predicate,
+            params Expression<Func<ComplaintReasons, object>>[] includes)
         {
-            return await _repositoryComplaintReasons.FindAsync(predicate);
+            return await _repositoryComplaintReasons.FindAsync(predicate, includes);
         }
 
         public async Task<List<ComplaintReasons>> GetAllComplaintReasonsAsync(

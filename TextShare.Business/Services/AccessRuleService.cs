@@ -32,9 +32,10 @@ namespace TextShare.Business.Services
             return await _repositoryAccessRules.DeleteAsync(id);
         }
 
-        public async Task<List<AccessRule>> FindAccessRulesAsync(Expression<Func<AccessRule, bool>> predicate)
+        public async Task<List<AccessRule>> FindAccessRulesAsync(Expression<Func<AccessRule, 
+            bool>> predicate, params Expression<Func<AccessRule, object>>[] includes)
         {
-            return await _repositoryAccessRules.FindAsync(predicate);
+            return await _repositoryAccessRules.FindAsync(predicate,includes);
         }
 
         public async Task<List<AccessRule>> GetAllAccessRulesAsync(params Expression<Func<AccessRule, object>>[] includes)

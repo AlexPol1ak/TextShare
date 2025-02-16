@@ -33,7 +33,7 @@ namespace TextShare.Business.Interfaces
         /// </summary>
         /// <param name="predicate">Условие поиска</param>
         /// <returns>Список найденных пользователей</returns>
-        Task<List<User>> FindUsersAsync(Expression<Func<User, bool>> predicate);
+        Task<List<User>> FindUsersAsync(Expression<Func<User, bool>> predicate, params Expression<Func<User, object>>[] includes);
 
         /// <summary>
         /// Создает нового пользователя.

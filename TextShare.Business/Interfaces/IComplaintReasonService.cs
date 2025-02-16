@@ -27,7 +27,8 @@ namespace TextShare.Business.Interfaces
         /// </summary>
         /// <param name="predicate">Условие поиска</param>
         /// <returns>Список найденных причин жалоб</returns>
-        Task<List<ComplaintReasons>> FindComplaintReasonsAsync(Expression<Func<ComplaintReasons, bool>> predicate);
+        Task<List<ComplaintReasons>> FindComplaintReasonsAsync(Expression<Func<ComplaintReasons, bool>> predicate,
+            params Expression<Func<ComplaintReasons, object>>[] includes);
 
         /// <summary>
         /// Создает новую причину жалобы.

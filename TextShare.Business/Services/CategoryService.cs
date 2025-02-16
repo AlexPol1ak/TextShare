@@ -34,9 +34,10 @@ namespace TextShare.Business.Services
             return await _repositoryCategories.DeleteAsync(id);
         }
 
-        public async Task<List<Category>> FindCategoriesAsync(Expression<Func<Category, bool>> predicate)
+        public async Task<List<Category>> FindCategoriesAsync(Expression<Func<Category,
+            bool>> predicate, params Expression<Func<Category, object>>[] includes)
         {
-            return await _repositoryCategories.FindAsync(predicate);
+            return await _repositoryCategories.FindAsync(predicate, includes);
         }
 
         public async Task<List<Category>> GetAllCategoriesAsync(params Expression<Func<Category, object>>[] includes)
@@ -51,18 +52,9 @@ namespace TextShare.Business.Services
 
         public async Task<Category?> GetCategoryByNameAsync(string categoryName, params Expression<Func<Category, object>>[] includes)
         {
-            IQueryable<Category> categories = (await _repositoryCategories.
-                FindAsync(c => c.Name == categoryName)).AsQueryable();
-            if (includes.Length > 0)
-            {
-                foreach (var include in includes)
-                {
-                    categories.Include(include);
-                }
-            }
-            List<Category> listCategory = categories.ToList();
-            return listCategory.FirstOrDefault();
+            var categories = await _repositoryCategories.FindAsync(c => c.Name == categoryName, includes);
 
+            return categories.FirstOrDefault();
         }
 
         public async Task<Category> UpdateCategoryAsync(Category category)

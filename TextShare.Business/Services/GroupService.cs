@@ -33,9 +33,10 @@ namespace TextShare.Business.Services
             return await _repositoryGroups.DeleteAsync(id);
         }
 
-        public async Task<List<Group>> FindGroupsAsync(Expression<Func<Group, bool>> predicate)
+        public async Task<List<Group>> FindGroupsAsync(Expression<Func<Group, bool>> predicate, 
+            params Expression<Func<Group, object>>[] includes)
         {
-            return await _repositoryGroups.FindAsync(predicate);
+            return await _repositoryGroups.FindAsync(predicate, includes);
         }
 
         public async Task<List<Group>> GetAllGroupsAsync(params Expression<Func<Group, object>>[] includes)

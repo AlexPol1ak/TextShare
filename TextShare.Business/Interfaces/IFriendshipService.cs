@@ -26,14 +26,14 @@ namespace TextShare.Business.Interfaces
         /// </summary>
         /// <param name="userId">Идентификатор пользователя</param>
         /// <returns>Список дружеских связей</returns>
-        Task<List<Friendship>> GetFriendshipsByUserIdAsync(int userId);
+        Task<List<Friendship>> GetFriendshipsByUserIdAsync(int userId, params Expression<Func<Friendship, object>>[] includes);
 
         /// <summary>
         /// Возвращает список дружеских связей, где пользователь указан как друг.
         /// </summary>
         /// <param name="friendId">Идентификатор друга</param>
         /// <returns>Список дружеских связей</returns>
-        Task<List<Friendship>> GetFriendshipsByFriendIdAsync(int friendId);
+        Task<List<Friendship>> GetFriendshipsByFriendIdAsync(int friendId, params Expression<Func<Friendship, object>>[] includes);
 
         /// <summary>
         /// Создает новую запись о дружбе.

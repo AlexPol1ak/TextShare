@@ -26,7 +26,10 @@ namespace TextShare.Business.Interfaces
         /// </summary>
         /// <param name="predicate">Условие поиска</param>
         /// <returns>Список найденных правил доступа</returns>
-        Task<List<AccessRule>> FindAccessRulesAsync(Expression<Func<AccessRule, bool>> predicate);
+        Task<List<AccessRule>> FindAccessRulesAsync(
+            Expression<Func<AccessRule, bool>> predicate,
+             params Expression<Func<AccessRule, object>>[] includes
+            );
 
         /// <summary>
         /// Создает новое правило доступа.

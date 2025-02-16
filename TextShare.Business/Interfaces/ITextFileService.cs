@@ -26,7 +26,8 @@ namespace TextShare.Business.Interfaces
         /// </summary>
         /// <param name="predicate">Лямбда-выражение с условием поиска</param>
         /// <returns>Список текстовых файлов, удовлетворяющих условию</returns>
-        Task<List<TextFile>> FindTextFilesAsync(Expression<Func<TextFile, bool>> predicate);
+        Task<List<TextFile>> FindTextFilesAsync(Expression<Func<TextFile, bool>> predicate,
+            params Expression<Func<TextFile, object>>[] includes);
 
         /// <summary>
         /// Создает новый текстовый файл.

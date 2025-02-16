@@ -26,7 +26,9 @@ namespace TextShare.Business.Interfaces
         /// </summary>
         /// <param name="predicate">Лямбда-выражение с условием поиска</param>
         /// <returns>Список групп, удовлетворяющих условию</returns>
-        Task<List<Group>> FindGroupsAsync(Expression<Func<Group, bool>> predicate);
+        Task<List<Group>> FindGroupsAsync(Expression<Func<Group, bool>> predicate, 
+            params Expression<Func<Group, object>>[] includes
+            );
 
         /// <summary>
         /// Создает новую группу.

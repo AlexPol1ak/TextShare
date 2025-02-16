@@ -35,9 +35,10 @@ namespace TextShare.Business.Services
             return await _repositoryShelves.DeleteAsync(id);
         }
 
-        public async Task<List<Shelf>> FindShelvesAsync(Expression<Func<Shelf, bool>> predicate)
+        public async Task<List<Shelf>> FindShelvesAsync(Expression<Func<Shelf, bool>> predicate,
+            params Expression<Func<Shelf, object>>[] includes)
         {
-            return await _repositoryShelves.FindAsync(predicate);
+            return await _repositoryShelves.FindAsync(predicate, includes);
         }
 
         public async Task<List<Shelf>> GetAllShelvesAsync(params Expression<Func<Shelf, object>>[] includes)
@@ -47,10 +48,9 @@ namespace TextShare.Business.Services
 
         public async Task<List<Shelf>> GetAllUserShelvesAsync(int userId, params Expression<Func<Shelf, object>>[] includes)
         {
-            IQueryable<Shelf> userShelves = (await FindShelvesAsync(u => u.CreatorId == userId)).AsQueryable();
-            foreach (var include in includes) userShelves.Include(include);
+            List<Shelf> userShelves = (await FindShelvesAsync(u => u.CreatorId == userId, includes));
 
-            return userShelves.ToList();
+            return userShelves;
 
         }
 

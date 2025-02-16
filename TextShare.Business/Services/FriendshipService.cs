@@ -43,14 +43,15 @@ namespace TextShare.Business.Services
             return await _repositoryFriendships.GetAsync(id, includes);
         }
 
-        public async Task<List<Friendship>> GetFriendshipsByUserIdAsync(int userId)
+        public async Task<List<Friendship>> GetFriendshipsByUserIdAsync(int userId, params Expression<Func<Friendship, object>>[] includes)
         {
-            return await _repositoryFriendships.FindAsync(f => f.UserId == userId);
+            return await _repositoryFriendships.FindAsync(f => f.UserId == userId, includes);
         }
 
-        public async Task<List<Friendship>> GetFriendshipsByFriendIdAsync(int friendId)
+        public async Task<List<Friendship>> GetFriendshipsByFriendIdAsync(int friendId,
+            params Expression<Func<Friendship, object>>[] includes)
         {
-            return await _repositoryFriendships.FindAsync(f => f.FriendId == friendId);
+            return await _repositoryFriendships.FindAsync(f => f.FriendId == friendId, includes);
         }
 
         public async Task<Friendship> UpdateFriendshipAsync(Friendship friendship)

@@ -33,7 +33,10 @@ namespace TextShare.Business.Interfaces
         /// </summary>
         /// <param name="predicate">Условие поиска</param>
         /// <returns>Список найденных категорий</returns>
-        Task<List<Category>> FindCategoriesAsync(Expression<Func<Category, bool>> predicate);
+        Task<List<Category>> FindCategoriesAsync
+            (Expression<Func<Category, bool>> predicate,
+            params Expression<Func<Category, object>>[] includes
+            );
 
         /// <summary>
         /// Создает новую категорию.

@@ -33,9 +33,10 @@ namespace TextShare.Business.Services
             return await _repositoryUsers.DeleteAsync(id);
         }
 
-        public async Task<List<User>> FindUsersAsync(Expression<Func<User, bool>> predicate)
+        public async Task<List<User>> FindUsersAsync(Expression<Func<User, bool>> predicate,
+            params Expression<Func<User, object>>[] includes)
         {
-            return await _repositoryUsers.FindAsync(predicate);
+            return await _repositoryUsers.FindAsync(predicate, includes);
         }
 
         public async Task<List<User>> GetAllUsersAsync(params Expression<Func<User, object>>[] includes)
@@ -50,17 +51,7 @@ namespace TextShare.Business.Services
 
         public async Task<User?> GetUserByUsernameAsync(string username, params Expression<Func<User, object>>[] includes)
         {
-            IQueryable<User> users = (await _repositoryUsers.
-                FindAsync(u => u.UserName == username)).AsQueryable();
-
-            if (includes.Length > 0)
-            {
-                foreach (var include in includes)
-                {
-                    users = users.Include(include);
-                }
-            }
-
+            List<User> users = (await _repositoryUsers.FindAsync(u => u.UserName == username, includes));       
             return users.FirstOrDefault();
         }
 

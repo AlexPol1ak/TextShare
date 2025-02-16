@@ -27,7 +27,7 @@ namespace TextShare.Business.Interfaces
         /// </summary>
         /// <param name="predicate">Условие</param>
         /// <returns>Список полок</returns>
-        Task<List<Shelf>> FindShelvesAsync(Expression<Func<Shelf, bool>> predicate);
+        Task<List<Shelf>> FindShelvesAsync(Expression<Func<Shelf, bool>> predicate, params Expression<Func<Shelf, object>>[] includes);
 
         /// <summary>
         /// Создает новую полку.ч
