@@ -57,6 +57,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IShelfService, ShelfService>();
 builder.Services.AddScoped<IAccessRuleService, AccessRuleService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IFriendshipService, FriendshipService>();
 
 var app = builder.Build();
 

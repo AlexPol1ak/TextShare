@@ -19,20 +19,26 @@ using X.PagedList.Extensions;
 
 namespace TextShare.UI.Controllers
 {
+    /// <summary>
+    /// Котроллер для управления полками.
+    /// </summary>
     [Route("shelves")]
     public class ShelvesController : Controller
     {
         private readonly IShelfService _shelfService;
-        private readonly IAccessRuleService _accessRuleService;
-        private readonly UserManager<User> _userManager;
+        private readonly IAccessRuleService _accessRuleService;       
         private readonly IUserService _userService;
+        private readonly IFriendshipService _friendshipService;
         private readonly ShelvesSettings _shelvesSettings;
+        private readonly UserManager<User> _userManager;
 
-        public ShelvesController(IShelfService shelfService, 
+
+        public ShelvesController(IShelfService shelfService,
             UserManager<User> userManager,
             IAccessRuleService accessRuleService,
             IUserService userService,
-            IOptions<ShelvesSettings> shelvesSettingsOptions
+            IOptions<ShelvesSettings> shelvesSettingsOptions,
+            IFriendshipService friendshipService
             )
         {
             _shelfService = shelfService;
@@ -40,9 +46,17 @@ namespace TextShare.UI.Controllers
             _accessRuleService = accessRuleService; 
             _userService = userService;
             _shelvesSettings = shelvesSettingsOptions.Value;
+            _friendshipService = friendshipService;
+
             
         }
 
+        /// <summary>
+        /// Отображает страницу с полками пользователя.
+        /// </summary>
+        /// <param name="page">Страница полок</param>
+        /// <returns></returns>
+        /// <remarks>shelves/my?page=1</remarks>
         [Authorize]
         [HttpGet("my")]
         public async Task<IActionResult> MyShelves(int page = 1)
@@ -58,11 +72,46 @@ namespace TextShare.UI.Controllers
             return View(shelvesPart);
         }
 
+        /// <summary>
+        /// Отображет страницу полок, к которым передставили  доступ друзья.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>shelves/friends-shared?page=1</remarks>
         [Authorize]
         [HttpGet("friends-shared")]
-        public async Task<IActionResult> AvailableFromFriends()
+        public async Task<IActionResult> AvailableFromFriends(int page=1)
         {
-            return Content("AvailableFromFriends");
+
+            User user = (await _userManager.GetUserAsync(User))!;
+            int pageSize = _shelvesSettings.MaxNumberShelvesInPage;
+
+            // Получаем список друзей
+            List<Friendship> userFriendships = await _friendshipService.GetFriendshipsByUserIdAsync(user.Id);
+
+            if (userFriendships.Count == 0)
+            {
+                IPagedList<Shelf> responseEmptyShelves = new List<Shelf>().ToPagedList(page,pageSize);
+                return View(responseEmptyShelves);
+            }
+
+            // Доступные полки пользователю
+            List<Shelf> availableShelves = new();
+
+            foreach (var friendship in userFriendships)
+            {
+                // Получаем полки друга вместе с правилами доступа и пользователями,кому эта полка доступна.
+                List<Shelf> friendShelves = await _shelfService.GetAllUserShelvesAsync(
+                    friendship.FriendId,
+                    s => s.AccessRule.AvailableUsers
+                );
+                // Фильтруем только те полки, где текущий пользователь есть в списке доступных
+                availableShelves.AddRange(friendShelves
+                    .Where(s => s.AccessRule.AvailableUsers.Any(u => u.Id == user.Id)));
+            }
+            // Преобразуем в пагинированный список
+            IPagedList<Shelf> pagedShelves = availableShelves.ToPagedList(page, 10);
+
+            return View(pagedShelves);
         }
 
         [Authorize]
