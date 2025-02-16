@@ -1,0 +1,24 @@
+﻿@model List<Shelf>
+@using System.Security.Claims
+
+@{
+    List<Shelf> shelves = Model;
+    int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+}
+<div>
+    @{
+        int shelfCounter = 1;
+        @foreach (var shelf in shelves)
+        {
+            <p>
+                @shelfCounter. <a asp-controller="Shelves"
+                                  asp-action="DetailShelf"
+                                  asp-route-id="@shelf.ShelfId">
+                    @shelf.Name
+                </a>
+            </p>
+            shelfCounter++;
+        }
+    }
+</div>
+

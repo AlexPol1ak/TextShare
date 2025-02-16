@@ -14,18 +14,12 @@
 
         @if (shelves.TotalItemCount > 0)
         {
-            int shelfCounter = 1; 
-            @foreach (var shelf in shelves) 
-            {
-                <p>@shelfCounter. <a asp-controller="Shelves" 
-                                   asp-action="DetailShelf" 
-                                   asp-route-id="@shelf.ShelfId">
-                                    @shelf.Name
-                                  </a>
-                </p>
-                shelfCounter++; 
-            }
-            @Html.PagedListPager(shelves, page => Url.Action("MyShelves", new { page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+            await Html.RenderPartialAsync("_ShelvesListPartial", shelves.ToList());
+            @Html.PagedListPager(
+                shelves,
+                page => Url.Action("MyShelves", new { page }),
+                PagedListRenderOptions.OnlyShowFivePagesAtATime
+                )
         }
         else
         {
