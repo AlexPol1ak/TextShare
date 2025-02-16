@@ -1,8 +1,8 @@
-﻿@model List<Shelf>
+﻿@model AvailableShelvesModel<User, IPagedList<Shelf>>
 @using System.Security.Claims
 
 @{
-    List<Shelf> shelves = Model;
+    List<Shelf> shelves = Model.AvailableShelves.ToList();
     int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
 }
 <div>

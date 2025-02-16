@@ -1,5 +1,8 @@
-﻿@{
-    IPagedList<Shelf> shelves = Model;
+﻿
+@{
+    
+    @model AvailableShelvesModel<User, IPagedList<Shelf>>
+    IPagedList<Shelf> shelves = Model.AvailableShelves;
 }
 
 <div class="d-flex align-items-start">
@@ -14,7 +17,7 @@
 
         @if (shelves.TotalItemCount > 0)
         {
-            await Html.RenderPartialAsync("_ShelvesListPartial", shelves.ToList());
+            await Html.RenderPartialAsync("_ShelvesListPartial", Model);
             @Html.PagedListPager(
                 shelves,
                 page => Url.Action("MyShelves", new { page }),

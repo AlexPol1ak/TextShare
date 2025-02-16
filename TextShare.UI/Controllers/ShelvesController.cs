@@ -63,13 +63,16 @@ namespace TextShare.UI.Controllers
         {
 
             int pageSize = _shelvesSettings.MaxNumberShelvesInPage;
-            User user = (await _userManager.GetUserAsync(User))!;
-            List<Shelf> userShelesAll = await _shelfService.GetAllUserShelvesAsync(user.Id);
+            User user = (await _userManager.GetUserAsync(User))!;           
+            List<Shelf> userShelvesAll = await _shelfService.GetAllUserShelvesAsync(user.Id);
+            
+            IPagedList<Shelf> shelvesPart = userShelvesAll.ToPagedList(page, pageSize);
 
-            IEnumerable<Shelf> userAllShelvesE = userShelesAll.AsEnumerable();
-            IPagedList<Shelf> shelvesPart = userAllShelvesE.ToPagedList(page, pageSize);
-                  
-            return View(shelvesPart);
+            AvailableShelvesModel<User, IPagedList<Shelf>> responseModel = new();
+            responseModel.User = user;
+            responseModel.AvailableShelves = shelvesPart;
+
+            return View(responseModel);
         }
 
         /// <summary>
@@ -84,14 +87,16 @@ namespace TextShare.UI.Controllers
 
             User user = (await _userManager.GetUserAsync(User))!;
             int pageSize = _shelvesSettings.MaxNumberShelvesInPage;
+            AvailableShelvesModel<User, IPagedList<Shelf>> responseModel = new();
+            responseModel.User = user;
 
             // Получаем список друзей
-            List<Friendship> userFriendships = await _friendshipService.GetFriendshipsByUserIdAsync(user.Id);
+            List <Friendship> userFriendships = await _friendshipService.GetFriendshipsByUserIdAsync(user.Id);
 
             if (userFriendships.Count == 0)
             {
-                IPagedList<Shelf> responseEmptyShelves = new List<Shelf>().ToPagedList(page,pageSize);
-                return View(responseEmptyShelves);
+                responseModel.AvailableShelves = new List<Shelf>().ToPagedList(page, pageSize);
+                return View(responseModel);
             }
 
             // Доступные полки пользователю
@@ -110,8 +115,9 @@ namespace TextShare.UI.Controllers
             }
             // Преобразуем в пагинированный список
             IPagedList<Shelf> pagedShelves = availableShelves.ToPagedList(page, 10);
+            responseModel.AvailableShelves = pagedShelves;
 
-            return View(pagedShelves);
+            return View(responseModel);
         }
 
         [Authorize]
