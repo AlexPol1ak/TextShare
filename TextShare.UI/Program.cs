@@ -8,6 +8,7 @@ using TextShare.Business.Interfaces;
 using TextShare.Business.Services;
 using TextShare.DAL.Interfaces;
 using TextShare.DAL.Repositories;
+using TextShare.Domain.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,9 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+builder.Services.Configure<ImageUploadSettings>(builder.Configuration.GetSection("ImageUploadSettings"));
+builder.Services.Configure<ShelvesSettings>(builder.Configuration.GetSection("ShelvesSettings"));
 
 // Business Services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

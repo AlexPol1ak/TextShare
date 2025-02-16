@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Options;
 using System.Net;
 using System.Runtime.CompilerServices;
 using TextShare.Business.Interfaces;
@@ -11,7 +12,10 @@ using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
 using TextShare.Domain.Models.EntityModels.ShelfModels;
+using TextShare.Domain.Settings;
 using TextShare.Domain.Utils;
+using X.PagedList;
+using X.PagedList.Extensions;
 
 namespace TextShare.UI.Controllers
 {
@@ -22,31 +26,36 @@ namespace TextShare.UI.Controllers
         private readonly IAccessRuleService _accessRuleService;
         private readonly UserManager<User> _userManager;
         private readonly IUserService _userService;
+        private readonly ShelvesSettings _shelvesSettings;
 
         public ShelvesController(IShelfService shelfService, 
             UserManager<User> userManager,
             IAccessRuleService accessRuleService,
-            IUserService userService
+            IUserService userService,
+            IOptions<ShelvesSettings> shelvesSettingsOptions
             )
         {
             _shelfService = shelfService;
             _userManager = userManager;
             _accessRuleService = accessRuleService; 
             _userService = userService;
+            _shelvesSettings = shelvesSettingsOptions.Value;
+            
         }
 
         [Authorize]
         [HttpGet("my")]
-        public async Task<IActionResult> MyShelves()
+        public async Task<IActionResult> MyShelves(int page = 1)
         {
-            ListModel<Shelf> listModel = new ListModel<Shelf>();
 
+            int pageSize = _shelvesSettings.MaxNumberShelvesInPage;
             User user = (await _userManager.GetUserAsync(User))!;
-            List<Shelf> userSheles = await _shelfService.GetAllUserShelvesAsync(user.Id);
+            List<Shelf> userShelesAll = await _shelfService.GetAllUserShelvesAsync(user.Id);
 
-            listModel.Items = userSheles;
-            
-            return View(listModel);
+            IEnumerable<Shelf> userAllShelvesE = userShelesAll.AsEnumerable();
+            IPagedList<Shelf> shelvesPart = userAllShelvesE.ToPagedList(page, pageSize);
+                  
+            return View(shelvesPart);
         }
 
         [Authorize]
@@ -102,6 +111,7 @@ namespace TextShare.UI.Controllers
             if (shelf.AccessRule.AvailableAll == true) return View(shelfDetailModel);
 
             if (!User.Identity.IsAuthenticated) return Challenge();
+
             User userDb = await _userService.GetUserByIdAsync((await _userManager.GetUserAsync(User)).Id,
                 u=>u.GroupMemberships);
 
