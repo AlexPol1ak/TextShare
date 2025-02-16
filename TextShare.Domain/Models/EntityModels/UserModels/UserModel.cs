@@ -31,7 +31,7 @@ namespace TextShare.Domain.Models.EntityModels.UserModels
         public string? AvatarUri { get; set; }
 
         /// <summary>
-        /// Создает объект User из UserDto 
+        /// Создает объект User из модели
         /// </summary>
         /// <returns></returns>
         public virtual User ToUser()
@@ -49,7 +49,7 @@ namespace TextShare.Domain.Models.EntityModels.UserModels
         }
 
         /// <summary>
-        /// Создает UserDto из объекта User.
+        /// Создает модель из объекта User.
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
