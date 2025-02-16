@@ -45,13 +45,13 @@ namespace TextShare.Business.Services
 
         public async Task<List<Friendship>> GetFriendshipsByUserIdAsync(int userId, params Expression<Func<Friendship, object>>[] includes)
         {
-            return await _repositoryFriendships.FindAsync(f => f.UserId == userId, includes);
+            return await _repositoryFriendships.FindAsync(f => f.UserId == userId&& f.IsConfirmed==true, includes);
         }
 
         public async Task<List<Friendship>> GetFriendshipsByFriendIdAsync(int friendId,
             params Expression<Func<Friendship, object>>[] includes)
         {
-            return await _repositoryFriendships.FindAsync(f => f.FriendId == friendId, includes);
+            return await _repositoryFriendships.FindAsync(f => f.FriendId == friendId &&f.IsConfirmed == true, includes);
         }
 
         public async Task<Friendship> UpdateFriendshipAsync(Friendship friendship)
