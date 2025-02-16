@@ -43,9 +43,19 @@ namespace TextShare.DAL.Repositories
             return true;
         }
 
-        public async Task<List<User>> FindAsync(Expression<Func<User, bool>> predicate)
+        public async Task<List<User>> FindAsync(
+                    Expression<Func<User, bool>> predicate,
+                    params Expression<Func<User, object>>[] includes
+            )
         {
-            return await _users.Where(predicate).ToListAsync();
+            IQueryable<User> query = _users.Where(predicate);
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task<List<User>> GetAllAsync(params Expression<Func<User, object>>[] includes)

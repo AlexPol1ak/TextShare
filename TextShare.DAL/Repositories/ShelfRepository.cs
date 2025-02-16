@@ -38,9 +38,19 @@ namespace TextShare.DAL.Repositories
             return await query.FirstOrDefaultAsync(s => s.ShelfId == id);
         }
 
-        public async Task<List<Shelf>> FindAsync(Expression<Func<Shelf, bool>> predicate)
+        public async Task<List<Shelf>> FindAsync(
+                    Expression<Func<Shelf, bool>> predicate,
+                    params Expression<Func<Shelf, object>>[] includes
+            )
         {
-            return await _shelves.Where(predicate).ToListAsync();
+            IQueryable<Shelf> query = _shelves.Where(predicate);
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task<Shelf> CreateAsync(Shelf entity)

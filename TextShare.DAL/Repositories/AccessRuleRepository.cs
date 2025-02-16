@@ -38,10 +38,21 @@ namespace TextShare.DAL.Repositories
             return await query.FirstOrDefaultAsync(ar => ar.AccessRuleId == id);
         }
 
-        public async Task<List<AccessRule>> FindAsync(Expression<Func<AccessRule, bool>> predicate)
+        public async Task<List<AccessRule>> FindAsync(
+                    Expression<Func<AccessRule, bool>> predicate,
+                    params Expression<Func<AccessRule, object>>[] includes
+            )
         {
-            return await _accessRules.Where(predicate).ToListAsync();
+            IQueryable<AccessRule> query = _accessRules.Where(predicate);
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.ToListAsync();
         }
+
 
         public async Task<AccessRule> CreateAsync(AccessRule entity)
         {

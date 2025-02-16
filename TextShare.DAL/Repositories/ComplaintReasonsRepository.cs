@@ -38,9 +38,19 @@ namespace TextShare.DAL.Repositories
             return await query.FirstOrDefaultAsync(c => c.ComplaintReasonsId == id);
         }
 
-        public async Task<List<ComplaintReasons>> FindAsync(Expression<Func<ComplaintReasons, bool>> predicate)
+        public async Task<List<ComplaintReasons>> FindAsync(
+                    Expression<Func<ComplaintReasons, bool>> predicate,
+                    params Expression<Func<ComplaintReasons, object>>[] includes
+            )
         {
-            return await _complaintReasons.Where(predicate).ToListAsync();
+            IQueryable<ComplaintReasons> query = _complaintReasons.Where(predicate);
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task<ComplaintReasons> CreateAsync(ComplaintReasons entity)
