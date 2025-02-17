@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿// Ignore Spelling: username
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TextShare.Domain.Entities.Users;
@@ -20,6 +22,13 @@ namespace TextShare.UI.Controllers
             _userManager = userManager;
         }
 
+        [HttpGet("{username}")]
+        [Authorize]
+        public async Task<IActionResult> DetailsUserByUserName(string username)
+        {
+            return Content(username);
+        }
+
         /// <summary>
         /// Страница пользователя
         /// </summary>
@@ -36,5 +45,8 @@ namespace TextShare.UI.Controllers
             ResponseData<User> responseModel = new() { Data = user };
             return View(responseModel);
         }
+
+        
+
     }
 }

@@ -17,7 +17,26 @@
 
         @if (shelves.TotalItemCount > 0)
         {
-            await Html.RenderPartialAsync("_ShelvesListPartial", Model);
+
+            int shelfCounter = 1;
+            @foreach (var shelf in shelves)
+            {
+                <div class="d-flex align-items-center mb-2">
+                    <h4 class="mb-0 me-3">@shelfCounter. @shelf.Name</h4>
+                    <a href="@Url.Action("DetailShelf", "Shelves", new { id = shelf.ShelfId })"
+                       target="_blank"
+                       class="btn btn-primary btn-sm me-2">
+                        Открыть
+                    </a>
+
+                    <a href="@Url.Action("EditShelf", "Shelves", new { id = shelf.ShelfId })"
+                       class="btn btn-warning btn-sm">
+                        Редактировать
+                    </a>                   
+                </div>
+                shelfCounter++;
+            }
+            
             @Html.PagedListPager(
                 shelves,
                 page => Url.Action("MyShelves", new { page }),

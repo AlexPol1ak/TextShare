@@ -7,7 +7,9 @@ using Microsoft.Extensions.Options;
 using System.Net;
 using System.Runtime.CompilerServices;
 using TextShare.Business.Interfaces;
+using TextShare.Business.Services;
 using TextShare.Domain.Entities.AccessRules;
+using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
@@ -29,8 +31,10 @@ namespace TextShare.UI.Controllers
         private readonly IAccessRuleService _accessRuleService;       
         private readonly IUserService _userService;
         private readonly IFriendshipService _friendshipService;
+        private readonly IGroupService _groupService;
         private readonly ShelvesSettings _shelvesSettings;
         private readonly UserManager<User> _userManager;
+        
 
 
         public ShelvesController(IShelfService shelfService,
@@ -38,7 +42,8 @@ namespace TextShare.UI.Controllers
             IAccessRuleService accessRuleService,
             IUserService userService,
             IOptions<ShelvesSettings> shelvesSettingsOptions,
-            IFriendshipService friendshipService
+            IFriendshipService friendshipService,
+            IGroupService groupService
             )
         {
             _shelfService = shelfService;
@@ -47,6 +52,7 @@ namespace TextShare.UI.Controllers
             _userService = userService;
             _shelvesSettings = shelvesSettingsOptions.Value;
             _friendshipService = friendshipService;
+            _groupService = groupService;
 
             
         }
@@ -124,7 +130,13 @@ namespace TextShare.UI.Controllers
         [HttpGet("shared-from-groups")]
         public async Task<IActionResult> AvailableFromGroups()
         {
-            return Content("AvailableFromGroups");
+            User user = (await _userManager.GetUserAsync(User))!;
+            List<Group> userGroups = await _groupService.FindGroupsAsync(
+                g => g.Members.Any(m => m.UserId == user.Id),
+                g => g.AccessRules);
+
+
+            return View();
         }
 
         [HttpGet("search")]
