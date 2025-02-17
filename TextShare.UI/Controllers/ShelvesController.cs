@@ -82,7 +82,7 @@ namespace TextShare.UI.Controllers
         }
 
         /// <summary>
-        /// Отображет страницу полок, к которым передставили  доступ друзья.
+        /// Отображает страницу полок, к которым предоставили  доступ друзья.
         /// </summary>
         /// <returns></returns>
         /// <remarks>shelves/friends-shared?page=1</remarks>
@@ -126,17 +126,38 @@ namespace TextShare.UI.Controllers
             return View(responseModel);
         }
 
+        /// <summary>
+        /// Отображает страницу полок, которые доступны группам, в которых состоит пользователь.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>shelves/shared-from-groups?page=1</remarks>
         [Authorize]
         [HttpGet("shared-from-groups")]
-        public async Task<IActionResult> AvailableFromGroups()
+        public async Task<IActionResult> AvailableFromGroups(int page=1)
         {
+            int pageSize = _shelvesSettings.MaxNumberShelvesInPage;
+
             User user = (await _userManager.GetUserAsync(User))!;
+            User userDb = (await _userService.GetUserByIdAsync(user.Id, u=>u.GroupMemberships))!;
+
+            // Группы ,в которых состоит пользователь.
             List<Group> userGroups = await _groupService.FindGroupsAsync(
-                g => g.Members.Any(m => m.UserId == user.Id),
+                g => g.Members.Any(m => m.UserId == user.Id && m.IsConfirmed == true),
                 g => g.AccessRules);
 
+            // Полки, доступные группам, в которых состоит пользователь
+            List<Shelf> availableShelves = userGroups
+                .SelectMany(g => g.AccessRules)
+                .Where(ar => ar.Shelf != null)
+                .Select(ar => ar.Shelf)
+                .Distinct()
+                .ToList();
 
-            return View();
+            AvailableShelvesModel<User, IPagedList<Shelf>> responseModel = new();
+            responseModel.User = userDb;
+            responseModel.AvailableShelves = availableShelves.ToPagedList(page, pageSize);
+          
+            return View(responseModel);
         }
 
         [HttpGet("search")]

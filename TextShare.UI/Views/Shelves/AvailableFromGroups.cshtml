@@ -1,5 +1,6 @@
 ﻿@{
-    IPagedList<Shelf> shelves = Model;
+    @model AvailableShelvesModel<User, IPagedList<Shelf>>
+    IPagedList<Shelf> shelves = Model.AvailableShelves;
 }
 
 <div class="d-flex align-items-start">
@@ -10,17 +11,29 @@
 
     <!-- Полки справа -->
     <div class="w-80 ms-5">
-        <h2>Доступные полки из групп </h2>       
+        <h2>Полки, доступные группам, в которых вы состоите. </h2>
 
         @if (shelves.TotalItemCount > 0)
         {
-            <h3>Этими полками  поделились участники групп, в которых вы состоите.</h3>
+            int shelfCounter = 1;
+            @foreach (var shelf in shelves)
+            {
+                <div class="d-flex align-items-center mb-2">
+                    <h4 class="mb-0 me-3">@shelfCounter. @shelf.Name</h4>
 
-            await Html.RenderPartialAsync("_ShelvesListPartial", shelves.ToList());
+                    <a href="@Url.Action("DetailShelf", "Shelves", new { id = shelf.ShelfId })"
+                       target="_blank"
+                       class="btn btn-primary btn-sm me-2">
+                        Открыть
+                    </a>
+                </div>               
+                shelfCounter++;
+            }
+
 
             Html.PagedListPager(
             shelves,
-            page => Url.Action("AvailableFromFriends",
+            page => Url.Action("AvailableFromFri0ends",
             new { page }),
             PagedListRenderOptions.OnlyShowFivePagesAtATime
             );

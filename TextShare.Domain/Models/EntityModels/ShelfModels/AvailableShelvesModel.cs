@@ -16,7 +16,7 @@ namespace TextShare.Domain.Models.EntityModels.ShelfModels
         where U: class
         where C: IEnumerable<Shelf>
     {
-        public U User { get; set; }
+        public U? User { get; set; }
         public C AvailableShelves { get; set; } = default;
 
     }
