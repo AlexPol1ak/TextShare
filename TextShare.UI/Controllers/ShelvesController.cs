@@ -161,9 +161,79 @@ namespace TextShare.UI.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> Search()
+        public async Task<IActionResult> Search([FromQuery] ShelvesSearchModel? shelvesSearchModel = null, int page= 1)
         {
-            return Content("Search");
+            
+            if (shelvesSearchModel == null || 
+                (string.IsNullOrEmpty(shelvesSearchModel.Name) && string.IsNullOrEmpty(shelvesSearchModel.Description)))
+            {
+                return View("SearchInput");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("SearchInput", shelvesSearchModel);
+            }
+            int pageSize = _shelvesSettings.MaxNumberShelvesInPage;
+            List<Shelf> shelvesResult = new(); // Результат всего поиска
+            List<Shelf> shelvesResponse = new(); // Результат фильтрации и ответ пользователю
+            string? name = shelvesSearchModel.Name;
+            string? description = shelvesSearchModel.Description;
+            bool onlyAvailableMe = shelvesSearchModel.OnlyAvailableMe;
+
+            // Если указано имя и описание
+            if ((!string.IsNullOrEmpty(name)) && (!string.IsNullOrEmpty(description)))
+            {
+                shelvesResult = await _shelfService.FindShelvesAsync(
+                    s => s.Name.Contains(name) && s.Description.Contains(description),
+                    s=>s.AccessRule.AvailableGroups,
+                    s=>s.AccessRule.AvailableUsers
+                    );
+            }
+
+            // Если указано только имя 
+            if ((!string.IsNullOrEmpty(name)) && (string.IsNullOrEmpty(description)))
+            {
+                shelvesResult = await _shelfService.FindShelvesAsync(
+                   s => s.Name.Contains(name),
+                   s => s.AccessRule.AvailableGroups,
+                   s => s.AccessRule.AvailableUsers
+                   );
+            }
+
+            // Если указано только описание
+            if ((string.IsNullOrEmpty(name)) && (!string.IsNullOrEmpty(description)))
+            {
+                shelvesResult = await _shelfService.FindShelvesAsync(
+                    s => s.Description.Contains(description),
+                    s => s.AccessRule.AvailableGroups,
+                    s => s.AccessRule.AvailableUsers
+                    );
+            }
+
+            // Если пользователь не авторизован или авторизован но поиск указан по общедоступным полкам
+            // Фильтруем только общедоступные полки
+            if ((!User.Identity.IsAuthenticated ) || (User.Identity.IsAuthenticated && (onlyAvailableMe == false)))
+            {
+                shelvesResponse = shelvesResult.Where(s => s.AccessRule.AvailableAll == true).ToList();
+                
+            }
+
+            // Если пользователь авторизован и указан поиск по доступным ему полкам.
+            if (User.Identity.IsAuthenticated && onlyAvailableMe == true)
+            {
+                User user = (await _userManager.GetUserAsync(User))!;
+                User userDb = (await _userService.GetUserByIdAsync(user.Id, u => u.GroupMemberships))!;
+                List<int> userGroupIds = userDb.GroupMemberships.Select(g => g.GroupId).ToList();
+
+                shelvesResponse = shelvesResult
+                    .Where(s => s.AccessRule.AvailableUsers.Any(u => u.Id == userDb.Id) ||
+                                s.AccessRule.AvailableGroups.Any(group => userGroupIds.Contains(group.GroupId)))
+                    .DistinctBy(s=>s.ShelfId)
+                    .ToList();
+            }
+
+            return View("SearchOutput", shelvesResponse.ToPagedList(page, pageSize));
         }
 
         [Authorize]

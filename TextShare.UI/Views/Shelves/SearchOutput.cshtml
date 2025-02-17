@@ -1,0 +1,45 @@
+﻿@{
+    @model AvailableShelvesModel<User, IPagedList<Shelf>>
+    IPagedList<Shelf> shelves = Model.AvailableShelves;
+}
+
+<div class="d-flex align-items-start">
+    <!-- Ссылки слева -->
+    <div class="w-20 ms-0 ps-2">
+        <partial name="_ShelvesLinksPartial" />
+    </div>
+
+    <!-- Полки справа -->
+    <div class="w-80 ms-5">
+        <h2>Результат поиска. </h2>
+
+        @if (shelves.TotalItemCount > 0)
+        {
+            <h5>Результатов: @shelves.TotalItemCount</h5>
+            int shelfCounter = 1;
+            @foreach (var shelf in shelves)
+            {
+                <div class="d-flex align-items-center mb-2">
+                    <h4 class="mb-0 me-3">@shelfCounter. @shelf.Name</h4>
+                    <a href="@Url.Action("DetailShelf", "Shelves", new { id = shelf.ShelfId })"
+                       target="_blank"
+                       class="btn btn-primary btn-sm me-2">
+                        Открыть
+                    </a>
+                </div>
+                shelfCounter++;
+            }
+
+            Html.PagedListPager(
+            shelves,
+            page => Url.Action("AvailableFromFriends",
+            new { page }),
+            PagedListRenderOptions.OnlyShowFivePagesAtATime
+            );
+        }
+        else
+        {
+            <p>Друзья пока не поделились с вами полками</p>
+        }
+    </div>
+</div>

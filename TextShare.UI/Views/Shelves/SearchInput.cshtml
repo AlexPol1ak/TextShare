@@ -1,0 +1,45 @@
+﻿@model TextShare.Domain.Models.EntityModels.ShelfModels.ShelvesSearchModel
+
+@{
+    ViewData["Title"] = "Поиск полок";
+}
+
+<h2>Поиск полок</h2>
+@if (!User.Identity.IsAuthenticated)
+{
+    <p>Вы не авторизованы. Поиск будет происходить по только общедоступным полкам.<br>
+        Для более широкого поиска 
+        <a asp-controller="Account" asp-action="Login" >войдите</a>
+        или
+        <a asp-controller="Account" asp-action="Register">зарегистрируйтесь</a>
+    </p>
+}
+
+<form asp-controller="Shelves" asp-action="Search" method="get" class="mt-3">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Название</label>
+        <input asp-for="Name" class="form-control" placeholder="Введите название">
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Описание</label>
+        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Введите описание"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="mb-3">
+            <label asp-for="OnlyAvailableMe" class="form-label">Искать только в доступных мне </label>
+            <input type="checkbox" asp-for="OnlyAvailableMe" class="form-check-input" />
+            <span asp-validation-for="OnlyAvailableMe" class="text-danger"></span>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary">Найти</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
