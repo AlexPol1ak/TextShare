@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /TextShare.API/appsettings.json
 /TextShare.API/wwwroot/Images
 /TextShare.API/wwwroot/TextFiles
+/TextShare.UI/wwwroot/Images

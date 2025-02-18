@@ -1,0 +1,32 @@
+﻿@model TextShare.Domain.Models.EntityModels.ShelfModels.ShelfCreateModel
+
+@{
+    ViewData["Title"] = "Создать полку";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="CreateShelf" asp-controller="Shelves" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Аватар полки</label>
+        <input type="file" name="AvatarFile" class="form-control" accept="image/*" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Создать</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

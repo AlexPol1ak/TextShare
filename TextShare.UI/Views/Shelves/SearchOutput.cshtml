@@ -1,13 +1,9 @@
 ﻿@{
-    @model AvailableShelvesModel<User, IPagedList<Shelf>>
-    IPagedList<Shelf> shelves = Model.AvailableShelves;
+    @model IPagedList<Shelf>
+    IPagedList<Shelf> shelves = Model;
 }
 
 <div class="d-flex align-items-start">
-    <!-- Ссылки слева -->
-    <div class="w-20 ms-0 ps-2">
-        <partial name="_ShelvesLinksPartial" />
-    </div>
 
     <!-- Полки справа -->
     <div class="w-80 ms-5">
@@ -32,14 +28,14 @@
 
             Html.PagedListPager(
             shelves,
-            page => Url.Action("AvailableFromFriends",
+            page => Url.Action("Search",
             new { page }),
             PagedListRenderOptions.OnlyShowFivePagesAtATime
             );
         }
         else
         {
-            <p>Друзья пока не поделились с вами полками</p>
+            <p>Нечего не найдено</p>
         }
     </div>
 </div>

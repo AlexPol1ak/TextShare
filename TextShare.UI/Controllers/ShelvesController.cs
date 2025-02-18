@@ -2,8 +2,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
+using System.Drawing;
+using System.IO;
 using System.Net;
 using System.Runtime.CompilerServices;
 using TextShare.Business.Interfaces;
@@ -32,9 +36,11 @@ namespace TextShare.UI.Controllers
         private readonly IUserService _userService;
         private readonly IFriendshipService _friendshipService;
         private readonly IGroupService _groupService;
+        private readonly IPhysicalFile _physicalFile;
         private readonly ShelvesSettings _shelvesSettings;
         private readonly UserManager<User> _userManager;
-        
+        private readonly ImageUploadSettings _imageUploadSettings;
+
 
 
         public ShelvesController(IShelfService shelfService,
@@ -43,7 +49,9 @@ namespace TextShare.UI.Controllers
             IUserService userService,
             IOptions<ShelvesSettings> shelvesSettingsOptions,
             IFriendshipService friendshipService,
-            IGroupService groupService
+            IGroupService groupService,
+            IPhysicalFile physicalFile,
+            IOptions<ImageUploadSettings> imageUploadSettingsOptions
             )
         {
             _shelfService = shelfService;
@@ -53,10 +61,13 @@ namespace TextShare.UI.Controllers
             _shelvesSettings = shelvesSettingsOptions.Value;
             _friendshipService = friendshipService;
             _groupService = groupService;
+            _physicalFile = physicalFile;
+            _imageUploadSettings = imageUploadSettingsOptions.Value;
 
             
         }
 
+        #region Actions
         /// <summary>
         /// Отображает страницу с полками пользователя.
         /// </summary>
@@ -174,12 +185,14 @@ namespace TextShare.UI.Controllers
             {
                 return View("SearchInput", shelvesSearchModel);
             }
+
             int pageSize = _shelvesSettings.MaxNumberShelvesInPage;
-            List<Shelf> shelvesResult = new(); // Результат всего поиска
-            List<Shelf> shelvesResponse = new(); // Результат фильтрации и ответ пользователю
             string? name = shelvesSearchModel.Name;
             string? description = shelvesSearchModel.Description;
             bool onlyAvailableMe = shelvesSearchModel.OnlyAvailableMe;
+            List<Shelf> shelvesResult = new(); // Результат всего поиска
+            List<Shelf> shelvesResponse = new(); // Результат фильтрации и ответ пользователю
+            
 
             // Если указано имя и описание
             if ((!string.IsNullOrEmpty(name)) && (!string.IsNullOrEmpty(description)))
@@ -232,7 +245,6 @@ namespace TextShare.UI.Controllers
                     .DistinctBy(s=>s.ShelfId)
                     .ToList();
             }
-
             return View("SearchOutput", shelvesResponse.ToPagedList(page, pageSize));
         }
 
@@ -240,14 +252,48 @@ namespace TextShare.UI.Controllers
         [HttpGet("create-shelf")]
         public async Task<IActionResult> CreateShelf()
         {
-            return Content("Create Shelf Get");
+            return View();
         }
 
         [Authorize]
         [HttpPost("create-shelf")]
-        public async Task<IActionResult> CreateShelf(ShelfDetailModel shelfModel)
+        public async Task<IActionResult> CreateShelf(ShelfCreateModel shelfCreateModel, IFormFile? avatarFile)
         {
-            return Content("Create Shelf Post");
+            if (!ModelState.IsValid)
+            {
+                return View(shelfCreateModel);
+            }
+            User user = (await _userManager.GetUserAsync(User))!;
+            AccessRule shelfAccessRule = new();
+            var taskCreateAccessRule = _accessRuleService.CreateAccessRuleAsync(shelfAccessRule);
+
+            Shelf shelf = shelfCreateModel.ToShelf();        
+            shelf.Creator = user;
+            shelf.CreatorId = user.Id;
+
+            if(avatarFile != null)
+            {
+                ResponseData<Dictionary<string, string>> data = new();
+                data = await SaveImage(avatarFile);
+                if(data.Success == false && data.ErrorMessage != null)
+                {
+                    ModelState.AddModelError("avatarFile", data.ErrorMessage);
+                    return View(shelfCreateModel);
+                }
+
+                shelf.ImageUri = data.Data.GetValueOrDefault("uri");
+                shelf.MimeType = avatarFile.ContentType;                                          
+            }
+            shelfAccessRule = await taskCreateAccessRule;
+            await _accessRuleService.SaveAsync();
+
+            shelf.AccessRule = shelfAccessRule;
+            shelf.AccessRuleId = shelfAccessRule.AccessRuleId;
+
+            Shelf createdShelf = await _shelfService.CreateShelfAsync(shelf);
+            await _shelfService.SaveAsync();
+
+            return RedirectToAction("MyShelves");
         }
 
 
@@ -318,5 +364,79 @@ namespace TextShare.UI.Controllers
         {
             return Content("EditShelf Post");
         }
+        #endregion
+
+        #region Supporting Methods
+        private async Task<string> GetFileUri(string relativePath)
+        {
+            await Task.CompletedTask;
+            string fullUrl = $"{Request.Scheme}://{Request.Host}{relativePath}";
+            return fullUrl;
+        }
+
+        private async Task<ResponseData<string>> validateImage(IFormFile imageFormFile)
+        {
+            await Task.CompletedTask;
+
+            ResponseData<string> data = new();
+            data.Success = true;
+
+            string mimeTypes = imageFormFile.ContentType;
+            string ext = Path.GetExtension(imageFormFile.FileName);
+            string fileName = imageFormFile.FileName;
+            long size = imageFormFile.Length;
+
+            if (!_imageUploadSettings.AllowedMimeTypes.Contains(mimeTypes))
+            {
+                data.Success = false;
+                data.ErrorMessage = "Неверный тип изображения";
+                return data;
+            }
+            if (!_imageUploadSettings.AllowedExtensions.Contains(ext))
+            {
+                data.Success = false;
+                data.ErrorMessage = $"Неверное расширение изображения. Поддерживаемые расширения: ";
+                foreach (var ex in _imageUploadSettings.AllowedExtensions)
+                    data.ErrorMessage += $"{ex} ";
+                return data;
+            }
+            if (size > _imageUploadSettings.MaxFileSize)
+            {
+                int megabytes = (int)(_imageUploadSettings.MaxFileSize / (1024 * 1024));
+
+                data.Success = false;
+                data.ErrorMessage = $"Слишком  большой размер изображения." +
+                    $" Изображение должно быть до {megabytes} Mb.";
+                return data;
+            }
+            return data;
+        }
+
+        private async Task<ResponseData<Dictionary<string, string>>> SaveImage(IFormFile imageFormFile)
+        {
+            ResponseData<Dictionary<string, string>> saveImageData = new();
+
+            ResponseData<string> validateImageData = await validateImage(imageFormFile);
+            if (validateImageData.Success == false)
+            {
+                saveImageData.Data = null;
+                saveImageData.Success = validateImageData.Success;
+                saveImageData.ErrorMessage = validateImageData.ErrorMessage;
+                return saveImageData;
+            }
+
+            Dictionary<string, string> data = new();
+            using(Stream fileStreame = imageFormFile.OpenReadStream())
+            {
+                data = await _physicalFile.Save(fileStreame, imageFormFile.FileName, "Images");
+            }
+
+            string uri = await GetFileUri(data["relativePath"]);
+            data.Add("uri", uri);
+            saveImageData.Data = data;
+                                               
+            return saveImageData;
+        }
+        #endregion
     }
 }

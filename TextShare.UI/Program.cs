@@ -9,6 +9,7 @@ using TextShare.Business.Services;
 using TextShare.DAL.Interfaces;
 using TextShare.DAL.Repositories;
 using TextShare.Domain.Settings;
+using Microsoft.DotNet.Scaffolding.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,6 +60,15 @@ builder.Services.AddScoped<IAccessRuleService, AccessRuleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFriendshipService, FriendshipService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddScoped<IPhysicalFile, PhysicalFileService>
+(
+    provider =>
+    {
+        var env = provider.GetRequiredService<IWebHostEnvironment>();
+        return new PhysicalFileService(env.WebRootPath);
+    }
+       
+    );
 
 var app = builder.Build();
 

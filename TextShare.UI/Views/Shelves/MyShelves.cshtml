@@ -14,6 +14,11 @@
     <!-- Полки справа -->
     <div class="w-80 ms-5">
         <h2>Мои полки</h2>
+        <p>
+            <a asp-controller="Shelves" asp-action="CreateShelf">
+                Создать новую полку
+            </a>
+        </p>
 
         @if (shelves.TotalItemCount > 0)
         {
