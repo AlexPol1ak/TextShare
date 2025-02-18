@@ -24,6 +24,11 @@ namespace TextShare.UI.Controllers
         }
 
         #region Save Images
+        /// <summary>
+        /// Формирует полный URL к файлу на основе относительного пути.
+        /// </summary>
+        /// <param name="relativePath">Относительный путь к файлу.</param>
+        /// <returns>Строка с полным URL к файлу.</returns>
         protected async Task<string> GetFileUri(string relativePath)
         {
             await Task.CompletedTask;
@@ -32,6 +37,13 @@ namespace TextShare.UI.Controllers
             return fullUrl;
         }
 
+        /// <summary>
+        /// Проверяет корректность загруженного изображения по типу, расширению и размеру.
+        /// </summary>
+        /// <param name="imageFormFile">Загруженный файл.</param>
+        /// <returns>
+        /// Объект ResponseData, содержащий флаг успешности и сообщение об ошибке, если изображение не соответствует требованиям.
+        /// </returns>
         protected async Task<ResponseData<string>> validateImage(IFormFile imageFormFile)
         {
             await Task.CompletedTask;
@@ -70,11 +82,32 @@ namespace TextShare.UI.Controllers
             return data;
         }
 
+        /// <summary>
+        /// Сохраняет изображение на сервере после проверки.
+        /// </summary>
+        /// <param name="imageFormFile">Файл изображения для сохранения.</param>
+        /// <returns>
+        /// Объект <see cref="ResponseData{Dictionary{string, string}}"/> с информацией о сохраненном файле.  
+        /// 
+        /// В случае успеха `Data` содержит следующий словарь:
+        /// <code>
+        /// {
+        ///     "originalFileName": "Исходное имя файла",
+        ///     "uniqueFileName": "Уникальное имя файла",
+        ///     "type": "Расширение файла",
+        ///     "size": "Размер файла в байтах",
+        ///     "relativePath": "Относительный путь к файлу",
+        ///     "uri": "Полный URL файла"
+        /// }
+        /// </code>
+        /// 
+        /// В случае ошибки валидации возвращает `Success = false` и `ErrorMessage`.
+        /// </returns>
         protected async Task<ResponseData<Dictionary<string, string>>> SaveImage(IFormFile imageFormFile)
         {
-            ResponseData<Dictionary<string, string>> saveImageData = new();
-
             ResponseData<string> validateImageData = await validateImage(imageFormFile);
+            ResponseData<Dictionary<string, string>> saveImageData = new();
+       
             if (validateImageData.Success == false)
             {
                 saveImageData.Data = null;
@@ -83,15 +116,24 @@ namespace TextShare.UI.Controllers
                 return saveImageData;
             }
 
-            Dictionary<string, string> data = new();
-            using (Stream fileStreame = imageFormFile.OpenReadStream())
+            Dictionary<string, string> dataDict = new();
+            try
             {
-                data = await _physicalFile.Save(fileStreame, imageFormFile.FileName, "Images");
+                using (Stream fileStreame = imageFormFile.OpenReadStream())
+                {
+                    dataDict = await _physicalFile.Save(fileStreame, imageFormFile.FileName, "Images");
+                }
+            }
+            catch
+            {
+                saveImageData.Success = false;
+                saveImageData.ErrorMessage = "Не удалось сохранить изображение.";
+                return saveImageData;
             }
 
-            string uri = await GetFileUri(data["relativePath"]);
-            data.Add("uri", uri);
-            saveImageData.Data = data;
+            string uri = await GetFileUri(dataDict["relativePath"]);
+            dataDict.Add("uri", uri);
+            saveImageData.Data = dataDict;
 
             return saveImageData;
         }

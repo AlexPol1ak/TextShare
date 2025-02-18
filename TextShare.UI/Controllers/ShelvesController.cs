@@ -20,6 +20,7 @@ using TextShare.Domain.Models;
 using TextShare.Domain.Models.EntityModels.ShelfModels;
 using TextShare.Domain.Settings;
 using TextShare.Domain.Utils;
+using TextShare.UI.Models;
 using X.PagedList;
 using X.PagedList.Extensions;
 
@@ -165,6 +166,13 @@ namespace TextShare.UI.Controllers
             return View(responseModel);
         }
 
+        /// <summary>
+        /// Отображает страницу поиска полок
+        /// </summary>
+        /// <param name="shelvesSearchModel">Модель запроса поиска полок</param>
+        /// <param name="page">страница резульатата</param>
+        /// <returns>Результат поиска</returns>
+        /// <remarks>shelves/search?page=1</remarks>
         [HttpGet("search")]
         public async Task<IActionResult> Search([FromQuery] ShelvesSearchModel? shelvesSearchModel = null, int page= 1)
         {
@@ -242,13 +250,33 @@ namespace TextShare.UI.Controllers
             return View("SearchOutput", shelvesResponse.ToPagedList(page, pageSize));
         }
 
+        /// <summary>
+        /// Отображает страницу создания новой полки.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>shelves/create-shelf</remarks>
         [Authorize]
         [HttpGet("create-shelf")]
         public async Task<IActionResult> CreateShelf()
         {
+            User user = (await _userManager.GetUserAsync(User))!;
+            var shelf = await _shelfService.GetAllUserShelvesAsync(user.Id);
+            if (shelf.Count < _shelvesSettings.MaxNumberUserShelves)
+            {
+                return View("Error");
+            }
+                
+
             return View();
         }
 
+        /// <summary>
+        /// Обрабатывает POST запрос создания новой полки.
+        /// </summary>
+        /// <param name="shelfCreateModel">Модель создания полки</param>
+        /// <param name="avatarFile">Аватар полки</param>
+        /// <returns>Перенаправляет на страницу с полками</returns>
+        /// <remarks>shelves/create-shelf</remarks>
         [Authorize]
         [HttpPost("create-shelf")]
         public async Task<IActionResult> CreateShelf(ShelfCreateModel shelfCreateModel, IFormFile? avatarFile)
