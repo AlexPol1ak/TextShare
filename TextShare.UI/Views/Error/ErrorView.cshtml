@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Ошибочка";
+    string errorTitle = "Ой, что-то пошло не так. Ошибочка ";
+
+    object? statusCode =null;
+    if (ViewData.TryGetValue("StatusCode", out statusCode) && statusCode != null && statusCode is int s)
+    {
+        errorTitle += $"{s.ToString()} ";
+        ViewData["Title"] += $" {s.ToString()}";
+    }
+    errorTitle += ":(";
+
+    object? errorMessage = null;
+    ViewData.TryGetValue("ErrorMessage", out errorMessage);        
+}
+
+<h2 class="text-danger"> @errorTitle </h2>
+@if(errorMessage != null && errorMessage is string es)
+{
+    <p>@es</p>
+}<br />
+<a href="@Url.Action("Index", "Home")" class="btn btn-primary">На главную</a>
+

@@ -261,12 +261,13 @@ namespace TextShare.UI.Controllers
         {
             User user = (await _userManager.GetUserAsync(User))!;
             var shelf = await _shelfService.GetAllUserShelvesAsync(user.Id);
-            if (shelf.Count < _shelvesSettings.MaxNumberUserShelves)
+            if (shelf.Count >= _shelvesSettings.MaxNumberUserShelves)
             {
-                return View("Error");
+                HttpContext.Items["ErrorMessage"] = 
+                    $"Вы достигли максимального количества полок.\nМаксимум {_shelvesSettings.MaxNumberUserShelves}.";
+                return BadRequest();
             }
-                
-
+               
             return View();
         }
 
@@ -303,7 +304,7 @@ namespace TextShare.UI.Controllers
                     return View(shelfCreateModel);
                 }
 
-                shelf.ImageUri = data.Data.GetValueOrDefault("uri");
+                shelf.ImageUri = data.Data.GetValueOrDefault("uri", null);
                 shelf.MimeType = avatarFile.ContentType;                                          
             }
             shelfAccessRule = await taskCreateAccessRule;
