@@ -29,19 +29,15 @@ namespace TextShare.UI.Controllers
     /// Котроллер для управления полками.
     /// </summary>
     [Route("shelves")]
-    public class ShelvesController : Controller
+    public class ShelvesController : BaseController
     {
         private readonly IShelfService _shelfService;
         private readonly IAccessRuleService _accessRuleService;       
         private readonly IUserService _userService;
         private readonly IFriendshipService _friendshipService;
         private readonly IGroupService _groupService;
-        private readonly IPhysicalFile _physicalFile;
         private readonly ShelvesSettings _shelvesSettings;
         private readonly UserManager<User> _userManager;
-        private readonly ImageUploadSettings _imageUploadSettings;
-
-
 
         public ShelvesController(IShelfService shelfService,
             UserManager<User> userManager,
@@ -50,9 +46,10 @@ namespace TextShare.UI.Controllers
             IOptions<ShelvesSettings> shelvesSettingsOptions,
             IFriendshipService friendshipService,
             IGroupService groupService,
+            // В базовый контроллер
             IPhysicalFile physicalFile,
             IOptions<ImageUploadSettings> imageUploadSettingsOptions
-            )
+            ) :base(physicalFile, imageUploadSettingsOptions)
         {
             _shelfService = shelfService;
             _userManager = userManager;
@@ -61,10 +58,7 @@ namespace TextShare.UI.Controllers
             _shelvesSettings = shelvesSettingsOptions.Value;
             _friendshipService = friendshipService;
             _groupService = groupService;
-            _physicalFile = physicalFile;
-            _imageUploadSettings = imageUploadSettingsOptions.Value;
-
-            
+                     
         }
 
         #region Actions
@@ -277,7 +271,7 @@ namespace TextShare.UI.Controllers
                 data = await SaveImage(avatarFile);
                 if(data.Success == false && data.ErrorMessage != null)
                 {
-                    ModelState.AddModelError("avatarFile", data.ErrorMessage);
+                    ModelState.AddModelError("AvatarFile", data.ErrorMessage);
                     return View(shelfCreateModel);
                 }
 
@@ -366,77 +360,6 @@ namespace TextShare.UI.Controllers
         }
         #endregion
 
-        #region Supporting Methods
-        private async Task<string> GetFileUri(string relativePath)
-        {
-            await Task.CompletedTask;
-            string fullUrl = $"{Request.Scheme}://{Request.Host}{relativePath}";
-            return fullUrl;
-        }
-
-        private async Task<ResponseData<string>> validateImage(IFormFile imageFormFile)
-        {
-            await Task.CompletedTask;
-
-            ResponseData<string> data = new();
-            data.Success = true;
-
-            string mimeTypes = imageFormFile.ContentType;
-            string ext = Path.GetExtension(imageFormFile.FileName);
-            string fileName = imageFormFile.FileName;
-            long size = imageFormFile.Length;
-
-            if (!_imageUploadSettings.AllowedMimeTypes.Contains(mimeTypes))
-            {
-                data.Success = false;
-                data.ErrorMessage = "Неверный тип изображения";
-                return data;
-            }
-            if (!_imageUploadSettings.AllowedExtensions.Contains(ext))
-            {
-                data.Success = false;
-                data.ErrorMessage = $"Неверное расширение изображения. Поддерживаемые расширения: ";
-                foreach (var ex in _imageUploadSettings.AllowedExtensions)
-                    data.ErrorMessage += $"{ex} ";
-                return data;
-            }
-            if (size > _imageUploadSettings.MaxFileSize)
-            {
-                int megabytes = (int)(_imageUploadSettings.MaxFileSize / (1024 * 1024));
-
-                data.Success = false;
-                data.ErrorMessage = $"Слишком  большой размер изображения." +
-                    $" Изображение должно быть до {megabytes} Mb.";
-                return data;
-            }
-            return data;
-        }
-
-        private async Task<ResponseData<Dictionary<string, string>>> SaveImage(IFormFile imageFormFile)
-        {
-            ResponseData<Dictionary<string, string>> saveImageData = new();
-
-            ResponseData<string> validateImageData = await validateImage(imageFormFile);
-            if (validateImageData.Success == false)
-            {
-                saveImageData.Data = null;
-                saveImageData.Success = validateImageData.Success;
-                saveImageData.ErrorMessage = validateImageData.ErrorMessage;
-                return saveImageData;
-            }
-
-            Dictionary<string, string> data = new();
-            using(Stream fileStreame = imageFormFile.OpenReadStream())
-            {
-                data = await _physicalFile.Save(fileStreame, imageFormFile.FileName, "Images");
-            }
-
-            string uri = await GetFileUri(data["relativePath"]);
-            data.Add("uri", uri);
-            saveImageData.Data = data;
-                                               
-            return saveImageData;
-        }
-        #endregion
+        
     }
 }
