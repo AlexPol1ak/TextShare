@@ -1,4 +1,5 @@
-﻿using TextShare.Business.Interfaces;
+﻿using System.IO;
+using TextShare.Business.Interfaces;
 
 namespace TextShare.Business.Services
 {
@@ -14,9 +15,24 @@ namespace TextShare.Business.Services
             this._root = root;
         }
 
-        public Task<Uri?> Get(string fileName, string? directoryName = null)
+        /// <summary>
+        /// Возвращает полный путь к файлу
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="directoryName"></param>
+        /// <returns></returns>
+        public async Task<string?> GetFullPath(string fileName, string? directoryName = null)
         {
-            throw new NotImplementedException();
+            string? filePath = null;
+            if(await FileExist(fileName, directoryName))
+            {
+                if (!string.IsNullOrEmpty(directoryName))
+                    filePath = Path.Combine(_root, directoryName, fileName);
+                else
+                    filePath = Path.Combine(_root, fileName);
+            }
+
+            return filePath;
         }
 
         /// <summary>
