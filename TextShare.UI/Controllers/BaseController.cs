@@ -139,13 +139,23 @@ namespace TextShare.UI.Controllers
         }
 
         /// <summary>
-        /// Удаляет изображение по uri
+        /// Удаляет физичекий файл изображения по Uri
         /// </summary>
-        /// <param name="uriImage"></param>
+        /// <param name="uriImage">Uri файла</param>
         /// <returns></returns>
         protected async Task<bool> DeleteImageByUri(string uriImage)
         {
-            string fileName = Path.GetFileName(new Uri(uriImage).LocalPath);
+            string fileName = string.Empty;
+            try
+            {
+                fileName = Path.GetFileName(new Uri(uriImage).LocalPath);
+            }
+            catch
+            {
+                fileName = Path.GetFileName(uriImage);
+            }
+            if (string.IsNullOrEmpty(fileName)) return false;
+
             return await _physicalFile.Delete(fileName, "Images");
         }
         #endregion

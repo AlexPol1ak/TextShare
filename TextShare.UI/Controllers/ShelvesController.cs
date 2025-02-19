@@ -1,5 +1,6 @@
 ﻿using Humanizer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp;
@@ -448,12 +449,61 @@ namespace TextShare.UI.Controllers
             return RedirectToAction("DetailShelf", new { id });
         }
 
-        [Authorize]
+        /// <summary>
+        /// Отображает страницу удаления полки или удаляет полку
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize]     
         [HttpGet("delete/{id}")]
-        [HttpDelete("delete/{id}")]
+        [HttpPost("delete/{id}")]
         public async Task<IActionResult> DeleteShelf(int id)
         {
-            return Content("EditShelf Post");
+            // Получаем полку и пользователя
+            Shelf? shelf = await _shelfService.GetShelfByIdAsync(id);
+            
+            // если полка не найдена
+            if(shelf == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Полка не найдена";
+                
+                return NotFound();
+            }
+
+            // Если полка базовая и не может быть удалена
+            if (!shelf.CanDeleted)
+            {
+                HttpContext.Items["ErrorMessage"] = "Эта полка не может быть удалена";
+                DebugHelper.ShowData(shelf);
+                return BadRequest();
+            }
+
+            User user = (await _userManager.GetUserAsync(User))!;
+            // Если  авторизованный пользователь не владелец полки
+            if (shelf.CreatorId != user.Id)
+            {
+                HttpContext.Items["ErrorMessage"] = "Вы не можете удалить чужую полку.";
+                return BadRequest();
+            }
+
+            // Если метод GET - вернуть страницу подтверждения действия удаления
+            if(HttpContext.Request.Method == HttpMethods.Get)
+            {
+                ShelfDeleteModel shelfDelete = ShelfDeleteModel.FromShelf(shelf);
+                return View(shelfDelete);
+            }
+            
+            if(HttpContext.Request.Method == HttpMethods.Post)
+            {
+                if (!string.IsNullOrEmpty(shelf.ImageUri))
+                {
+                    await DeleteImageByUri(shelf.ImageUri);
+                }
+                await _shelfService.DeleteShelfAsync(shelf.ShelfId);
+                await _shelfService.SaveAsync();
+            }
+
+            return RedirectToAction("MyShelves");
         }
 
         [Authorize]
