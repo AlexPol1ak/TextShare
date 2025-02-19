@@ -1,11 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Options;
+using Microsoft.Extensions.Options;
 using TextShare.Business.Interfaces;
 using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
+using TextShare.Domain.Models;
 using TextShare.Domain.Models.EntityModels.UserModels;
+using TextShare.Domain.Settings;
 using TextShare.Domain.Utils;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TextShare.UI.Controllers
 {
@@ -15,7 +20,7 @@ namespace TextShare.UI.Controllers
     /// <remarks>
     /// Маршрут по умолчанию: <c>/Account/{action}</c>
     /// </remarks>
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
@@ -25,8 +30,10 @@ namespace TextShare.UI.Controllers
         public AccountController(UserManager<User> userManager,
             SignInManager<User> signInManager, 
             IShelfService shelfService,
-            IAccessRuleService accessRuleService
-            )
+            IAccessRuleService accessRuleService,
+            IPhysicalFile physicalFile,
+            IOptions<ImageUploadSettings> imageUploadOptions
+            ): base(physicalFile, imageUploadOptions)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -111,29 +118,41 @@ namespace TextShare.UI.Controllers
         /// </returns>
         /// <remarks>POST /Account/Register</remarks>
         [HttpPost]
-        public async Task<IActionResult> Register(UserRegisterModel model)
+        public async Task<IActionResult> Register(UserRegisterModel model, IFormFile? AvatarFile)
         {
             
             if (!ModelState.IsValid)
             {
-                
-                if (await _userManager.FindByNameAsync(model.UserName) != null)
-                {
-                    ModelState.AddModelError("UserName", "Этот имя пользователя уже занято. Попробуйте другое.");
-                    return View(model); 
-                }
-
+                              
                 return View(model);
             }
 
-            if(model.BirthDate > DateTime.Now.AddDays(3))
+            if (await _userManager.FindByNameAsync(model.UserName) != null)
+            {
+                ModelState.AddModelError("UserName", "Этот имя пользователя уже занято. Попробуйте другое.");
+                return View(model);
+            }
+
+            if (model.BirthDate > DateTime.Now.AddDays(3))
             {
                 ModelState.AddModelError("BirthDate", "Не корректная дата рождения");
                 return View(model);
             }
-                         
+
+            string? avatarUri = null;
+            if(AvatarFile != null)
+            {
+                ResponseData<Dictionary<string,string>> data =  await SaveImage(AvatarFile);
+                if(data.Success == false)
+                {
+                    ViewData["AvatarError"] = data.ErrorMessage;
+                    return View(model);
+                }
+                avatarUri = data?.Data.GetValueOrDefault("uri", null);
+            }
             var user = model.ToUser();
             user.EmailConfirmed = true; // Подтверждение Email
+            if (avatarUri != null) user.AvatarUri = avatarUri;
             var result = await _userManager.CreateAsync(user, model.Password);
 
             // Добавление базовой полки.

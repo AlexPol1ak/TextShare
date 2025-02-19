@@ -7,8 +7,7 @@ namespace TextShare.Domain.Models.EntityModels.UserModels
     {
         [Required(ErrorMessage = "Поле обязательно для заполнения.")]
         [StringLength(45, ErrorMessage = "Имя пользователя должно содержать не более 45 символов.")]
-        [RegularExpression(@"^[a-zA-Z0-9_]+$",
-            ErrorMessage = "Имя пользователя может содержать только латинские буквы, цифры и символ '_'.")]
+        [RegularExpression(@"^[a-zA-Z0-9_]+$",ErrorMessage = "Имя пользователя может содержать только латинские буквы, цифры и символ '_'.")]
         public string UserName { get; set; }
 
         [Required(ErrorMessage = "Поле обязательно для заполнения.")]

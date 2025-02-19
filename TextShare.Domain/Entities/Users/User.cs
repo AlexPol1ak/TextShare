@@ -18,6 +18,7 @@ namespace TextShare.Domain.Entities.Users
         public DateOnly BirthDate { get; set; }
         public DateTime RegisteredAt { get; set; } = DateTime.UtcNow;
         public string? AvatarUri { get; set; }
+        public string? AvatarMimeType { get; set; }
         public string? SelfDescription { get; set; }
         //Token
         public string? RefreshToken { get; set; } = string.Empty;
