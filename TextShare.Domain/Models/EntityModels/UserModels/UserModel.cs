@@ -9,7 +9,7 @@ using TextShare.Domain.Entities.Users;
 namespace TextShare.Domain.Models.EntityModels.UserModels
 {
     /// <summary>
-    /// Класс DTO для пользователя
+    /// Модель для пользователя
     /// </summary>
     public class UserModel
     {

@@ -14,9 +14,14 @@ namespace TextShare.Domain.Models.EntityModels.ShelfModels
     public class ShelfCreateModel
     {
         [Required(ErrorMessage = "Поле обязательно для заполнения.")]
-        [StringLength(100, ErrorMessage = "Имя должно содержать не более 45 символов.")]
+        [StringLength(100, ErrorMessage = "Имя должно содержать не более 100 символов.")]
+        [RegularExpression(@"^[a-zA-Zа-яА-Я\s]+$",
+            ErrorMessage = "Имя полки  может содержать только буквы (латинские или русские) и пробелы.")]
         public string Name { get; set; }
-        [StringLength(100, ErrorMessage = "Описание должно содержать не более 500 символов.")]
+
+        [StringLength(500, ErrorMessage = "Описание должно содержать не более 500 символов.")]
+        [RegularExpression(@"^[a-zA-Zа-яА-Я\s]+$",
+            ErrorMessage = "Описание полки  может содержать только буквы (латинские или русские) и пробелы.")]
         public string? Description { get; set; }
 
         public Shelf ToShelf()

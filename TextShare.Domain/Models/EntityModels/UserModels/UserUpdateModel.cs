@@ -12,22 +12,31 @@ namespace TextShare.Domain.Models.EntityModels.UserModels
 
         public int Id { get; set; }
 
-        [Required]
-        [StringLength(50, ErrorMessage = "Имя пользователя должно содержать не более 50 символов.")]
+        [Required(ErrorMessage = "Поле обязательно для заполнения.")]
+        [StringLength(45, ErrorMessage = "Имя пользователя должно содержать не более 25 символов.")]
+        [RegularExpression(@"^[a-zA-Z0-9_]+$",
+            ErrorMessage = "Имя пользователя может содержать только латинские буквы, цифры и символ '_'.")]
         public string UserName { get; set; }
 
-        [Required]
-        [StringLength(50, ErrorMessage = "Имя должно содержать не более 50 символов.")]
+        [Required(ErrorMessage = "Поле обязательно для заполнения.")]
+        [StringLength(45, ErrorMessage = "Имя должно содержать не более 45 символов.")]
+        [RegularExpression(@"^[a-zA-Zа-яА-Я\s]+$",
+            ErrorMessage = "Имя  может содержать только буквы (латинские или русские) и пробелы.")]
         public string FirstName { get; set; }
 
-        [Required]
-        [StringLength(50, ErrorMessage = "Фамилия должна содержать не более 50 символов.")]
+        [Required(ErrorMessage = "Поле обязательно для заполнения.")]
+        [StringLength(45, ErrorMessage = "Фамилия должна содержать не более 45 символов.")]
+        [RegularExpression(@"^[a-zA-Zа-яА-Я\s]+$",
+            ErrorMessage = "Фамилия  может содержать только буквы (латинские или русские) и пробелы.")]
         public string LastName { get; set; }
 
-        [StringLength(50, ErrorMessage = "Отчество должно содержать не более 50 символов.")]
+        [StringLength(45, ErrorMessage = "Отчество должно содержать не более 45 символов.")]
+        [RegularExpression(@"^[a-zA-Zа-яА-Я\s]+$",
+                    ErrorMessage = "Отчество  может содержать только буквы (латинские или русские) и пробелы.")]
         public string? Patronymic { get; set; }
 
-        [Required]
+
+        [Required(ErrorMessage = "Поле обязательно для заполнения.")]
         public DateOnly BirthDate { get; set; }
 
         [StringLength(500, ErrorMessage = "Описание не должно превышать 500 символов.")]
