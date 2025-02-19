@@ -23,6 +23,7 @@ using TextShare.Domain.Utils;
 using TextShare.UI.Models;
 using X.PagedList;
 using X.PagedList.Extensions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TextShare.UI.Controllers
 {
@@ -319,7 +320,11 @@ namespace TextShare.UI.Controllers
             return RedirectToAction("MyShelves");
         }
 
-
+        /// <summary>
+        /// Отображает детальную информацию о полке
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("detail/{id}")]
         public async Task<IActionResult> DetailShelf(int id)
         {
@@ -353,21 +358,98 @@ namespace TextShare.UI.Controllers
 
         }
 
+        /// <summary>
+        /// Отображает страницу редактирования полки
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        ///<remarks>GET shelves/edit/id</remarks>
         [Authorize]
         [HttpGet("edit/{id}")]
         public async Task<IActionResult> EditShelf(int id)
         {
-            return Content("EditShelf Get");
+
+            Shelf? updateShelf = await _shelfService.GetShelfByIdAsync(id);
+            if(updateShelf == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Такая полка не найдена";
+                return NotFound();
+            }
+
+            User user = (await _userManager.GetUserAsync(User))!;
+            if(updateShelf.CreatorId != user.Id)
+            {
+                HttpContext.Items["ErrorMessage"] = "Недостаточно прав";
+                return NotFound();
+            }
+
+            ShelfCreateModel updateShelfModel = ShelfCreateModel.FromShelf(updateShelf);
+
+            return View(updateShelfModel);
         }
 
+        /// <summary>
+        /// Обрабатывает POST запрос на редактирование полки
+        /// </summary>
+        /// <param name="id">Id полки</param>
+        /// <param name="shelfCreateModel">Модель создания полки</param>
+        /// <param name="AvatarFile">Изображение</param>
+        /// <returns></returns>
+        /// <remarks> POST shelves/edit/id</remarks>
         [Authorize]
         [HttpPost("edit/{id}")]
-        public async Task<IActionResult> EditShelf(int id, ShelfDetailModel shelfModel)
+        public async Task<IActionResult> EditShelf(int id, ShelfCreateModel shelfCreateModel, IFormFile? AvatarFile)
         {
-            return Content("EditShelf Post");
+            if (!ModelState.IsValid)
+            {
+                return View(shelfCreateModel);
+            }
+            Shelf? updateShelf = await _shelfService.GetShelfByIdAsync(id);
+            if (updateShelf == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Такая полка не найдена";
+                return NotFound();
+            }
+
+            User user = (await _userManager.GetUserAsync(User))!;
+            if (updateShelf.CreatorId != user.Id)
+            {
+                HttpContext.Items["ErrorMessage"] = "Недостаточно прав";
+                return Forbid();
+            }
+
+            updateShelf.Name = shelfCreateModel.Name;
+            updateShelf.Description = shelfCreateModel.Description;
+
+            if(AvatarFile != null)
+            {
+                var result = await validateImage(AvatarFile);
+                if (!result.Success)
+                {
+                    ModelState.AddModelError("AvatarFile", result.ErrorMessage);
+                    return View(shelfCreateModel);
+                }
+              
+                ResponseData<Dictionary<string, string>> data = await SaveImage(AvatarFile);
+                if (data.Success && data.Data != null)
+                {
+                    if (updateShelf.ImageUri != null)
+                    {
+                        await DeleteImageByUri(updateShelf.ImageUri);
+                        updateShelf.ImageUri = null;
+                    }
+                    updateShelf.MimeType = AvatarFile.ContentType;
+                    updateShelf.ImageUri = data.Data["uri"];
+                }                           
+            }
+            await _shelfService.UpdateShelfAsync(updateShelf);
+            await _shelfService.SaveAsync();
+
+            return RedirectToAction("DetailShelf", new { id });
         }
 
         [Authorize]
+        [HttpGet("delete/{id}")]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteShelf(int id)
         {

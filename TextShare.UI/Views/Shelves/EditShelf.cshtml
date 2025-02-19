@@ -1,13 +1,14 @@
 ﻿@model TextShare.Domain.Models.EntityModels.ShelfModels.ShelfCreateModel
 
 @{
-    ViewData["Title"] = "Создать полку";
+    ViewData["Title"] = "Редактировать полку";
 }
 
 <h2>@ViewData["Title"]</h2>
 
-<form asp-action="CreateShelf" asp-controller="Shelves" method="post" enctype="multipart/form-data">
+<form asp-action="EditShelf" asp-controller="Shelves" method="post" enctype="multipart/form-data">
     <div asp-validation-summary="All" class="text-danger"></div>
+
     <div class="mb-3">
         <label asp-for="Name" class="form-label">Название</label>
         <input asp-for="Name" class="form-control" />
@@ -19,13 +20,13 @@
         <textarea asp-for="Description" class="form-control"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
-    
+
     <div class="mb-3">
         <label class="form-label">Обложка полки</label>
-        <input type="file" name="AvatarFile" class="form-control" accept="image/*" />     
+        <input type="file" name="AvatarFile" class="form-control" accept="image/*" />
     </div>
 
-    <button type="submit" class="btn btn-primary">Создать</button>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
 </form>
 
 @section Scripts {

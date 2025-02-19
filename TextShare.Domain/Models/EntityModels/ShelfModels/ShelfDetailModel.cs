@@ -8,7 +8,7 @@ using TextShare.Domain.Entities.Users;
 namespace TextShare.Domain.Models.EntityModels.ShelfModels
 {
     /// <summary>
-    /// DTO-класс детальной информации полки.
+    /// Модель детальной информации полки.
     /// </summary>
     public class ShelfDetailModel
     {

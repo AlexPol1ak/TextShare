@@ -137,6 +137,17 @@ namespace TextShare.UI.Controllers
 
             return saveImageData;
         }
+
+        /// <summary>
+        /// Удаляет изображение по uri
+        /// </summary>
+        /// <param name="uriImage"></param>
+        /// <returns></returns>
+        protected async Task<bool> DeleteImageByUri(string uriImage)
+        {
+            string fileName = Path.GetFileName(new Uri(uriImage).LocalPath);
+            return await _physicalFile.Delete(fileName, "Images");
+        }
         #endregion
     }
 }

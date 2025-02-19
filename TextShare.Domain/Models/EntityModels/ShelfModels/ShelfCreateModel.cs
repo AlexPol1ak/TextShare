@@ -26,7 +26,15 @@ namespace TextShare.Domain.Models.EntityModels.ShelfModels
             shelf.Description = Description;
 
             return shelf;
+        }
 
+        static public ShelfCreateModel FromShelf(Shelf shelf)
+        {
+            ShelfCreateModel shelfCreateModel = new();
+            shelfCreateModel.Name = shelf.Name;
+            shelfCreateModel.Description = shelf.Description;
+
+            return shelfCreateModel;
         }
     }
 
