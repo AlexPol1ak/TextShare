@@ -101,6 +101,6 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 DbInitData initData = new(app);
-await initData.SeedData();
+//await initData.SeedData();
 
 app.Run();
