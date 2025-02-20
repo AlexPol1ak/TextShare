@@ -10,6 +10,7 @@ using TextShare.DAL.Interfaces;
 using TextShare.DAL.Repositories;
 using TextShare.Domain.Settings;
 using Microsoft.DotNet.Scaffolding.Shared;
+using TextShare.UI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -98,5 +99,8 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
+
+DbInitData initData = new(app);
+await initData.SeedData();
 
 app.Run();

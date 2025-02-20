@@ -27,8 +27,8 @@
 
   <ItemGroup>
     <Folder Include="Areas\" />
-    <Folder Include="Data\" />
     <Folder Include="Migrations\" />
+    <Folder Include="Views\Friends\" />
     <Folder Include="wwwroot\Images\" />
     <Folder Include="wwwroot\TextFiles\" />
   </ItemGroup>
