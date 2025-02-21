@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TextShare.Business.Interfaces;
 using TextShare.Domain.Entities.Users;
+using TextShare.Domain.Models.EntityModels.FriendsModels;
 
 namespace TextShare.UI.Controllers
 {
@@ -14,14 +16,17 @@ namespace TextShare.UI.Controllers
     {
         private readonly IFriendshipService _friendshipService;
         private readonly UserManager<User> _userManager;
+        private readonly IUserService _userService;
 
         public FriendsController(
             IFriendshipService friendshipService, 
-            UserManager<User> userManager
+            UserManager<User> userManager,
+            IUserService userService
             )
         {
             _friendshipService = friendshipService;
             _userManager = userManager;
+            _userService = userService;
         }
 
         [Authorize]
@@ -42,13 +47,77 @@ namespace TextShare.UI.Controllers
             return View();
         }
 
+
         [Authorize]
         [HttpGet("search")]
-        public async Task<IActionResult> FriendsSearch(int page = 1)
+        public async Task<IActionResult> FriendsSearch(string? search = null, int page = 1)
         {
+            // Если строка поиска пустая, просто отобразить пустую страницу поиска
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                return View();
+            }
 
-            return View();
+            User user = (await _userManager.GetUserAsync(User))!;
+
+            // Получаем друзей и входящие заявки
+            var friends = (await _friendshipService.GetFriendshipsByUserIdAsync(user.Id))
+                .Select(f => f.User)
+                .ToList();
+
+            var friendRequests = (await _friendshipService.FindFriendshipsAsync(
+                f => f.UserId == user.Id && !f.IsConfirmed))
+                .Select(f => f.User)
+                .ToList();
+
+            // Поиск пользователей
+            var resultSearch = new List<User>();
+
+            User? exactUser = await _userService.GetUserByUsernameAsync(search);
+            if (exactUser != null)
+            {
+                resultSearch.Add(exactUser);
+            }
+            else
+            {
+                var res1 = await _userService.FindUsersAsync(u => u.UserName!.Contains(search));
+                var res2 = await _userService.FindUsersAsync(u =>EF.Functions.Like(u.FirstName + " " + u.LastName, $"%{search}%")
+                                                );
+                resultSearch.AddRange(res1);
+                resultSearch.AddRange(res2);
+
+                resultSearch = resultSearch.DistinctBy(u => u.Id).ToList();
+            }
+
+            // Создаем модель результата
+            var friendSearchResultModel = new FriendSearchResultModel
+            {
+                Friends = friends,
+                FriendRequests = friendRequests,
+                ResultSearch = resultSearch
+            };
+
+            return View(friendSearchResultModel);
         }
+
+        [Authorize]
+        public async Task<IActionResult> AcceptFriendRequest(int id)
+        {
+            return Content("");
+        }
+
+        [Authorize]
+        public async Task<IActionResult> SendFriendRequest(int id)
+        {
+            return Content("");
+        }
+
+        [Authorize]
+        public async Task<IActionResult> DeleteFriend(int id)
+        {
+            return Content("");
+        }
+
 
     }
 }

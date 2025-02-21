@@ -75,5 +75,12 @@ namespace TextShare.Business.Services
         {
             return await _repositoryFriendships.DeleteAsync(friendshipId);
         }
+
+        public async Task<List<Friendship>> FindFriendshipsAsync(Expression<Func<
+            Friendship, bool>> predicate,
+            params Expression<Func<Friendship, object>>[] includes)
+        {
+            return await _repositoryFriendships.FindAsync(predicate, includes);
+        }
     }
 }

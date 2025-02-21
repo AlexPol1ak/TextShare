@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Business.Interfaces
@@ -76,5 +77,9 @@ namespace TextShare.Business.Interfaces
         /// <param name="friendshipId">Идентификатор дружбы</param>
         /// <returns>true, если отклонение успешно, иначе false</returns>
         Task<bool> RejectFriendshipAsync(int friendshipId);
+
+        Task<List<Friendship>> FindFriendshipsAsync(Expression<Func<
+            Friendship, bool>> predicate,
+            params Expression<Func<Friendship, object>>[] includes);
     }
 }

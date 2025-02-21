@@ -1,5 +1,8 @@
-﻿@{
-    string Title = " Поиск людей";
+﻿@using TextShare.Domain.Models.EntityModels.FriendsModels
+@model FriendSearchResultModel
+
+@{
+    string Title = "Поиск людей";
     ViewData["Title"] = Title;
 }
 
@@ -9,9 +12,59 @@
         <partial name="_FriendsLinksPartial" />
     </div>
 
-    <!-- результат справа -->
+    <!-- Основная область поиска -->
     <div class="w-80 ms-5">
         <h2>@Title</h2>
 
+        <!-- Форма поиска -->
+        <form method="get" asp-controller="Friends" asp-action="FriendsSearch" class="mb-3">
+            <div class="input-group">
+                <input type="text" name="search" class="form-control" placeholder="Введите имя пользователя">
+                <button type="submit" class="btn btn-primary">🔍 Найти</button>
+            </div>
+        </form>
+
+        <hr />
+
+        <!-- Результаты поиска -->
+        @if (Model?.ResultSearch?.Any() ?? false)
+        {
+            <h3>Результаты поиска:</h3>
+            <ul class="list-group">
+                @foreach (var user in Model.ResultSearch)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>@user.UserName</strong> (@user.FirstName @user.LastName)
+                        </div>
+                        <div>
+                            <a href="@Url.Action("AcceptFriendRequest", "Friends", new { id = user.Id })"
+                               class="btn btn-success btn-sm">Посмотреть</a>
+                            @if (Model.Friends.Any(f => f.Id == user.Id))
+                            {
+                                <!-- Уже друг -->
+                                <button class="btn btn-secondary btn-sm" disabled>✅ Уже в друзьях</button>
+                            }
+                            else if (Model.FriendRequests.Any(f => f.Id == user.Id))
+                            {
+                                <!-- Принять заявку -->
+                                <a href="@Url.Action("AcceptFriendRequest", "Friends", new { id = user.Id })"
+                                   class="btn btn-success btn-sm">✅ Принять заявку</a>
+                            }
+                            else
+                            {
+                                <!-- Добавить в друзья -->
+                                <a href="@Url.Action("SendFriendRequest", "Friends", new { id = user.Id })"
+                                   class="btn btn-primary btn-sm">➕ Добавить</a>
+                            }
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+        else if (!string.IsNullOrEmpty(Context.Request.Query["friendsSearchModel.Search"]))
+        {
+            <p class="text-danger">Пользователь не найден.</p>
+        }
     </div>
 </div>
