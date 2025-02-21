@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using TextShare.Business.Interfaces;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models.EntityModels.FriendsModels;
+using X.PagedList.Extensions;
 
 namespace TextShare.UI.Controllers
 {
@@ -53,9 +54,10 @@ namespace TextShare.UI.Controllers
         public async Task<IActionResult> FriendsSearch(string? search = null, int page = 1)
         {
             // Если строка поиска пустая, просто отобразить пустую страницу поиска
+            var friendSearchResultModel = new FriendSearchResultModel();
             if (string.IsNullOrWhiteSpace(search))
             {
-                return View();
+                return View(friendSearchResultModel);
             }
 
             User user = (await _userManager.GetUserAsync(User))!;
@@ -89,14 +91,12 @@ namespace TextShare.UI.Controllers
                 resultSearch = resultSearch.DistinctBy(u => u.Id).ToList();
             }
 
-            // Создаем модель результата
-            var friendSearchResultModel = new FriendSearchResultModel
-            {
-                Friends = friends,
-                FriendRequests = friendRequests,
-                ResultSearch = resultSearch
-            };
+            var partResultSearch = resultSearch.ToPagedList(page, 5);
 
+            // Передаем в модель данные
+            friendSearchResultModel.Friends = friends;
+            friendSearchResultModel.FriendRequests = friendRequests;
+            friendSearchResultModel.ResultSearch = partResultSearch;
             return View(friendSearchResultModel);
         }
 
@@ -109,6 +109,9 @@ namespace TextShare.UI.Controllers
         [Authorize]
         public async Task<IActionResult> SendFriendRequest(int id)
         {
+            User user = (await _userManager.GetUserAsync(User))!;
+            User? requestedUser;
+
             return Content("");
         }
 
