@@ -1,44 +1,68 @@
 ﻿@using TextShare.Domain.Models.EntityModels.FriendsModels
 @model FriendSearchResultModel
 
+@{
+    User currentUser = Model.User;
+    var friends = Model.Friends.ToList();
+    var inFriendRequests = Model.InFriendRequests.ToList();
+    var outFriendRequests = Model.OutFriendRequests.ToList();
+    var resultSearch = Model.ResultSearch.ToList();
+}
+
 <ul class="list-group">
-    @foreach (var user in Model.ResultSearch)
+    @foreach (var user in resultSearch)
     {
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-                <a href="@Url.Action("DetailsUserByUserName", "User", new { username = user.UserName })" class="d-flex align-items-center">
-                @if (!string.IsNullOrEmpty(user.AvatarUri))
-                {
-                    <img src="@user.AvatarUri" alt="Avatar" class="rounded-circle"
-                         style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
-                }
-                <div>
-                    <strong>@user.UserName</strong>
-                        <p style="padding-right: 50px;">@user.FirstName @user.LastName</p>
-                </div>
+        <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+            <div class="d-flex align-items-center gap-3">
+                <a href="@Url.Action("DetailsUserByUserName", "User", new { username = user.UserName })"
+                   class="text-decoration-none text-dark d-flex align-items-center gap-3">
+                    @if (!string.IsNullOrEmpty(user.AvatarUri))
+                    {
+                        <img src="@user.AvatarUri" alt="Avatar" class="rounded-circle"
+                             style="width: 50px; height: 50px; object-fit: cover;">
+                    }
+                    <div>
+                        <strong>@user.UserName</strong>
+                        <p class="mb-0 text-muted">@user.FirstName @user.LastName</p>
+                    </div>
                 </a>
             </div>
-            <div>
-                
-                @if (Model.Friends.Any(f => f.Id == user.Id))
+
+            <div class="d-flex gap-2">
+                @if (user.Id == currentUser.Id)
                 {
-                    <!-- Удалить -->
-                    <a href="@Url.Action("DeleteFriend", "Friends", new { id = user.Id })"
-                       class="btn btn-danger btn-sm">Удалить</a>
-                }
-                else if (Model.FriendRequests.Any(f => f.Id == user.Id))
-                {
-                    <!-- Принять заявку -->
-                    <a href="@Url.Action("AcceptFriendRequest", "Friends", new { id = user.Id })"
-                       class="btn btn-success btn-sm">✅ Принять заявку</a>
-                    <a href="@Url.Action("DeleteFriend", "Friends", new { id = user.Id })"
-                       class="btn btn-danger btn-sm">Удалить</a>
+                    <span class="text-muted">Это вы</span>
                 }
                 else
                 {
-                    <!-- Добавить в друзья -->
-                    <a href="@Url.Action("SendFriendRequest", "Friends", new { id = user.Id })"
-                       class="btn btn-primary btn-sm">➕ Добавить</a>
+                    bool isFriend = friends.Any(u => u.Id == user.Id);
+                    bool isIncomingRequest = inFriendRequests.Any(u => u.Id == user.Id);
+                    bool isOutgoingRequest = outFriendRequests.Any(u => u.Id == user.Id);
+
+                    switch (true)
+                    {
+                        case var _ when isFriend:
+                            <a href="@Url.Action("DeleteFriend", "Friends", new { username = user.UserName })"
+                               class="btn btn-danger btn-sm">Удалить</a>
+                            break;
+
+                        case var _ when isIncomingRequest:
+                            <a href="@Url.Action("AcceptFriendRequest", "Friends", new { username = user.UserName })"
+                               class="btn btn-success btn-sm">✅Принять</a>
+                            <a href="@Url.Action("DeleteFriend", "Friends", new { username = user.UserName })"
+                               class="btn btn-danger btn-sm">Удалить</a>
+                            break;
+
+                        case var _ when isOutgoingRequest:
+                            <a href="@Url.Action("DeleteFriend", "Friends", new { username = user.UserName })"
+                               class="btn btn-warning btn-sm">Отменить</a>
+                            break;
+
+                        default:
+                            <a href="@Url.Action("SendFriendRequest", "Friends", new { username = user.UserName })"
+                               class="btn btn-primary btn-sm">➕ Добавить</a>
+                            break;
+                    }
                 }
             </div>
         </li>

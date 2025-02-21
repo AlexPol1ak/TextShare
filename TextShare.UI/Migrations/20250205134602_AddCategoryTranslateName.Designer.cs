@@ -818,7 +818,7 @@ namespace TextShare.UI.Migrations
             modelBuilder.Entity("TextShare.Domain.Entities.Users.Friendship", b =>
                 {
                     b.HasOne("TextShare.Domain.Entities.Users.User", "Friend")
-                        .WithMany("FriendRequests")
+                        .WithMany("InFriendRequests")
                         .HasForeignKey("FriendId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -866,7 +866,7 @@ namespace TextShare.UI.Migrations
 
             modelBuilder.Entity("TextShare.Domain.Entities.Users.User", b =>
                 {
-                    b.Navigation("FriendRequests");
+                    b.Navigation("InFriendRequests");
 
                     b.Navigation("Friendships");
 

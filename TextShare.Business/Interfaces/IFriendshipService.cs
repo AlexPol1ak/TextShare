@@ -78,6 +78,12 @@ namespace TextShare.Business.Interfaces
         /// <returns>true, если отклонение успешно, иначе false</returns>
         Task<bool> RejectFriendshipAsync(int friendshipId);
 
+        /// <summary>
+        /// поиск дружбы по условию
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <param name="includes"></param>
+        /// <returns></returns>
         Task<List<Friendship>> FindFriendshipsAsync(Expression<Func<
             Friendship, bool>> predicate,
             params Expression<Func<Friendship, object>>[] includes);
