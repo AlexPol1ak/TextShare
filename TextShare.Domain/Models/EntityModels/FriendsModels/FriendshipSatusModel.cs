@@ -9,22 +9,23 @@ namespace TextShare.Domain.Models.EntityModels.FriendsModels
     /// </summary>
     public enum FriendStatus
     {
-        [Display(Name = "Не друзья")]
-        None = 0,
-
-        [Display(Name = "Заявка отправлена")]
-        Requested = 1,
-
-        [Display(Name = "Заявка получена")]
-        Pending = 2,
+        [Display(Name = "Я")]
+        Iam = 0,
 
         [Display(Name = "Друзья")]
-        Accepted = 3,
-        [Display(Name = "Я")]
-        Iam = 4
+        Accepted = 1,
 
+        [Display(Name = "Заявка отправлена")]
+        Requested = 2,
+             
+        [Display(Name = "Заявка получена")]
+        Pending = 3,
 
+        [Display(Name = "Не друзья")]
+        None = 4
 
+        
+        
     }
 
     /// <summary>
