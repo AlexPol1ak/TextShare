@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Linq;
 using TextShare.Business.Interfaces;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
@@ -33,31 +34,44 @@ namespace TextShare.UI.Controllers
             _userService = userService;
         }
 
+        /// <summary>
+        /// Отображение страницы "Мои друзья".
+        /// </summary>
+        /// <param name="page"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpGet("")]
         public async Task<IActionResult> MyFriends(int page = 1)
         {
             User currentUser = (await _userManager.GetUserAsync(User))!;
-            IEnumerable<User> friends = (await _friendshipService.GetFriendshipsByUserIdAsync(
-                currentUser.Id, f => f.Friend)).Select(u => u.Friend);
+            IEnumerable<User> friends = (await _friendshipService.GetAllUserAcceptedFriendshipAsync(
+                        currentUser.Id, f => f.User, f => f.Friend))
+                        .SelectMany(f => new List<User> { f.User, f.Friend })
+                        .Distinct()
+                        .Where(user=> user.Id != currentUser.Id);
 
             IEnumerable<FriendshipSatusModel> friendModels = (await FriendshipSatusModel.FromUsers(friends))
                 .Select(model => {
                     model.FriendStatus = FriendStatus.Accepted;
                     return model;
-                });
+                }).OrderBy(user => user.UserName);
 
             return View(friendModels.ToPagedList(page, 5));
         }
 
+        /// <summary>
+        /// Отображение страницы входящих заявок в друзья.
+        /// </summary>
+        /// <param name="page"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpGet("requests")]
         public async Task<IActionResult> FriendRequests(int page = 1)
         {
             User currentUser = (await _userManager.GetUserAsync(User))!;
             IEnumerable<User> inRequests = (await _friendshipService.FindFriendshipsAsync(
-                f => f.UserId == currentUser.Id && f.IsConfirmed == false, f => f.Friend
-                )).Select(u => u.Friend);
+                f => f.FriendId == currentUser.Id && f.IsConfirmed == false, f => f.User
+                )).Select(u => u.User);
 
             IEnumerable<FriendshipSatusModel> FriendModels = (await FriendshipSatusModel.FromUsers(inRequests))
                 .Select(model=> { 
@@ -69,6 +83,12 @@ namespace TextShare.UI.Controllers
         }
 
 
+        /// <summary>
+        /// Отображение страницы "Поиск"
+        /// </summary>
+        /// <param name="search"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpGet("search")]
         public async Task<IActionResult> FriendsSearch(string? search = null, int page = 1)
@@ -134,6 +154,7 @@ namespace TextShare.UI.Controllers
                                          FriendStatus.None;
                     return model;
                 })
+                .OrderBy(model=>model.FriendStatus)
                 .ToList();
 
             return View(friendshipSatusModels.ToPagedList(page, 5));
@@ -142,14 +163,46 @@ namespace TextShare.UI.Controllers
 
         [Authorize]
         [HttpGet("accept-friend")]
-        public async Task<IActionResult> AcceptFriendRequest(string username)
+        public async Task<IActionResult> AcceptFriendRequest(string username, string? returnUrl = null)
         {
-            return Content("");
+            var result = await verifyUsername(username);
+            if (result.Success == false || result.Data == null)
+            {
+                HttpContext.Items["ErrorMessage"] = result.ErrorMessage;
+                return BadRequest();
+            }
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            User requestedUser = result.Data;
+
+            Friendship? friendship =( await _friendshipService.FindFriendshipsAsync(
+                f => f.FriendId == currentUser.Id && f.UserId == requestedUser.Id && f.IsConfirmed == false
+                )).FirstOrDefault();
+            
+            if(friendship == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Заявки не найдено";
+                return BadRequest();
+            }
+
+            await _friendshipService.ConfirmFriendshipAsync(friendship.Id);
+            await _friendshipService.SaveAsync();
+
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction("FriendRequests");
         }
 
+        /// <summary>
+        /// Добавление пользователя в друзья
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpGet("add-friend")]
-        public async Task<IActionResult> SendFriendRequest(string username)
+        public async Task<IActionResult> SendFriendRequest(string username, string? returnUrl = null)
         {
             var result = await verifyUsername(username);
             if(result.Success == false || result.Data == null)
@@ -176,12 +229,22 @@ namespace TextShare.UI.Controllers
                 await _friendshipService.SaveAsync();
             }
 
-            return Content("");
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction("MyFriends");
         }
 
+        /// <summary>
+        /// Удаление пользователя из друзей или удаление заявки
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpGet("delete-friend")]
-        public async Task<IActionResult> DeleteFriend(string username)
+        public async Task<IActionResult> DeleteFriend(string username, string? returnUrl = null)
         {
             var result = await verifyUsername(username);
             if (result.Success == false || result.Data == null)
@@ -205,9 +268,21 @@ namespace TextShare.UI.Controllers
                 await _friendshipService.SaveAsync();
             }
 
-            return RedirectToAction("FriendsSearch");
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction("MyFriends");
         }
 
+        /// <summary>
+        /// Проверка существует ли пользователь по username.
+        /// Проверяет существует ли пользователь,
+        /// возвращает его если существует, если нет-возвращает ошибку.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         private async Task<ResponseData<User?>> verifyUsername(string username)
         {
             ResponseData<User?> responseData = new();

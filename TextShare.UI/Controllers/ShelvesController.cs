@@ -105,7 +105,7 @@ namespace TextShare.UI.Controllers
             responseModel.User = user;
 
             // Получаем список друзей
-            List <Friendship> userFriendships = await _friendshipService.GetFriendshipsByUserIdAsync(user.Id);
+            List <Friendship> userFriendships = await _friendshipService.GetAllUserAcceptedFriendshipAsync(user.Id);
 
             if (userFriendships.Count == 0)
             {

@@ -1,7 +1,9 @@
 ﻿@using TextShare.Domain.Models.EntityModels.FriendsModels
 @model List<FriendshipSatusModel>
 
-
+@{
+    var retrunUrl = Context.Request.Path;
+}
 
 <ul class="list-group">
     @foreach (var user in Model)
@@ -30,29 +32,29 @@
                                 <p>Я</p>
                                 break;
                         case FriendStatus.Accepted:
-                                <a href="@Url.Action("DeleteFriend", "Friends", new { username = user.UserName })"
+                                <a href="@Url.Action("DeleteFriend", "Friends", new { username = user.UserName, returnUrl = retrunUrl})"
                                    class="btn btn-danger btn-sm">Удалить</a>
                                 break;
 
                         case FriendStatus.Pending:
-                            <a href="@Url.Action("AcceptFriendRequest", "Friends", new { username = user.UserName })"
+                        <a href="@Url.Action("AcceptFriendRequest", "Friends", new { username = user.UserName, returnUrl = retrunUrl })"
                                class="btn btn-success btn-sm">✅Принять</a>
-                            <a href="@Url.Action("DeleteFriend", "Friends", new { username = user.UserName })"
+                        <a href="@Url.Action("DeleteFriend", "Friends", new { username = user.UserName, returnUrl = retrunUrl })"
                                class="btn btn-danger btn-sm">Удалить</a>
                             break;
 
                         case FriendStatus.Requested:
-                            <a href="@Url.Action("DeleteFriend", "Friends", new { username = user.UserName })"
+                        <a href="@Url.Action("DeleteFriend", "Friends", new { username = user.UserName, returnUrl = retrunUrl })"
                                class="btn btn-warning btn-sm">Отменить</a>
                             break;
 
                         case FriendStatus.None:
-                            <a href="@Url.Action("SendFriendRequest", "Friends", new { username = user.UserName })"
+                        <a href="@Url.Action("SendFriendRequest", "Friends", new { username = user.UserName, returnUrl = retrunUrl })"
                                class="btn btn-primary btn-sm">➕ Добавить</a>
                             break;
 
                         default:
-                            <a href="@Url.Action("SendFriendRequest", "Friends", new { username = user.UserName })"
+                        <a href="@Url.Action("SendFriendRequest", "Friends", new { username = user.UserName, returnUrl = retrunUrl })"
                                class="btn btn-primary btn-sm"> Добавить</a>
                             break;
                }
