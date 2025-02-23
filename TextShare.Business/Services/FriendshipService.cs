@@ -17,6 +17,10 @@ namespace TextShare.Business.Services
             _repositoryFriendships = unitOfWork.FriendshipRepository;
         }
 
+        public async Task<List<Friendship>> GetAllFriendshipsAsync(params Expression<Func<Friendship, object>>[] includes)
+        {
+            return await _repositoryFriendships.GetAllAsync(includes);
+        }
         public async Task<bool> ContainsFriendshipAsync(Friendship friendship)
         {
             return await _repositoryFriendships.ContainsAsync(friendship);
@@ -31,29 +35,22 @@ namespace TextShare.Business.Services
         {
             return await _repositoryFriendships.DeleteAsync(id);
         }
-
-        public async Task<List<Friendship>> GetAllFriendshipsAsync(params Expression<Func<Friendship, object>>[] includes)
-        {
-            return await _repositoryFriendships.GetAllAsync(includes);
-        }
-
+      
         public async Task<Friendship?> GetFriendshipByIdAsync(int id,
             params Expression<Func<Friendship, object>>[] includes)
         {
             return await _repositoryFriendships.GetAsync(id, includes);
         }
 
-        public async Task<List<Friendship>> GetFriendshipsByUserIdAsync(int userId, params Expression<Func<Friendship, object>>[] includes)
+        public async Task<List<Friendship>> GetAllUserAcceptedFriendshipAsync(int userId, params Expression<Func<Friendship, object>>[] includes)
         {
-            return await _repositoryFriendships.FindAsync(f => f.UserId == userId&& f.IsConfirmed==true, includes);
-        }
+            List<Friendship> friendships = (await FindFriendshipsAsync(
+                f =>(f.UserId == userId || f.FriendId == userId) && f.IsConfirmed == true, includes
+                ));
 
-        public async Task<List<Friendship>> GetFriendshipsByFriendIdAsync(int friendId,
-            params Expression<Func<Friendship, object>>[] includes)
-        {
-            return await _repositoryFriendships.FindAsync(f => f.FriendId == friendId &&f.IsConfirmed == true, includes);
+            return friendships;
         }
-
+             
         public async Task<Friendship> UpdateFriendshipAsync(Friendship friendship)
         {
             return await _repositoryFriendships.UpdateAsync(friendship);

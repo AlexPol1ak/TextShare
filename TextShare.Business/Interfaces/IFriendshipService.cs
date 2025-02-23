@@ -22,19 +22,16 @@ namespace TextShare.Business.Interfaces
         /// <returns>Объект дружбы, если найден, иначе null</returns>
         Task<Friendship?> GetFriendshipByIdAsync(int id, params Expression<Func<Friendship, object>>[] includes);
 
-        /// <summary>
-        /// Возвращает список дружеских связей для конкретного пользователя.
-        /// </summary>
-        /// <param name="userId">Идентификатор пользователя</param>
-        /// <returns>Список дружеских связей</returns>
-        Task<List<Friendship>> GetFriendshipsByUserIdAsync(int userId, params Expression<Func<Friendship, object>>[] includes);
+
+       
 
         /// <summary>
-        /// Возвращает список дружеских связей, где пользователь указан как друг.
+        /// Возвращает всех подтвержденных друзей для конкретного пользователя.
         /// </summary>
-        /// <param name="friendId">Идентификатор друга</param>
-        /// <returns>Список дружеских связей</returns>
-        Task<List<Friendship>> GetFriendshipsByFriendIdAsync(int friendId, params Expression<Func<Friendship, object>>[] includes);
+        /// <param name="userId"></param>
+        /// <param name="includes"></param>
+        /// <returns></returns>
+        Task<List<Friendship>> GetAllUserAcceptedFriendshipAsync(int userId, params Expression<Func<Friendship, object>>[] includes);
 
         /// <summary>
         /// Создает новую запись о дружбе.
