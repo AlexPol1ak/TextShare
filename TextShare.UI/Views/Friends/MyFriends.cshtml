@@ -1,6 +1,7 @@
-﻿
+﻿@using TextShare.Domain.Models.EntityModels.FriendsModels
+
 @{
-    @model List<Friendship>
+    @model IPagedList<FriendshipSatusModel>
 
     string Title = " Мои Друзья";
     ViewData["Title"] = Title;
@@ -14,11 +15,17 @@
     </div>
 
     <!-- результат справа -->
-    <div class="w-80 ms-5">
+    <div class="w-50 border rounded p-3 overflow-auto ms-3">
         <h2>@Title</h2>
 
-        @if(Model.Count > 0)
+        @if(Model.Any())
         {
+            await Html.RenderPartialAsync("_FriendsListPartial", Model.ToList());
+            @Html.PagedListPager(
+                     Model,
+                     page => Url.Action("MyFriends", new {  page }),
+                     PagedListRenderOptions.OnlyShowFivePagesAtATime
+                     )
 
         }
         else

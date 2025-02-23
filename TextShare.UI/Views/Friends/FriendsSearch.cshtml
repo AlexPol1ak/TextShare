@@ -1,5 +1,5 @@
 ﻿@using TextShare.Domain.Models.EntityModels.FriendsModels
-@model FriendSearchResultModel
+@model IPagedList<FriendshipSatusModel>
 
 @{
     string Title = "Поиск людей";
@@ -27,10 +27,10 @@
                         <button type="submit" class="btn btn-primary">🔍 Найти</button>
                     </div>
                 </form>
-                @if (Model?.ResultSearch?.Any() ?? false)
+                @if (Model.Any())
                 {
                     @Html.PagedListPager(
-                                      Model.ResultSearch,
+                                      Model,
                                       page => Url.Action("FriendsSearch", new { search = Context.Request.Query["search"], page }),
                                       PagedListRenderOptions.OnlyShowFivePagesAtATime
                                       )
@@ -39,10 +39,10 @@
 
             <!-- Результаты поиска -->
             <div class="w-75 border rounded p-3 overflow-auto ms-3" style="max-height: 400px;">
-                @if (Model?.ResultSearch?.Any() ?? false)
+                @if (Model.Any())
                 {
                     <h5>Результаты поиска:</h5>
-                    await Html.RenderPartialAsync("_FriendsListPartial", Model);
+                    await Html.RenderPartialAsync("_FriendsListPartial", Model.ToList());
                 }
                 else if (!string.IsNullOrEmpty(Context.Request.Query["search"]))
                 {

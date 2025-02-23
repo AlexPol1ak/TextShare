@@ -37,18 +37,35 @@ namespace TextShare.UI.Controllers
         [HttpGet("")]
         public async Task<IActionResult> MyFriends(int page = 1)
         {
-            User user = (await _userManager.GetUserAsync(User))!;
-            List<Friendship> friends =  await _friendshipService.GetFriendshipsByUserIdAsync(user.Id);
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            IEnumerable<User> friends = (await _friendshipService.GetFriendshipsByUserIdAsync(
+                currentUser.Id, f => f.Friend)).Select(u => u.Friend);
 
-            return View(friends);
+            IEnumerable<FriendshipSatusModel> friendModels = (await FriendshipSatusModel.FromUsers(friends))
+                .Select(model => {
+                    model.FriendStatus = FriendStatus.Accepted;
+                    return model;
+                });
+
+            return View(friendModels.ToPagedList(page, 5));
         }
 
         [Authorize]
         [HttpGet("requests")]
         public async Task<IActionResult> FriendRequests(int page = 1)
         {
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            IEnumerable<User> inRequests = (await _friendshipService.FindFriendshipsAsync(
+                f => f.UserId == currentUser.Id && f.IsConfirmed == false, f => f.Friend
+                )).Select(u => u.Friend);
 
-            return View();
+            IEnumerable<FriendshipSatusModel> FriendModels = (await FriendshipSatusModel.FromUsers(inRequests))
+                .Select(model=> { 
+                    model.FriendStatus = FriendStatus.Pending; 
+                    return model; 
+                });
+
+            return View(FriendModels.ToPagedList(page, 5));
         }
 
 
@@ -58,11 +75,10 @@ namespace TextShare.UI.Controllers
         {
             // Получаем текущего пользователя
             User currentUser = (await _userManager.GetUserAsync(User))!;
-            var friendSearchResultModel = new FriendSearchResultModel { User = currentUser };
 
             if (string.IsNullOrWhiteSpace(search))
             {
-                return View(friendSearchResultModel);
+                return View((new List<FriendshipSatusModel>().ToPagedList()));
             }
 
             // Получаем друзей
@@ -102,13 +118,25 @@ namespace TextShare.UI.Controllers
                 resultSearch = resultSearch.DistinctBy(u => u.Id).ToList();
             }
 
-            // Заполняем модель данными
-            friendSearchResultModel.Friends = friends.ToPagedList();
-            friendSearchResultModel.InFriendRequests = inFriendRequests.ToPagedList();
-            friendSearchResultModel.OutFriendRequests = outFriendRequests.ToPagedList();
-            friendSearchResultModel.ResultSearch = resultSearch.ToPagedList(page, 5);          
+            // Создаем HashSet для быстрого поиска статуса дружбы
+            var friendIds = friends.Select(f => f.Id).ToHashSet();
+            var inRequestIds = inFriendRequests.Select(f => f.Id).ToHashSet();
+            var outRequestIds = outFriendRequests.Select(f => f.Id).ToHashSet();
 
-            return View(friendSearchResultModel);
+            // Преобразуем пользователей в модели дружбы с правильными статусами
+            List<FriendshipSatusModel> friendshipSatusModels = (await FriendshipSatusModel.FromUsers(resultSearch))
+                .Select(model =>
+                {
+                    model.FriendStatus = model.Id == currentUser.Id? FriendStatus.Iam:
+                                         friendIds.Contains(model.Id) ? FriendStatus.Accepted :
+                                         inRequestIds.Contains(model.Id) ? FriendStatus.Pending :
+                                         outRequestIds.Contains(model.Id) ? FriendStatus.Requested :
+                                         FriendStatus.None;
+                    return model;
+                })
+                .ToList();
+
+            return View(friendshipSatusModels.ToPagedList(page, 5));
         }
 
 
