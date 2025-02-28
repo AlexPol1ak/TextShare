@@ -79,5 +79,14 @@ namespace TextShare.Business.Services
         {
             return await _repositoryFriendships.FindAsync(predicate, includes);
         }
+
+        public async Task<List<User>> GetOutFriendRequestsUsers(int userId)
+        {
+            IEnumerable<User> outRequests = (await FindFriendshipsAsync(
+               f => f.UserId == userId && f.IsConfirmed == false, f => f.Friend
+               )).Select(u => u.Friend);
+
+            return outRequests.ToList();
+        }
     }
 }

@@ -38,7 +38,8 @@ namespace TextShare.UI.Controllers
         /// Отображение страницы "Мои друзья".
         /// </summary>
         /// <param name="page"></param>
-        /// <returns></returns>
+        /// <returns>Страница с списком друзей</returns>
+        /// <remarks>GET /friends?page=1 </remarks>
         [Authorize]
         [HttpGet("")]
         public async Task<IActionResult> MyFriends(int page = 1)
@@ -59,14 +60,16 @@ namespace TextShare.UI.Controllers
             return View(friendModels.ToPagedList(page, 5));
         }
 
+
         /// <summary>
         /// Отображение страницы входящих заявок в друзья.
         /// </summary>
         /// <param name="page"></param>
-        /// <returns></returns>
+        /// <returns>Страница с списком входящих заявок в друзья</returns>
+        /// <remarks>GET /friends/in-requests?page=1</remarks>
         [Authorize]
-        [HttpGet("requests")]
-        public async Task<IActionResult> FriendRequests(int page = 1)
+        [HttpGet("in-requests")]
+        public async Task<IActionResult> FriendsInRequests(int page = 1)
         {
             User currentUser = (await _userManager.GetUserAsync(User))!;
             IEnumerable<User> inRequests = (await _friendshipService.FindFriendshipsAsync(
@@ -82,6 +85,26 @@ namespace TextShare.UI.Controllers
             return View(FriendModels.ToPagedList(page, 5));
         }
 
+        /// <summary>
+        /// Отображает страницы исходящих заявок в друзья
+        /// </summary>
+        /// <param name="page"></param>
+        /// <returns>Страница с списком исходящих заявок в друзья</returns>
+        /// <remarks>GET /friends/out-requests?page=1</remarks>
+        [Authorize]
+        [HttpGet("out-requests")]
+        public async Task<IActionResult>FriendsOutRequests(int page = 1)
+        {
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            IEnumerable<User> outRequests = await _friendshipService.GetOutFriendRequestsUsers(currentUser.Id);
+
+            IEnumerable<FriendshipSatusModel> FriendOutRequestsModels = (await FriendshipSatusModel.FromUsers(outRequests))
+                .Select(model => {
+                    model.FriendStatus = FriendStatus.Requested;
+                    return model;
+                });
+            return View(FriendOutRequestsModels.ToPagedList(page, 5));
+        }
 
         /// <summary>
         /// Отображение страницы "Поиск"
@@ -192,7 +215,7 @@ namespace TextShare.UI.Controllers
                 return Redirect(returnUrl);
             }
 
-            return RedirectToAction("FriendRequests");
+            return RedirectToAction("FriendsInRequests");
         }
 
         /// <summary>

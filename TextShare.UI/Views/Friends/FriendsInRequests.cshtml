@@ -3,7 +3,7 @@
 @{
     @model IPagedList<FriendshipSatusModel>
 
-    string Title = " Заявки в друзья";
+    string Title = "Полученные запросы в друзья";
     ViewData["Title"] = Title;
 
 }
@@ -23,7 +23,7 @@
             await Html.RenderPartialAsync("_FriendsListPartial", Model.ToList());
             @Html.PagedListPager(
                      Model,
-                     page => Url.Action("FriendRequests", new { page }),
+                     page => Url.Action("FriendsInRequests", new { page }),
                      PagedListRenderOptions.OnlyShowFivePagesAtATime
                      )
 
@@ -31,7 +31,7 @@
         else
         {
             <p>
-                Нет входящих заявок
+                Нет входящих запросов
             </p>
 
 

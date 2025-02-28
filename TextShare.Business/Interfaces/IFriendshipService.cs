@@ -76,7 +76,7 @@ namespace TextShare.Business.Interfaces
         Task<bool> RejectFriendshipAsync(int friendshipId);
 
         /// <summary>
-        /// поиск дружбы по условию
+        /// Поиск дружбы по условию
         /// </summary>
         /// <param name="predicate"></param>
         /// <param name="includes"></param>
@@ -84,5 +84,12 @@ namespace TextShare.Business.Interfaces
         Task<List<Friendship>> FindFriendshipsAsync(Expression<Func<
             Friendship, bool>> predicate,
             params Expression<Func<Friendship, object>>[] includes);
+
+        /// <summary>
+        /// Возвращает пользователей, которым отправлены запросы в друзья.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<List<User>> GetOutFriendRequestsUsers(int userId);
     }
 }
