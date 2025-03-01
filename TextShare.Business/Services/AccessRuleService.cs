@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using TextShare.Business.Interfaces;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.AccessRules;
@@ -35,12 +36,14 @@ namespace TextShare.Business.Services
         public async Task<List<AccessRule>> FindAccessRulesAsync(Expression<Func<AccessRule, 
             bool>> predicate, params Expression<Func<AccessRule, object>>[] includes)
         {
-            return await _repositoryAccessRules.FindAsync(predicate,includes);
+            var query = await _repositoryAccessRules.FindAsync(predicate, includes);
+            return await query.ToListAsync() ;
         }
 
         public async Task<List<AccessRule>> GetAllAccessRulesAsync(params Expression<Func<AccessRule, object>>[] includes)
         {
-            return await _repositoryAccessRules.GetAllAsync(includes);
+            var query = await _repositoryAccessRules.GetAllAsync(includes);
+            return await query.ToListAsync() ;
         }
 
         public async Task<AccessRule?> GetAccessRuleByIdAsync(int id, params Expression<Func<AccessRule, object>>[] includes)

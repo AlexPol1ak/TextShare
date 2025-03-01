@@ -18,14 +18,15 @@ namespace TextShare.DAL.Repositories
             _categories = context.Categories;
         }
 
-        public async Task<List<Category>> GetAllAsync(params Expression<Func<Category, object>>[] includes)
+        public async Task<IQueryable<Category>> GetAllAsync(params Expression<Func<Category, object>>[] includes)
         {
+            await Task.CompletedTask;
             IQueryable<Category> query = _categories.AsQueryable();
             foreach (var include in includes)
             {
                 query = query.Include(include);
             }
-            return await query.ToListAsync();
+            return query;
         }
 
         public async Task<Category?> GetAsync(int id, params Expression<Func<Category, object>>[] includes)
@@ -38,11 +39,12 @@ namespace TextShare.DAL.Repositories
             return await query.FirstOrDefaultAsync(c => c.CategoryId == id);
         }
 
-        public async Task<List<Category>> FindAsync(
+        public async Task<IQueryable<Category>> FindAsync(
                     Expression<Func<Category, bool>> predicate,
                     params Expression<Func<Category, object>>[] includes
             )
         {
+            await Task.CompletedTask;
             IQueryable<Category> query = _categories.Where(predicate);
 
             foreach (var include in includes)
@@ -50,7 +52,7 @@ namespace TextShare.DAL.Repositories
                 query = query.Include(include);
             }
 
-            return await query.ToListAsync();
+            return query;
         }
 
         public async Task<Category> CreateAsync(Category entity)

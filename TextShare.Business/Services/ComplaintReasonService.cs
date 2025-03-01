@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using TextShare.Business.Interfaces;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.Complaints;
@@ -36,13 +37,15 @@ namespace TextShare.Business.Services
         public async Task<List<ComplaintReasons>> FindComplaintReasonsAsync(Expression<Func<ComplaintReasons, bool>> predicate,
             params Expression<Func<ComplaintReasons, object>>[] includes)
         {
-            return await _repositoryComplaintReasons.FindAsync(predicate, includes);
+            var query = await _repositoryComplaintReasons.FindAsync(predicate, includes);
+            return await query.ToListAsync();
         }
 
         public async Task<List<ComplaintReasons>> GetAllComplaintReasonsAsync(
             params Expression<Func<ComplaintReasons, object>>[] includes)
         {
-            return await _repositoryComplaintReasons.GetAllAsync(includes);
+            var query = await _repositoryComplaintReasons.GetAllAsync(includes);
+            return await query.ToListAsync() ;
         }
 
         public async Task<ComplaintReasons?> GetComplaintReasonByIdAsync(int id,

@@ -38,12 +38,14 @@ namespace TextShare.Business.Services
         public async Task<List<Shelf>> FindShelvesAsync(Expression<Func<Shelf, bool>> predicate,
             params Expression<Func<Shelf, object>>[] includes)
         {
-            return await _repositoryShelves.FindAsync(predicate, includes);
+            var query = await _repositoryShelves.FindAsync(predicate, includes);
+            return await query.ToListAsync();
         }
 
         public async Task<List<Shelf>> GetAllShelvesAsync(params Expression<Func<Shelf, object>>[] includes)
         {
-            return await _repositoryShelves.GetAllAsync(includes);
+            var query = await _repositoryShelves.GetAllAsync(includes);
+            return await query.ToListAsync();
         }
 
         public async Task<List<Shelf>> GetAllUserShelvesAsync(int userId, params Expression<Func<Shelf, object>>[] includes)

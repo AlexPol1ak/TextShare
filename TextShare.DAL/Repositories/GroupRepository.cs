@@ -18,14 +18,16 @@ namespace TextShare.DAL.Repositories
             _groups = context.Groups;
         }
 
-        public async Task<List<Group>> GetAllAsync(params Expression<Func<Group, object>>[] includes)
+        public async Task<IQueryable<Group>> GetAllAsync(params Expression<Func<Group, object>>[] includes)
         {
+            await Task.CompletedTask;
+
             IQueryable<Group> query = _groups.AsQueryable();
             foreach (var include in includes)
             {
                 query = query.Include(include);
             }
-            return await query.ToListAsync();
+            return query;
         }
 
         public async Task<Group?> GetAsync(int id, params Expression<Func<Group, object>>[] includes)
@@ -38,11 +40,12 @@ namespace TextShare.DAL.Repositories
             return await query.FirstOrDefaultAsync(g => g.GroupId == id);
         }
 
-        public async Task<List<Group>> FindAsync(
+        public async Task<IQueryable<Group>> FindAsync(
                     Expression<Func<Group, bool>> predicate,
                     params Expression<Func<Group, object>>[] includes
             )
         {
+            await Task.CompletedTask;
             IQueryable<Group> query = _groups.Where(predicate);
 
             foreach (var include in includes)
@@ -50,7 +53,7 @@ namespace TextShare.DAL.Repositories
                 query = query.Include(include);
             }
 
-            return await query.ToListAsync();
+            return query;
         }
 
         public async Task<Group> CreateAsync(Group entity)

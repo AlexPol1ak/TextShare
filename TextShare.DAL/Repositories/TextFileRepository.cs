@@ -18,14 +18,15 @@ namespace TextShare.DAL.Repositories
             _textFiles = context.TextFiles;
         }
 
-        public async Task<List<TextFile>> GetAllAsync(params Expression<Func<TextFile, object>>[] includes)
+        public async Task<IQueryable<TextFile>> GetAllAsync(params Expression<Func<TextFile, object>>[] includes)
         {
+            await Task.CompletedTask;
             IQueryable<TextFile> query = _textFiles.AsQueryable();
             foreach (var include in includes)
             {
                 query = query.Include(include);
             }
-            return await query.ToListAsync();
+            return query;
         }
 
         public async Task<TextFile?> GetAsync(int id, params Expression<Func<TextFile, object>>[] includes)
@@ -38,11 +39,12 @@ namespace TextShare.DAL.Repositories
             return await query.FirstOrDefaultAsync(tf => tf.TextFileId == id);
         }
 
-        public async Task<List<TextFile>> FindAsync(
+        public async Task<IQueryable<TextFile>> FindAsync(
                 Expression<Func<TextFile, bool>> predicate,
                 params Expression<Func<TextFile, object>>[] includes
             )
         {
+            await Task.CompletedTask;
             IQueryable<TextFile> query = _textFiles.Where(predicate);
 
             foreach (var include in includes)
@@ -50,7 +52,7 @@ namespace TextShare.DAL.Repositories
                 query = query.Include(include);
             }
 
-            return await query.ToListAsync();
+            return query;
         }
 
         public async Task<TextFile> CreateAsync(TextFile entity)

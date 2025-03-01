@@ -18,14 +18,15 @@ namespace TextShare.DAL.Repositories
             _complaintReasons = context.ComplaintReasons;
         }
 
-        public async Task<List<ComplaintReasons>> GetAllAsync(params Expression<Func<ComplaintReasons, object>>[] includes)
+        public async Task<IQueryable<ComplaintReasons>> GetAllAsync(params Expression<Func<ComplaintReasons, object>>[] includes)
         {
+            await Task.CompletedTask;
             IQueryable<ComplaintReasons> query = _complaintReasons.AsQueryable();
             foreach (var include in includes)
             {
                 query = query.Include(include);
             }
-            return await query.ToListAsync();
+            return query;
         }
 
         public async Task<ComplaintReasons?> GetAsync(int id, params Expression<Func<ComplaintReasons, object>>[] includes)
@@ -38,11 +39,12 @@ namespace TextShare.DAL.Repositories
             return await query.FirstOrDefaultAsync(c => c.ComplaintReasonsId == id);
         }
 
-        public async Task<List<ComplaintReasons>> FindAsync(
+        public async Task<IQueryable<ComplaintReasons>> FindAsync(
                     Expression<Func<ComplaintReasons, bool>> predicate,
                     params Expression<Func<ComplaintReasons, object>>[] includes
             )
         {
+            await Task.CompletedTask;
             IQueryable<ComplaintReasons> query = _complaintReasons.Where(predicate);
 
             foreach (var include in includes)
@@ -50,7 +52,7 @@ namespace TextShare.DAL.Repositories
                 query = query.Include(include);
             }
 
-            return await query.ToListAsync();
+            return query;
         }
 
         public async Task<ComplaintReasons> CreateAsync(ComplaintReasons entity)

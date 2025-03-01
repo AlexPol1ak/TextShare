@@ -18,14 +18,15 @@ namespace TextShare.DAL.Repositories
             _accessRules = context.AccessRules;
         }
 
-        public async Task<List<AccessRule>> GetAllAsync(params Expression<Func<AccessRule, object>>[] includes)
+        public async Task<IQueryable<AccessRule>> GetAllAsync(params Expression<Func<AccessRule, object>>[] includes)
         {
+            await Task.CompletedTask;
             IQueryable<AccessRule> query = _accessRules.AsQueryable();
             foreach (var include in includes)
             {
                 query = query.Include(include);
             }
-            return await query.ToListAsync();
+            return query;
         }
 
         public async Task<AccessRule?> GetAsync(int id, params Expression<Func<AccessRule, object>>[] includes)
@@ -38,11 +39,12 @@ namespace TextShare.DAL.Repositories
             return await query.FirstOrDefaultAsync(ar => ar.AccessRuleId == id);
         }
 
-        public async Task<List<AccessRule>> FindAsync(
+        public async Task<IQueryable<AccessRule>> FindAsync(
                     Expression<Func<AccessRule, bool>> predicate,
                     params Expression<Func<AccessRule, object>>[] includes
             )
         {
+            await Task.CompletedTask;
             IQueryable<AccessRule> query = _accessRules.Where(predicate);
 
             foreach (var include in includes)
@@ -50,7 +52,7 @@ namespace TextShare.DAL.Repositories
                 query = query.Include(include);
             }
 
-            return await query.ToListAsync();
+            return query;
         }
 
 

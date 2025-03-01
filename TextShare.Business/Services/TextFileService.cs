@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using TextShare.Business.Interfaces;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.TextFiles;
@@ -35,12 +36,14 @@ namespace TextShare.Business.Services
         public async Task<List<TextFile>> FindTextFilesAsync(Expression<Func<TextFile, bool>> predicate, 
             params Expression<Func<TextFile, object>>[] includes)
         {
-            return await _repositoryTextFiles.FindAsync(predicate,includes);
+            var query = await _repositoryTextFiles.FindAsync(predicate, includes);
+            return await query.ToListAsync() ;
         }
 
         public async Task<List<TextFile>> GetAllTextFilesAsync(params Expression<Func<TextFile, object>>[] includes)
         {
-            return await _repositoryTextFiles.GetAllAsync(includes);
+            var query = await _repositoryTextFiles.GetAllAsync(includes);
+            return await query.ToListAsync() ;
         }
 
         public async Task<TextFile?> GetTextFileByIdAsync(int id, params Expression<Func<TextFile, object>>[] includes)

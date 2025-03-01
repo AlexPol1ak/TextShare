@@ -18,14 +18,15 @@ namespace TextShare.DAL.Repositories
             _shelves = context.Shelves;
         }
 
-        public async Task<List<Shelf>> GetAllAsync(params Expression<Func<Shelf, object>>[] includes)
+        public async Task<IQueryable<Shelf>> GetAllAsync(params Expression<Func<Shelf, object>>[] includes)
         {
+            await Task.CompletedTask;
             IQueryable<Shelf> query = _shelves.AsQueryable();
             foreach (var include in includes)
             {
                 query = query.Include(include);
             }
-            return await query.ToListAsync();
+            return query;
         }
 
         public async Task<Shelf?> GetAsync(int id, params Expression<Func<Shelf, object>>[] includes)
@@ -38,11 +39,12 @@ namespace TextShare.DAL.Repositories
             return await query.FirstOrDefaultAsync(s => s.ShelfId == id);
         }
 
-        public async Task<List<Shelf>> FindAsync(
+        public async Task<IQueryable<Shelf>> FindAsync(
                     Expression<Func<Shelf, bool>> predicate,
                     params Expression<Func<Shelf, object>>[] includes
             )
         {
+            await Task.CompletedTask;
             IQueryable<Shelf> query = _shelves.Where(predicate);
 
             foreach (var include in includes)
@@ -50,7 +52,7 @@ namespace TextShare.DAL.Repositories
                 query = query.Include(include);
             }
 
-            return await query.ToListAsync();
+            return query;
         }
 
         public async Task<Shelf> CreateAsync(Shelf entity)

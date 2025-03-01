@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using TextShare.Business.Interfaces;
 using TextShare.DAL.Interfaces;
 using TextShare.Domain.Entities.Users;
@@ -19,7 +20,8 @@ namespace TextShare.Business.Services
 
         public async Task<List<Friendship>> GetAllFriendshipsAsync(params Expression<Func<Friendship, object>>[] includes)
         {
-            return await _repositoryFriendships.GetAllAsync(includes);
+            var query = await _repositoryFriendships.GetAllAsync(includes);
+            return await query.ToListAsync();
         }
         public async Task<bool> ContainsFriendshipAsync(Friendship friendship)
         {
@@ -77,7 +79,8 @@ namespace TextShare.Business.Services
             Friendship, bool>> predicate,
             params Expression<Func<Friendship, object>>[] includes)
         {
-            return await _repositoryFriendships.FindAsync(predicate, includes);
+            var query = await _repositoryFriendships.FindAsync(predicate, includes);
+            return await query.ToListAsync();
         }
 
         public async Task<List<User>> GetOutFriendRequestsUsers(int userId)

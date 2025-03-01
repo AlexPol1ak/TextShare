@@ -43,11 +43,12 @@ namespace TextShare.DAL.Repositories
             return true;
         }
 
-        public async Task<List<User>> FindAsync(
+        public async Task<IQueryable<User>> FindAsync(
                     Expression<Func<User, bool>> predicate,
                     params Expression<Func<User, object>>[] includes
             )
         {
+            await Task.CompletedTask;
             IQueryable<User> query = _users.Where(predicate);
 
             foreach (var include in includes)
@@ -55,17 +56,18 @@ namespace TextShare.DAL.Repositories
                 query = query.Include(include);
             }
 
-            return await query.ToListAsync();
+            return query;
         }
 
-        public async Task<List<User>> GetAllAsync(params Expression<Func<User, object>>[] includes)
+        public async Task<IQueryable<User>> GetAllAsync(params Expression<Func<User, object>>[] includes)
         {
+            await Task.CompletedTask;
             IQueryable<User> query = _users.AsQueryable();
             foreach (var include in includes)
             {
                 query = query.Include(include);
             }
-            return await query.ToListAsync();
+            return query;
         }
 
         public async Task<User?> GetAsync(int id, params Expression<Func<User, object>>[] includes)
