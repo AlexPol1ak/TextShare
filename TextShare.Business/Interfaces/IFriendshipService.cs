@@ -22,9 +22,6 @@ namespace TextShare.Business.Interfaces
         /// <returns>Объект дружбы, если найден, иначе null</returns>
         Task<Friendship?> GetFriendshipByIdAsync(int id, params Expression<Func<Friendship, object>>[] includes);
 
-
-       
-
         /// <summary>
         /// Возвращает всех подтвержденных друзей для конкретного пользователя.
         /// </summary>
@@ -90,6 +87,24 @@ namespace TextShare.Business.Interfaces
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<List<User>> GetOutFriendRequestsUsers(int userId);
+        Task<List<User>> GetOutFriendRequestsUsers(int userId, 
+            params Expression<Func<User, object>>[] includes);
+
+        /// <summary>
+        /// Возвращает пользователей, которые отправили запросы в друзья.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<List<User>> GetInFriendRequestsUsers(int userId,
+            params Expression<Func<User, object>>[] includes);
+
+        /// <summary>
+        /// Возвращает список друзей пользователя.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="includes"></param>
+        /// <returns></returns>
+        Task<List<User>> GetFriendsUser(int userId,
+            params Expression<Func<User, object>>[] includes);
     }
 }

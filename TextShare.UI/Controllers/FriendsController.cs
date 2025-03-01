@@ -45,11 +45,7 @@ namespace TextShare.UI.Controllers
         public async Task<IActionResult> MyFriends(int page = 1)
         {
             User currentUser = (await _userManager.GetUserAsync(User))!;
-            IEnumerable<User> friends = (await _friendshipService.GetAllUserAcceptedFriendshipAsync(
-                        currentUser.Id, f => f.User, f => f.Friend))
-                        .SelectMany(f => new List<User> { f.User, f.Friend })
-                        .Distinct()
-                        .Where(user=> user.Id != currentUser.Id);
+            IEnumerable<User> friends = await _friendshipService.GetFriendsUser(currentUser.Id);
 
             IEnumerable<FriendshipSatusModel> friendModels = (await FriendshipSatusModel.FromUsers(friends))
                 .Select(model => {
@@ -72,9 +68,7 @@ namespace TextShare.UI.Controllers
         public async Task<IActionResult> FriendsInRequests(int page = 1)
         {
             User currentUser = (await _userManager.GetUserAsync(User))!;
-            IEnumerable<User> inRequests = (await _friendshipService.FindFriendshipsAsync(
-                f => f.FriendId == currentUser.Id && f.IsConfirmed == false, f => f.User
-                )).Select(u => u.User);
+            IEnumerable<User> inRequests = await _friendshipService.GetInFriendRequestsUsers(currentUser.Id);
 
             IEnumerable<FriendshipSatusModel> FriendModels = (await FriendshipSatusModel.FromUsers(inRequests))
                 .Select(model=> { 

@@ -44,7 +44,8 @@ namespace TextShare.Business.Services
             return await _repositoryFriendships.GetAsync(id, includes);
         }
 
-        public async Task<List<Friendship>> GetAllUserAcceptedFriendshipAsync(int userId, params Expression<Func<Friendship, object>>[] includes)
+        public async Task<List<Friendship>> GetAllUserAcceptedFriendshipAsync(int userId, 
+            params Expression<Func<Friendship, object>>[] includes)
         {
             List<Friendship> friendships = (await FindFriendshipsAsync(
                 f =>(f.UserId == userId || f.FriendId == userId) && f.IsConfirmed == true, includes
@@ -83,13 +84,57 @@ namespace TextShare.Business.Services
             return await query.ToListAsync();
         }
 
-        public async Task<List<User>> GetOutFriendRequestsUsers(int userId)
+        public async Task<List<User>> GetOutFriendRequestsUsers(int userId,
+            params Expression<Func<User, object>>[] includes)
         {
-            IEnumerable<User> outRequests = (await FindFriendshipsAsync(
-               f => f.UserId == userId && f.IsConfirmed == false, f => f.Friend
-               )).Select(u => u.Friend);
+            IQueryable<Friendship> outRequestsQuery = await _repositoryFriendships.FindAsync(
+                f => f.UserId == userId && f.IsConfirmed == false, f => f.Friend
+                );
+            IQueryable<User> usersQuery = outRequestsQuery.Select(f => f.Friend);
+            
+            foreach(var include in includes)
+            {
+                usersQuery = usersQuery.Include(include);
+            }
 
-            return outRequests.ToList();
+            return await usersQuery.ToListAsync();
+        }
+
+        public async Task<List<User>> GetInFriendRequestsUsers(int userId,
+            params Expression<Func<User, object>>[] includes)
+        {
+            IQueryable<Friendship> outRequestsQuery = await _repositoryFriendships.FindAsync(
+                f => f.FriendId == userId && f.IsConfirmed == false, f => f.User
+                );
+            IQueryable<User> usersQuery = outRequestsQuery.Select(f => f.User);
+
+            foreach (var include in includes)
+            {
+                usersQuery = usersQuery.Include(include);
+            }
+
+            return await usersQuery.ToListAsync();
+        }
+
+        public async Task<List<User>>GetFriendsUser(int userId, params Expression<Func<User, object>>[] includes)
+        {
+            IQueryable<Friendship> friendshipsQuery = await _repositoryFriendships.FindAsync(
+                f => (f.UserId == userId || f.FriendId == userId) && f.IsConfirmed == true,
+                f => f.Friend, f => f.User
+                );
+
+            IQueryable<User> usersQuery = friendshipsQuery
+                    .Select(f => f.User) // Выбираем одного пользователя
+                    .Union(friendshipsQuery.Select(f => f.Friend)) // Объединяем с другим
+                    .Distinct()
+                    .Where(user => user.Id != userId);
+
+            foreach (var include in includes)
+            {
+                usersQuery = usersQuery.Include(include);
+            }
+
+            return await usersQuery.ToListAsync();
         }
     }
 }
