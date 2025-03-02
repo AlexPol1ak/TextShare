@@ -70,7 +70,7 @@ namespace TextShare.UI.Controllers
         /// </summary>
         /// <param name="page">Страница полок</param>
         /// <returns></returns>
-        /// <remarks>shelves/my?page=1</remarks>
+        /// <remarks>GET shelves/my?page=1</remarks>
         [Authorize]
         [HttpGet("my")]
         public async Task<IActionResult> MyShelves(int page = 1)
@@ -93,7 +93,7 @@ namespace TextShare.UI.Controllers
         /// Отображает страницу полок, к которым предоставили  доступ друзья.
         /// </summary>
         /// <returns></returns>
-        /// <remarks>shelves/friends-shared?page=1</remarks>
+        /// <remarks>GET shelves/friends-shared?page=1</remarks>
         [Authorize]
         [HttpGet("friends-shared")]
         public async Task<IActionResult> AvailableFromFriends(int page=1)
@@ -138,7 +138,7 @@ namespace TextShare.UI.Controllers
         /// Отображает страницу полок, которые доступны группам, в которых состоит пользователь.
         /// </summary>
         /// <returns></returns>
-        /// <remarks>shelves/shared-from-groups?page=1</remarks>
+        /// <remarks>GET shelves/shared-from-groups?page=1</remarks>
         [Authorize]
         [HttpGet("shared-from-groups")]
         public async Task<IActionResult> AvailableFromGroups(int page=1)
@@ -174,7 +174,7 @@ namespace TextShare.UI.Controllers
         /// <param name="shelvesSearchModel">Модель запроса поиска полок</param>
         /// <param name="page">страница резульатата</param>
         /// <returns>Результат поиска</returns>
-        /// <remarks>shelves/search?page=1</remarks>
+        /// <remarks>GET shelves/search?page=1</remarks>
         [HttpGet("search")]
         public async Task<IActionResult> Search([FromQuery] ShelvesSearchModel? shelvesSearchModel = null, int page= 1)
         {
@@ -256,7 +256,7 @@ namespace TextShare.UI.Controllers
         /// Отображает страницу создания новой полки.
         /// </summary>
         /// <returns></returns>
-        /// <remarks>shelves/create-shelf</remarks>
+        /// <remarks>GET shelves/create-shelf</remarks>
         [Authorize]
         [HttpGet("create-shelf")]
         public async Task<IActionResult> CreateShelf()
@@ -279,7 +279,7 @@ namespace TextShare.UI.Controllers
         /// <param name="shelfCreateModel">Модель создания полки</param>
         /// <param name="avatarFile">Аватар полки</param>
         /// <returns>Перенаправляет на страницу с полками</returns>
-        /// <remarks>shelves/create-shelf</remarks>
+        /// <remarks>POST shelves/create-shelf</remarks>
         [Authorize]
         [HttpPost("create-shelf")]
         public async Task<IActionResult> CreateShelf(ShelfCreateModel shelfCreateModel, IFormFile? avatarFile)

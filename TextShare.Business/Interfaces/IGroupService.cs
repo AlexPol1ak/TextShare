@@ -57,5 +57,14 @@ namespace TextShare.Business.Interfaces
         /// <param name="group">Объект группы</param>
         /// <returns>true, если группа существует, иначе false</returns>
         Task<bool> ContainsGroupAsync(Group group);
+
+        /// <summary>
+        /// Получает все группы созданные пользователем.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="includes"></param>
+        /// <returns>Список групп, которые создал пользователь</returns>
+        Task<List<Group>> GetUserCreatedGroupsAsync(int userId,
+            params Expression<Func<Group, object>>[] includes);
     }
 }

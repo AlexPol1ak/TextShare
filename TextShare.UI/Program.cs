@@ -53,6 +53,7 @@ builder.Services.AddRazorPages();
 
 builder.Services.Configure<ImageUploadSettings>(builder.Configuration.GetSection("ImageUploadSettings"));
 builder.Services.Configure<ShelvesSettings>(builder.Configuration.GetSection("ShelvesSettings"));
+builder.Services.Configure<GroupsSettings>(builder.Configuration.GetSection("GroupsSettings"));
 
 // Business Services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

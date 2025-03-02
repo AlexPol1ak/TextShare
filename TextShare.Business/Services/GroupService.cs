@@ -56,5 +56,15 @@ namespace TextShare.Business.Services
         {
             return await _repositoryGroups.UpdateAsync(group);
         }
+
+        public async Task<List<Group>> GetUserCreatedGroupsAsync(int userId,
+            params Expression<Func<Group, object>>[] includes)
+        {
+            IQueryable<Group> groupsQuery = await _repositoryGroups.FindAsync(
+                g => g.CreatorId == userId, includes
+                );
+
+            return await groupsQuery.ToListAsync();
+        }
     }
 }

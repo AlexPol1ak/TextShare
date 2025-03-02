@@ -7,7 +7,6 @@
 <h2>@ViewData["Title"]</h2>
 
 <form asp-action="CreateShelf" asp-controller="Shelves" method="post" enctype="multipart/form-data">
-    <div asp-validation-summary="All" class="text-danger"></div>
     <div class="mb-3">
         <label asp-for="Name" class="form-label">Название</label>
         <input asp-for="Name" class="form-control" />
@@ -22,7 +21,11 @@
     
     <div class="mb-3">
         <label class="form-label">Обложка полки</label>
-        <input type="file" name="AvatarFile" class="form-control" accept="image/*" />     
+        <input type="file" name="AvatarFile" class="form-control" accept="image/*" />  
+        @if (ViewData["AvatarError"] != null)
+        {
+            <span class="text-danger">@ViewData["AvatarError"]</span>
+        }
     </div>
 
     <button type="submit" class="btn btn-primary">Создать</button>

@@ -18,7 +18,8 @@ namespace TextShare.Domain.Entities.Groups
         public string? Description { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? ImageUri { get; set; }
-     
+        public string? MimeType { get; set; }
+
         public int CreatorId { get; set; }
         public User Creator { get; set; }
 
