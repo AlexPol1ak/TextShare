@@ -22,10 +22,7 @@ namespace TextShare.Domain.Models.EntityModels.FriendsModels
         Pending = 3,
 
         [Display(Name = "Не друзья")]
-        None = 4
-
-        
-        
+        None = 4             
     }
 
     /// <summary>

@@ -1,0 +1,54 @@
+﻿@using TextShare.Domain.Models.EntityModels.GroupModels
+@model List<GroupDetailModel>
+
+@{
+    var returnUrl = Context.Request.Path;
+}
+
+<ul class="list-group">
+    @foreach (var group in Model)
+    {
+        <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+            <div class="d-flex align-items-center gap-3">
+                <a href="@Url.Action("DetailGroup", "Groups", new { groupId = group.GroupId })"
+                   class="text-decoration-none text-dark d-flex align-items-center gap-3">
+                    @if (!string.IsNullOrEmpty(group.ImageUri))
+                    {
+                        <img src="@group.ImageUri" alt="Group Image" class="rounded-circle"
+                             style="width: 50px; height: 50px; object-fit: cover;">
+                    }
+                    <div>
+                        <strong>@group.Name</strong>                      
+                    </div>
+                </a>
+            </div>
+
+            <div class="d-flex gap-2">              
+                @switch (group.UserRelationStatus)
+                {
+                    case UserRelationStatus.Creator:
+                        <p>Вы организатор</p>                
+                        break;
+
+                    case UserRelationStatus.Member:
+                        <a href="@Url.Action("LeaveGroup", "Groups", new { groupId = group.GroupId, returnUrl = returnUrl })"
+                           class="btn btn-danger btn-sm">Покинуть</a>
+                        break;
+
+                    case UserRelationStatus.Requsted:
+                        <span class="badge bg-warning text-dark">Заявка отправлена</span>
+                        <a href="@Url.Action("CancelJoinRequest", "Groups", new { groupId = group.GroupId, returnUrl = returnUrl })"
+                           class="btn btn-warning btn-sm">Отменить</a>
+                        break;
+
+                    case UserRelationStatus.NotMember:
+                        <a href="@Url.Action("JoinGroup", "Groups", new { groupId = group.GroupId, returnUrl = returnUrl })"
+                           class="btn btn-primary btn-sm">Вступить</a>
+                        break;
+                }
+                <a href="@Url.Action("DetailGroup", "Groups", new { groupId = group.GroupId })"
+                   class="btn btn-primary btn-sm" , target="_blank" rel="noopener noreferrer">Открыть</a>
+            </div>
+        </li>
+    }
+</ul>

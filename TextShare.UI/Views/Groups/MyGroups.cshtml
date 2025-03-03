@@ -1,8 +1,8 @@
-﻿@using TextShare.Domain.Models.EntityModels.FriendsModels
+﻿@using TextShare.Domain.Models.EntityModels.GroupModels
+
 
 @{
-    @* @model IPagedList<FriendshipSatusModel> *@
-
+    @model IPagedList<GroupDetailModel>
     string Title = "Группы";
     ViewData["Title"] = Title;
 
@@ -18,14 +18,14 @@
     <div class="w-50 rounded p-3 overflow-auto ms-3">
         <h2>@Title</h2>
 
-        @if (true)
+        @if (Model.Any())
         {
-            @* await Html.RenderPartialAsync("_FriendsListPartial", Model.ToList());
+            await Html.RenderPartialAsync("_GroupsListPartial", Model.ToList());
             @Html.PagedListPager(
                               Model,
-                              page => Url.Action("MyFriends", new { page }),
+                              page => Url.Action("MyGroups", new { page }),
                               PagedListRenderOptions.OnlyShowFivePagesAtATime
-                              ) *@
+                              )
 
         }
         else

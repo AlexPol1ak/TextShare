@@ -9,6 +9,7 @@ using TextShare.Domain.Models;
 using TextShare.Domain.Models.EntityModels.GroupModels;
 using TextShare.Domain.Models.EntityModels.ShelfModels;
 using TextShare.Domain.Settings;
+using X.PagedList.Extensions;
 
 namespace TextShare.UI.Controllers
 {
@@ -43,7 +44,30 @@ namespace TextShare.UI.Controllers
         [HttpGet("my")]
         public async Task<IActionResult> MyGroups(int page = 1)
         {
-            return View();
+
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            List<Group> groups = new();
+            groups.AddRange(
+                (await _groupService.GetUserCreatedGroupsAsync(currentUser.Id, g=>g.Creator))
+                .OrderBy(g=>g.CreatedAt)
+                );
+            groups.AddRange(
+                (await _groupService.GetUserMemberGroupsAsync(currentUser.Id, g => g.Creator, g => g.Members))
+                .OrderBy(g=>g.Members.Select(m=>m.JoinedAt))
+                );
+
+            List<GroupDetailModel> groupDetailsList = (await GroupDetailModel.FromGroup(groups))
+                .Select(
+                model =>
+                {
+                    if (model.Creator.Id == currentUser.Id) model.UserRelationStatus = UserRelationStatus.Creator;
+                    else model.UserRelationStatus = UserRelationStatus.Member;
+                    return model;
+                }         
+                ).ToList();
+
+
+            return View(groupDetailsList.ToPagedList(page, _groupsSettings.MaxGroupInPage));
         }
 
         [HttpGet("{username}")]
@@ -178,7 +202,7 @@ namespace TextShare.UI.Controllers
             return Content("");
         }
 
-        public async Task<IActionResult> DeleteReauestGroup()
+        public async Task<IActionResult> DeleteRequestGroup()
         {
             return Content("");
         }
