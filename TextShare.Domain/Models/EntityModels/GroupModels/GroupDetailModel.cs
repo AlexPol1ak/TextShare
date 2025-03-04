@@ -9,7 +9,7 @@ using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Domain.Models.EntityModels.GroupModels
 {
-    public enum UserRelationStatus
+    public enum UserGroupRelationStatus
     {
         [Display(Name = "Владелец")]
         Creator = 0,
@@ -37,7 +37,7 @@ namespace TextShare.Domain.Models.EntityModels.GroupModels
         public string? ImageUri { get; set; }
         public User Creator { get; set; }
 
-        public UserRelationStatus UserRelationStatus { get; set; }
+        public UserGroupRelationStatus UserGroupRelationStatus { get; set; }
 
         public static async Task<GroupDetailModel> FromGroup(Group group)
         {

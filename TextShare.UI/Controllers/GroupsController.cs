@@ -60,8 +60,8 @@ namespace TextShare.UI.Controllers
                 .Select(
                 model =>
                 {
-                    if (model.Creator.Id == currentUser.Id) model.UserRelationStatus = UserRelationStatus.Creator;
-                    else model.UserRelationStatus = UserRelationStatus.Member;
+                    if (model.Creator.Id == currentUser.Id) model.UserGroupRelationStatus = UserGroupRelationStatus.Creator;
+                    else model.UserGroupRelationStatus = UserGroupRelationStatus.Member;
                     return model;
                 }         
                 ).ToList();
@@ -77,9 +77,43 @@ namespace TextShare.UI.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> SearchGroups(int page = 1)
+        public async Task<IActionResult> SearchGroups([FromQuery] string? groupName = null, int page = 1)
         {
-            return Content("");
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            User userDb = (await _userService.GetUserByIdAsync(currentUser.Id, u => u.GroupMemberships))!;
+            List<int> userGroupRequest = userDb.GroupMemberships.Where(m => m.IsConfirmed == false).Select(m => m.GroupId).ToList();
+            List<int> userGroupsMember = userDb.GroupMemberships.Where(m => m.IsConfirmed == true).Select(m => m.GroupId).ToList();
+
+            if (string.IsNullOrEmpty(groupName) || string.IsNullOrWhiteSpace(groupName))
+            {
+                return View("SearchGroupsInput");
+            }
+
+            List<Group> resultSearsh = new();
+            resultSearsh = await _groupService.FindGroupsAsync(
+                g => g.Name.Contains(groupName),
+                g=>g.Creator,
+                g=>g.Members
+                );
+            
+            
+
+            List<GroupDetailModel> groupDetailsList = (await GroupDetailModel.FromGroup(resultSearsh))
+                .Select(
+                model =>
+                {
+                    if (model.Creator.Id == currentUser.Id) model.UserGroupRelationStatus = UserGroupRelationStatus.Creator;
+                    else if (userGroupRequest.Any(
+                        id => id == model.GroupId)) model.UserGroupRelationStatus = UserGroupRelationStatus.Requsted;
+                    else if (userGroupsMember.Any(
+                        id => id == model.GroupId)) model.UserGroupRelationStatus = UserGroupRelationStatus.Member;
+                    else
+                        model.UserGroupRelationStatus = UserGroupRelationStatus.NotMember;
+                    return model;
+                }              
+                ).ToList();
+
+            return View("SearchGroupsOutput", groupDetailsList.ToPagedList(page, _groupsSettings.MaxGroupInPage));
         }
 
         /// <summary>
@@ -160,7 +194,7 @@ namespace TextShare.UI.Controllers
 
             List<GroupDetailModel> groupDetailsList = (await GroupDetailModel.FromGroup(outRequestGroups))
                 .Select(
-                model => { model.UserRelationStatus = UserRelationStatus.Requsted; return model; }
+                model => { model.UserGroupRelationStatus = UserGroupRelationStatus.Requsted; return model; }
                 ).ToList();
 
             return View(groupDetailsList.ToPagedList(page,_groupsSettings.MaxGroupInPage));
