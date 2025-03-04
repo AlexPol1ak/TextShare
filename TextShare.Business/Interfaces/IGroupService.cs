@@ -75,5 +75,15 @@ namespace TextShare.Business.Interfaces
         /// <returns>Список групп, в которых состоит  пользователь</returns>
         Task<List<Group>> GetUserMemberGroupsAsync(int userId,
             params Expression<Func<Group, object>>[] includes);
+
+        /// <summary>
+        /// Возвращает группы в которые пользователь подал заявку на вступление.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="includes"></param>
+        /// <returns>Список групп, в которые пользователь подал заявку на вступление.</returns>
+        Task<List<Group>> GetUserOutRequestsGroups(int userId,
+            params Expression<Func<Group, object>>[] includes
+            );
     }
 }

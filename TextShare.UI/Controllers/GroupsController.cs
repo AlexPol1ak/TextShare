@@ -152,6 +152,20 @@ namespace TextShare.UI.Controllers
 
         }
 
+        [HttpGet("out-requests")]
+        public async Task<IActionResult> OutRequests(int page=1)
+        {
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            List<Group> outRequestGroups = await _groupService.GetUserOutRequestsGroups(currentUser.Id);
+
+            List<GroupDetailModel> groupDetailsList = (await GroupDetailModel.FromGroup(outRequestGroups))
+                .Select(
+                model => { model.UserRelationStatus = UserRelationStatus.Requsted; return model; }
+                ).ToList();
+
+            return View(groupDetailsList.ToPagedList(page,_groupsSettings.MaxGroupInPage));
+        }
+
         [HttpPost("update")]
         [HttpGet("update")]
         public async Task<IActionResult> UpdateGroup()
@@ -191,11 +205,7 @@ namespace TextShare.UI.Controllers
         {
             return Content("");
         }
-
-        public async Task<IActionResult> OutRequests()
-        {
-            return Content("");
-        }
+      
 
         public async Task<IActionResult> AcceptRequest()
         {

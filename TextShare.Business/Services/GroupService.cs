@@ -77,5 +77,16 @@ namespace TextShare.Business.Services
 
             return groups;
         }
+
+        public async Task<List<Group>> GetUserOutRequestsGroups(int userId,
+            params Expression<Func<Group, object>>[] includes
+            )
+        {
+            var groups = await FindGroupsAsync(
+                g => g.Members.Any(m => m.UserId == userId && m.IsConfirmed == false),
+                includes);
+
+            return groups;
+        }
     }
 }
