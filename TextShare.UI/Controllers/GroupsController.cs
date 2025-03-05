@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using TextShare.Business.Interfaces;
+using TextShare.Business.Services;
 using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
@@ -25,13 +26,15 @@ namespace TextShare.UI.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IGroupService _groupService;
         private readonly IUserService _userService;
+        private readonly IFriendshipService _friendshipService;
         public GroupsController(
             IPhysicalFile physicalFile,
             IOptions<ImageUploadSettings> imageUploadSettingsOptions,
             UserManager<User> userManager,
             IGroupService groupService,
             IUserService userService,
-            IOptions<GroupsSettings> groupsSettings
+            IOptions<GroupsSettings> groupsSettings,
+            IFriendshipService friendshipService
             ) 
             : base(physicalFile, imageUploadSettingsOptions)
         {
@@ -39,9 +42,10 @@ namespace TextShare.UI.Controllers
             _groupService = groupService;
             _userService = userService;
             _groupsSettings = groupsSettings.Value;
+            _friendshipService = friendshipService;
         }
 
-        [HttpGet("my")]
+        [HttpGet()]
         public async Task<IActionResult> MyGroups(int page = 1)
         {
 
@@ -70,11 +74,71 @@ namespace TextShare.UI.Controllers
             return View(groupDetailsList.ToPagedList(page, _groupsSettings.MaxGroupInPage));
         }
 
+        /// <summary>
+        /// Возвращает страницу с списком групп определенного пользователя.
+        /// </summary>
+        /// <param name="username">Username просматриваемого пользователя</param>
+        /// <param name="page"></param>
+        /// <returns>Страницу с списком групп пользователя.</returns>
+        /// <remarks> GET groups/{username}?page=1</remarks>
         [HttpGet("{username}")]
         public async Task<IActionResult> UserGroups(string username,int page = 1)
         {
-            return Content("");
-        }
+            // Если пустой username
+            if (string.IsNullOrEmpty(username))
+            {
+                HttpContext.Items["ErrorMessage"] = "Не корректная ссылка.";
+                return BadRequest();
+            }
+
+            // Текущий пользователь ( который получает страницу)
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+
+            // Просматриваемый пользователь 
+            User? viewedUser = await _userService.GetUserByUsernameAsync(username);           
+            // Если просматриваемый пользователь не найден.
+            if (viewedUser ==null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Не корректная ссылка.";
+                return BadRequest();
+            }
+
+            // Список друзей просматриваемого пользователя.
+            List<User> viewedUserFriends = await _friendshipService.GetFriendsUser(viewedUser.Id);
+            // Если  текущий пол-ль не дружит с просматр. поль-лем - перенаправить на страницу
+            if((viewedUserFriends.Any(u=>u.Id == currentUser.Id)))
+            {
+                return RedirectToAction("UserDetail", "User", new {username = viewedUser.UserName});
+            }
+
+            // Список созданных групп просмтр. пользователем.
+            List<Group> viewedUserGroups = await _groupService.GetUserCreatedGroupsAsync(viewedUser.Id, g=>g.Members);
+            // Список групп, в которых просмотр. поль-ль состоит.
+            viewedUserGroups.AddRange(await _groupService.GetUserMemberGroupsAsync(viewedUser.Id, g => g.Members));
+
+            // Модель групп для View();
+            List<GroupDetailModel> groupDetailsList = (await GroupDetailModel.FromGroup(viewedUserGroups))
+                .Select(
+                model =>
+                {
+                    // Установка отношений в модели текущего пользователя к группам в списке
+                    Group? group = viewedUserGroups.Find(g => g.GroupId == model.GroupId);
+                    if (group == null) return model;
+
+                    if (group.CreatorId == currentUser.Id)
+                        model.UserGroupRelationStatus = UserGroupRelationStatus.Creator;
+                    else if (group.Members.Any(m => m.UserId == currentUser.Id && m.IsConfirmed == true))
+                        model.UserGroupRelationStatus = UserGroupRelationStatus.Member;
+                    else if (group.Members.Any(m => m.UserId == currentUser.Id && m.IsConfirmed == false))
+                        model.UserGroupRelationStatus = UserGroupRelationStatus.Requsted;
+                    else
+                        model.UserGroupRelationStatus = UserGroupRelationStatus.NotMember;
+                        return model;
+                }
+                ).ToList();
+
+            return View(groupDetailsList.ToPagedList(page, _groupsSettings.MaxGroupInPage));
+        }       
 
         [HttpGet("search")]
         public async Task<IActionResult> SearchGroups([FromQuery] string? groupName = null, int page = 1)
@@ -209,9 +273,43 @@ namespace TextShare.UI.Controllers
 
         [HttpGet("delete")]
         [HttpPost("delete")]
-        public async Task<IActionResult> DeleteGroup()
+        public async Task<IActionResult> DeleteGroup(int groupId)
         {
-            return Content("");
+            Group? group = await _groupService.GetGroupByIdAsync(groupId, g=>g.Creator);
+            if(group == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Группа не найдена";
+                return BadRequest();
+            }
+
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            if(Request.Method == HttpMethods.Get)
+            {
+                if(group.CreatorId != currentUser.Id)
+                {
+                    HttpContext.Items["ErrorMessage"] = "У вас нет прав для управления  этой группой";
+                    return BadRequest();
+                }
+                GroupDeleteModel groupDeleteModel = GroupDeleteModel.FromGroup(group);
+                return View(groupDeleteModel);                               
+            }
+
+            if(Request.Method == HttpMethods.Post)
+            {
+                if (group.CreatorId != currentUser.Id)
+                {
+                    HttpContext.Items["ErrorMessage"] = "У вас нет прав для управления  этой группой";
+                    return BadRequest();
+                }
+
+                if(group.ImageUri != null)
+                {
+                    await this.DeleteImageByUri(group.ImageUri);
+                }
+                await _groupService.DeleteGroupAsync(group.GroupId);
+            }
+
+            return RedirectToAction("MyGroups");
         }
 
         [HttpGet("group-{groupId}")]
