@@ -9,6 +9,7 @@ using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
 using TextShare.Domain.Models.EntityModels.GroupModels;
 using TextShare.Domain.Models.EntityModels.ShelfModels;
+using TextShare.Domain.Models.EntityModels.UserModels;
 using TextShare.Domain.Settings;
 using TextShare.Domain.Utils;
 using X.PagedList.Extensions;
@@ -399,7 +400,25 @@ namespace TextShare.UI.Controllers
         [HttpGet("group-{groupId}/members")]
         public async Task<IActionResult> GroupMembers(int groupId, int page=1)
         {
-            return Content("");
+            Group? group = await _groupService.GetGroupByIdAsync(groupId, g => g.Creator, g => g.Members);
+            if(group == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Группа не найдена";
+                return BadRequest();
+            }
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            List<int> membersIds = group.Members.Select(m => m.UserId).ToList();
+            List<User> members = await _userService.FindUsersAsync(
+                u=> membersIds.Any(id => id == u.Id)
+                );
+
+            GroupMembersModel groupMembersModel = new();
+            groupMembersModel.CurrentUser = UserModel.FromUser(currentUser);
+            groupMembersModel.Group = await  GroupDetailModel.FromGroup(group);
+            groupMembersModel.Members = (await UserModel.FromUsers(members)).ToPagedList(page, 10);
+
+
+            return View(groupMembersModel);
         }
 
         [HttpGet("group-{groupId}/in-requests")]
@@ -421,7 +440,8 @@ namespace TextShare.UI.Controllers
             return Content("");
         }
 
-        public async Task<IActionResult> DeleteRequest()
+        [HttpPost("group-{groupId}/delete-member")]
+        public async Task<IActionResult> DeleteMember(int groupId, string username)
         {
             return Content("");
         }

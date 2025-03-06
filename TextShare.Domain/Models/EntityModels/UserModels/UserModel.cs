@@ -55,16 +55,25 @@ namespace TextShare.Domain.Models.EntityModels.UserModels
         /// <returns></returns>
         public static UserModel FromUser(User user)
         {
-            UserModel userDto = new UserModel();
-            userDto.FirstName = user.FirstName;
-            userDto.LastName = user.LastName;
-            userDto.Patronymic = user.Patronymic;
-            userDto.BirthDate = user.BirthDate;
-            userDto.SelfDescription = user.SelfDescription;
-            userDto.Id = user.Id;
-            userDto.UserName = user.UserName!;
-            userDto.AvatarUri = user.AvatarUri;
-            return userDto;
+            UserModel userModel = new UserModel();
+            userModel.FirstName = user.FirstName;
+            userModel.LastName = user.LastName;
+            userModel.Patronymic = user.Patronymic;
+            userModel.BirthDate = user.BirthDate;
+            userModel.SelfDescription = user.SelfDescription;
+            userModel.Id = user.Id;
+            userModel.UserName = user.UserName!;
+            userModel.AvatarUri = user.AvatarUri;
+            return userModel;
+        }
+
+        public async static Task<List<UserModel>> FromUsers(IEnumerable<User> users)
+        {
+            List<UserModel> usersModels = new();
+            var tasks = users.Select(async user => FromUser(user));
+            usersModels = (await Task.WhenAll(tasks)).ToList();
+
+            return usersModels;
         }
     }
 }
