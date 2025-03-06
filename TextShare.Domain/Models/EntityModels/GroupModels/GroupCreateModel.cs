@@ -13,8 +13,6 @@ namespace TextShare.Domain.Models.EntityModels.GroupModels
         public string Name { get; set; }
 
         [StringLength(500, ErrorMessage = "Описание должно содержать не более 500 символов.")]
-        [RegularExpression(@"^[a-zA-Zа-яА-Я0-9_#\-\s]+$",
-            ErrorMessage = "Описание группы может содержать буквы (латинские или русские), цифры, пробелы, символы _ и #.")]
         public string? Description { get; set; }
 
         public Group ToGroup()

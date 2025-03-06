@@ -1,0 +1,37 @@
+﻿@using TextShare.Domain.Models.EntityModels.GroupModels
+@model GroupDetailModel
+
+<div class="d-flex flex-column align-items-start border-end p-1 w-30 ms-2">
+    <a asp-controller="Groups" asp-action="DetailGroup" asp-route-groupId="@Model.GroupId"
+       class="btn btn-link mb-3 text-start">
+        К Группе "@(Model.Name.Length > 10 ? Model.Name.Substring(0, 10) + "..." : Model.Name)"
+    </a>
+
+    <a asp-controller="Groups" asp-action="GroupMembers" asp-route-groupId="@Model.GroupId"
+       class="btn btn-link mb-3 text-start">
+        Участники
+    </a>
+
+    <a asp-controller="Groups" asp-action="AvailableShelves" asp-route-groupId="@Model.GroupId"
+       class="btn btn-link mb-3 text-start">
+        Полки доступные группе
+    </a>
+
+    <a asp-controller="Groups" asp-action="AvailableFiles" asp-route-groupId="@Model.GroupId"
+       class="btn btn-link mb-3 text-start">
+        Файлы доступные группе
+    </a>
+
+    @if (Model.UserGroupRelationStatus == UserGroupRelationStatus.Creator)
+    {
+        <a asp-controller="Groups" asp-action="RequestsUsers" asp-route-groupId="@Model.GroupId"
+           class="btn btn-link mb-3 text-start">
+            Входящие заявки
+        </a>
+
+        <a asp-controller="Groups" asp-action="UpdateGroup" asp-route-groupId="@Model.GroupId"
+           class="btn btn-link mb-3 text-start">
+            Управление
+        </a>
+    }
+</div>

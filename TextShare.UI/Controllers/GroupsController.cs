@@ -10,6 +10,7 @@ using TextShare.Domain.Models;
 using TextShare.Domain.Models.EntityModels.GroupModels;
 using TextShare.Domain.Models.EntityModels.ShelfModels;
 using TextShare.Domain.Settings;
+using TextShare.Domain.Utils;
 using X.PagedList.Extensions;
 
 namespace TextShare.UI.Controllers
@@ -207,14 +208,14 @@ namespace TextShare.UI.Controllers
         /// </summary>
         /// <returns>Перенаправляет на страницу созданной группы</returns>
         ///<remarks>POST groups/create-group</remarks>
-        [HttpPost("create-group")]   
+        [HttpPost("create")]   
         public async Task<IActionResult> CreateGroup(GroupCreateModel groupCreateModel, IFormFile? AvatarFile)
         {
             User currentUser = (await _userManager.GetUserAsync(User))!;
 
             int countUserGroups = (await _groupService.GetUserCreatedGroupsAsync(currentUser.Id)).Count;
             if(countUserGroups >= _groupsSettings.MaxGroupsCreate)
-            {
+            {              
                 HttpContext.Items["ErrorMessage"] = "Вы организовали максимально допустимое количество групп";
                 return BadRequest();
             }
@@ -223,7 +224,6 @@ namespace TextShare.UI.Controllers
             {
                 return View(groupCreateModel);
             }
-
             Group newGroup = groupCreateModel.ToGroup();
             newGroup.Creator = currentUser;
             newGroup.CreatorId = currentUser.Id;
@@ -262,13 +262,6 @@ namespace TextShare.UI.Controllers
                 ).ToList();
 
             return View(groupDetailsList.ToPagedList(page,_groupsSettings.MaxGroupInPage));
-        }
-
-        [HttpPost("update")]
-        [HttpGet("update")]
-        public async Task<IActionResult> UpdateGroup()
-        {
-            return Content("");
         }
 
         [HttpGet("delete")]
@@ -315,36 +308,66 @@ namespace TextShare.UI.Controllers
         [HttpGet("group-{groupId}")]
         public async Task<IActionResult> DetailGroup(int groupId)
         {
-            return Content($"{groupId}");
+            Group? group = await _groupService.GetGroupByIdAsync(groupId, g => g.Members, g=>g.Creator);
+            if(group == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Группа не найдена";
+                return BadRequest();
+            }
+
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            GroupDetailModel groupDetailModel = await GroupDetailModel.FromGroup(group);
+
+            if (group.CreatorId == currentUser.Id)
+                groupDetailModel.UserGroupRelationStatus = UserGroupRelationStatus.Creator;
+            else if (group.Members.Any(m => m.UserId == currentUser.Id && m.IsConfirmed == true))
+                groupDetailModel.UserGroupRelationStatus = UserGroupRelationStatus.Member;
+            else if (group.Members.Any(m => m.UserId == currentUser.Id && m.IsConfirmed == false))
+                groupDetailModel.UserGroupRelationStatus = UserGroupRelationStatus.Requsted;
+            else
+                groupDetailModel.UserGroupRelationStatus = UserGroupRelationStatus.NotMember;
+
+            return View(groupDetailModel);
         }
 
-        public async Task<IActionResult> AvailableShelvesGroup()
+        [HttpGet("group-{groupId}/shelves")]
+        public async Task<IActionResult> AvailableShelves(int groupId, int page = 1)
         {
             return Content("");
         }
 
-        public async Task<IActionResult> AvailableFilesGroup()
+        [HttpGet("group-{groupId}/files")]
+        public async Task<IActionResult> AvailableFiles(int groupId, int page = 1)
         {
             return Content("");
         }
 
-        public async Task<IActionResult> GroupMembers()
+        [HttpGet("group-{groupId}/members")]
+        public async Task<IActionResult> GroupMembers(int groupId, int page=1)
         {
             return Content("");
         }
 
-        public async Task<IActionResult> RequestsUsersGroup()
+        [HttpGet("group-{groupId}/in-requests")]
+        public async Task<IActionResult> RequestsUsers(int groupId, int page = 1)
         {
             return Content("");
         }
-      
+
+        [HttpPost("group-{groupId}/update")]
+        [HttpGet("group-{groupId}/update")]
+        public async Task<IActionResult> UpdateGroup(int groupId)
+        {
+            return Content("");
+        }
+
 
         public async Task<IActionResult> AcceptRequest()
         {
             return Content("");
         }
 
-        public async Task<IActionResult> DeleteRequestGroup()
+        public async Task<IActionResult> DeleteRequest()
         {
             return Content("");
         }
