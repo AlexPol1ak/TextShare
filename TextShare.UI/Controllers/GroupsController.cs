@@ -141,6 +141,13 @@ namespace TextShare.UI.Controllers
             return View(groupDetailsList.ToPagedList(page, _groupsSettings.MaxGroupInPage));
         }       
 
+        /// <summary>
+        /// Отображает страницу поиска
+        /// </summary>
+        /// <param name="groupName">Название группы</param>
+        /// <param name="page">Номер страницы поиска</param>
+        /// <returns>Страница поиска</returns>
+        /// <remarks>GET search?groupName=null?page=1</remarks>
         [HttpGet("search")]
         public async Task<IActionResult> SearchGroups([FromQuery] string? groupName = null, int page = 1)
         {
@@ -160,9 +167,7 @@ namespace TextShare.UI.Controllers
                 g=>g.Creator,
                 g=>g.Members
                 );
-            
-            
-
+                      
             List<GroupDetailModel> groupDetailsList = (await GroupDetailModel.FromGroup(resultSearsh))
                 .Select(
                 model =>
@@ -243,13 +248,26 @@ namespace TextShare.UI.Controllers
                 newGroup.MimeType = AvatarFile.ContentType;
             }
 
-            newGroup = await  _groupService.CreateGroupAsync(newGroup);
-            await _groupService.SaveAsync();
+            GroupMember member = new();
+            member.Group = newGroup;
+            member.User = currentUser;
+            member.IsConfirmed = true;
+
+            newGroup.Members.Add(member);
+
+            newGroup = await _groupService.CreateGroupAsync(newGroup);
+            await _groupService.SaveAsync();            
 
             return RedirectToAction("DetailGroup", new { groupId = newGroup.GroupId });
 
         }
 
+
+        /// <summary>
+        /// Отображает страницу с исходящими заявками пользователя.
+        /// </summary>
+        /// <param name="page"></param>
+        /// <returns></returns>
         [HttpGet("out-requests")]
         public async Task<IActionResult> OutRequests(int page=1)
         {
@@ -262,6 +280,36 @@ namespace TextShare.UI.Controllers
                 ).ToList();
 
             return View(groupDetailsList.ToPagedList(page,_groupsSettings.MaxGroupInPage));
+        }
+
+        /// <summary>
+        /// Обрабатывает Post запрос присоединения к новой группе
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns>Перенаправляет на группу</returns>
+        [HttpPost("join-group")]
+        public async Task<IActionResult> JoinGroup(int groupId)
+        {
+            Group? group = await _groupService.GetGroupByIdAsync(groupId, g => g.Members, g => g.Creator);
+            if(group == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Группа не найдена";
+                return BadRequest();
+            }
+
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            
+            if(!(group.Members.Any(m=>m.UserId == currentUser.Id)))
+            {
+                GroupMember groupMember = new();
+                groupMember.User = currentUser;
+                groupMember.Group = group;
+
+                group.Members.Add(groupMember);
+                await _groupService.UpdateGroupAsync(group);
+                await _groupService.SaveAsync();
+            }         
+            return RedirectToAction("DetailGroup", "Groups", new {groupId = groupId});
         }
 
         [HttpGet("delete")]
@@ -305,6 +353,12 @@ namespace TextShare.UI.Controllers
             return RedirectToAction("MyGroups");
         }
 
+        /// <summary>
+        /// Отображает страницу с детальной информацией о группе.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns>Страница с информацией о группе.</returns>
+        /// <remarks>GET groups/group-{groupId}</remarks>
         [HttpGet("group-{groupId}")]
         public async Task<IActionResult> DetailGroup(int groupId)
         {
@@ -371,6 +425,8 @@ namespace TextShare.UI.Controllers
         {
             return Content("");
         }
+
+
 
 
     }
