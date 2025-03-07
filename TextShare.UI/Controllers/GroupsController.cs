@@ -440,14 +440,57 @@ namespace TextShare.UI.Controllers
             return Content("");
         }
 
+        /// <summary>
+        /// Обрабатывает POST запрос на удаление пользователя из группы.
+        /// </summary>
+        /// <param name="groupId">Id группы</param>
+        /// <param name="username"> username пользователя</param>
+        /// <param name="returnUrl">Ссылка перенаправления</param>
+        /// <returns></returns>
         [HttpPost("group-{groupId}/delete-member")]
-        public async Task<IActionResult> DeleteMember(int groupId, string username)
+        public async Task<IActionResult> DeleteMember(int groupId, string username, string? returnUrl = null)
         {
-            return Content("");
+            Group? group = await _groupService.GetGroupByIdAsync(groupId, g => g.Creator, g => g.Members);
+            if (group == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Группа не найдена";
+                return BadRequest();
+            }
+
+            User? deleteUser = await _userService.GetUserByUsernameAsync(username);
+            if (deleteUser == null)
+            {
+                HttpContext.Items["ErrorMessage"] = $"Пользователь {username} не найден";
+                return BadRequest();
+            }
+
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+
+            if(currentUser.Id == deleteUser.Id || group.CreatorId == currentUser.Id)
+            {
+                GroupMember? groupMember =  group.Members.Where(m => m.UserId == deleteUser.Id).FirstOrDefault();
+                if(groupMember != null)
+                {
+                    group.Members.Remove(groupMember);
+                    await _groupService.UpdateGroupAsync(group);
+                    await _groupService.SaveAsync();
+                }
+            }
+            else
+            {
+                HttpContext.Items["ErrorMessage"] = "Вы не можете удалить этого пользователя из группы";
+                return BadRequest();
+            }
+
+
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction("GroupMembers", new { groupId });
         }
 
-
-
-
+       
     }
 }

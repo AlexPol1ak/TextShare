@@ -35,7 +35,8 @@
                         @if (Model.Group.Creator.Id == Model.CurrentUser.Id && Model.Group.Creator.Id != member.Id)
                         {
                             <form asp-controller="Groups" asp-action="DeleteMember" asp-route-groupId="@Model.Group.GroupId"
-                                  asp-route-username="@member.UserName" method="post" class="ms-3">
+                                  asp-route-username="@member.UserName" asp-route-returnUrl="@Context.Request.Path"
+                                  method="post" class="ms-3">
                                 <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
                             </form>
                         }
