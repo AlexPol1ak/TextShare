@@ -1,0 +1,67 @@
+﻿@using TextShare.Domain.Models.EntityModels.GroupModels
+@using TextShare.Domain.Models.EntityModels.UserModels
+@model GroupMembersModel
+
+@{
+    ViewData["Title"] = $"Заявки в группу \"{Model.Group.Name}\"";
+}
+
+<div class="d-flex align-items-start">
+    <!-- Ссылки справа -->
+    <div class="w-25 border-start p-3 ms-3">
+        <partial name="_GroupDetailLinksPartial" model="Model.Group" />
+    </div>
+
+    <!-- Список участников слева -->
+    <div class="w-75 p-3">
+        <h2>@ViewData["Title"]</h2>
+
+        @if (Model.Members.Any())
+        {
+            <ul class="list-group">
+                @foreach (var member in Model.Members)
+                {
+                    <li class="list-group-item d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <img src="@(member.AvatarUri ?? "/Images/default_user.png")"
+                                 alt="Avatar" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+                            <div>
+                                <strong>@member.FirstName @member.LastName</strong>
+                                <br>
+                                <a asp-controller="User" asp-action="Profile" asp-route-username="@member.UserName">@member.UserName</a>
+                            </div>
+                        </div>
+
+                        @if (Model.Group.Creator.Id == Model.CurrentUser.Id && Model.Group.Creator.Id != member.Id)
+                        {
+                            <div class="d-flex gap-2">
+                                <form asp-controller="Groups" asp-action="AcceptRequest" asp-route-groupId="@Model.Group.GroupId"
+                                      asp-route-username="@member.UserName" asp-route-returnUrl="@Context.Request.Path"
+                                      method="post">
+                                    <button type="submit" class="btn btn-success btn-sm">Принять</button>
+                                </form>
+
+                                <form asp-controller="Groups" asp-action="DeleteMember" asp-route-groupId="@Model.Group.GroupId"
+                                      asp-route-username="@member.UserName" asp-route-returnUrl="@Context.Request.Path"
+                                      method="post">
+                                    <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                                </form>
+                            </div>
+
+                        }
+                    </li>
+                }
+            </ul>
+
+            @Html.PagedListPager(
+                     Model.Members,
+                     page => Url.Action("GroupMembers", new { groupId = Model.Group.GroupId, page }),
+                     PagedListRenderOptions.OnlyShowFivePagesAtATime
+                     )
+        }
+        else
+        {
+            <p>Нет входящих заявок</p>
+        }
+    </div>
+</div>

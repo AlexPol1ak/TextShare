@@ -4,6 +4,8 @@
 @{
     string Title = "Детали группы";
     ViewData["Title"] = Title;
+
+    var returnUrl = Context.Request.Path;
 }
 
 <div class="d-flex align-items-start">
@@ -41,16 +43,20 @@
 
         @if (Model.UserGroupRelationStatus == UserGroupRelationStatus.NotMember)
         {
-            <form asp-controller="Groups" asp-action="JoinGroup" method="post">
-                <input type="hidden" name="groupId" value="@Model.GroupId">
-                <button type="submit" class="btn btn-primary">Подать заявку</button>
+            <br />
+            <br />
+            <form asp-action="JoinGroup" asp-controller="Groups" method="post" class="d-inline">
+                <input type="hidden" name="groupId" value="@Model.GroupId" />
+                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                <button type="submit" class="btn btn-primary btn-sm3">Подать заявку</button>
             </form>
         }
         else if (Model.UserGroupRelationStatus == UserGroupRelationStatus.Requsted)
         {
             <p class="text-warning">Заявка отправлена</p>
-            <form asp-controller="Groups" asp-action="CancelRequest" method="post">
-                <input type="hidden" name="groupId" value="@Model.GroupId">
+            <form asp-controller="Groups" asp-action="LeaveGroup" asp-route-groupId="@Model.GroupId"
+                  class="d-inline" method="post">
+                <input type="hidden" name="returnUrl" value="@returnUrl" />
                 <button type="submit" class="btn btn-danger">Отменить заявку</button>
             </form>
         }

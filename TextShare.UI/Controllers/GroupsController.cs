@@ -47,6 +47,11 @@ namespace TextShare.UI.Controllers
             _friendshipService = friendshipService;
         }
 
+        /// <summary>
+        /// Отображает страницу с списком групп пользователя.
+        /// </summary>
+        /// <param name="page"></param>
+        /// <returns>Страница с списком групп пользователя</returns>
         [HttpGet()]
         public async Task<IActionResult> MyGroups(int page = 1)
         {
@@ -263,7 +268,6 @@ namespace TextShare.UI.Controllers
 
         }
 
-
         /// <summary>
         /// Отображает страницу с исходящими заявками пользователя.
         /// </summary>
@@ -289,29 +293,43 @@ namespace TextShare.UI.Controllers
         /// <param name="groupId"></param>
         /// <returns>Перенаправляет на группу</returns>
         [HttpPost("join-group")]
-        public async Task<IActionResult> JoinGroup(int groupId)
+        public async Task<IActionResult> JoinGroup(int groupId, string? returnUrl = null)
         {
             Group? group = await _groupService.GetGroupByIdAsync(groupId, g => g.Members, g => g.Creator);
-            if(group == null)
+            if (group == null)
             {
                 HttpContext.Items["ErrorMessage"] = "Группа не найдена";
                 return BadRequest();
             }
 
             User currentUser = (await _userManager.GetUserAsync(User))!;
-            
-            if(!(group.Members.Any(m=>m.UserId == currentUser.Id)))
+
+            if (group.Members == null)
             {
-                GroupMember groupMember = new();
-                groupMember.User = currentUser;
-                groupMember.Group = group;
+                group.Members = new List<GroupMember>();
+            }
+
+            if (!group.Members.Any(m => m.UserId == currentUser.Id))
+            {
+                GroupMember groupMember = new()
+                {
+                    User = currentUser,
+                    Group = group
+                };
 
                 group.Members.Add(groupMember);
                 await _groupService.UpdateGroupAsync(group);
                 await _groupService.SaveAsync();
-            }         
-            return RedirectToAction("DetailGroup", "Groups", new {groupId = groupId});
+            }
+
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction("DetailGroup", "Groups", new { groupId });
         }
+
 
         [HttpGet("delete")]
         [HttpPost("delete")]
@@ -397,6 +415,12 @@ namespace TextShare.UI.Controllers
             return Content("");
         }
 
+        /// <summary>
+        /// Отображает страницу с участниками группы.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
         [HttpGet("group-{groupId}/members")]
         public async Task<IActionResult> GroupMembers(int groupId, int page=1)
         {
@@ -407,7 +431,7 @@ namespace TextShare.UI.Controllers
                 return BadRequest();
             }
             User currentUser = (await _userManager.GetUserAsync(User))!;
-            List<int> membersIds = group.Members.Select(m => m.UserId).ToList();
+            List<int> membersIds = group.Members.Where(m => m.IsConfirmed == true).Select(m => m.UserId).ToList();
             List<User> members = await _userService.FindUsersAsync(
                 u=> membersIds.Any(id => id == u.Id)
                 );
@@ -424,7 +448,25 @@ namespace TextShare.UI.Controllers
         [HttpGet("group-{groupId}/in-requests")]
         public async Task<IActionResult> RequestsUsers(int groupId, int page = 1)
         {
-            return Content("");
+            Group? group = await _groupService.GetGroupByIdAsync(groupId, g => g.Creator, g => g.Members);
+            if (group == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Группа не найдена";
+                return BadRequest();
+            }
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            List<int> membersIds = group.Members.Where(m => m.IsConfirmed == false).Select(m => m.UserId).ToList();
+            List<User> members = await _userService.FindUsersAsync(
+                u => membersIds.Any(id => id == u.Id)
+                );
+
+            GroupMembersModel groupMembersModel = new();
+            groupMembersModel.CurrentUser = UserModel.FromUser(currentUser);
+            groupMembersModel.Group = await GroupDetailModel.FromGroup(group);
+            groupMembersModel.Members = (await UserModel.FromUsers(members)).ToPagedList(page, 10);
+
+
+            return View(groupMembersModel);
         }
 
         [HttpPost("group-{groupId}/update")]
@@ -432,12 +474,62 @@ namespace TextShare.UI.Controllers
         public async Task<IActionResult> UpdateGroup(int groupId)
         {
             return Content("");
-        }
+        }     
 
-
-        public async Task<IActionResult> AcceptRequest()
+        /// <summary>
+        /// Обрабатывает POST запрос одобрения заявки участия в группе.
+        /// </summary>
+        /// <param name="groupId">Id группы</param>
+        /// <param name="username">Username пользователя</param>
+        /// <param name="returnUrl"></param>
+        /// <returns></returns>
+        [HttpPost("group-{groupId}/accept-request")]
+        public async Task<IActionResult> AcceptRequest(int groupId, string username, string? returnUrl = null)
         {
-            return Content("");
+            if (string.IsNullOrEmpty(username))
+            {
+                HttpContext.Items["ErrorMessage"] = $"Некорректный username";
+                return BadRequest();
+            }
+
+            Group? group = await _groupService.GetGroupByIdAsync(groupId, g => g.Creator, g => g.Members);
+            if (group == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Группа не найдена";
+                return BadRequest();
+            }
+
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            if(group.CreatorId != currentUser.Id)
+            {
+                HttpContext.Items["ErrorMessage"] = "Недостаточно полномочий";
+                return BadRequest();
+            }
+
+            User? acceptUser = await _userService.GetUserByUsernameAsync(username);
+            if(acceptUser == null)
+            {
+                HttpContext.Items["ErrorMessage"] = $"Пользователь {username} не найден";
+                return BadRequest();
+            }
+
+            GroupMember? groupMember = group.Members.Where(
+                g => g.UserId == acceptUser.Id && g.IsConfirmed == false
+                ).FirstOrDefault();
+
+            if(groupMember != null)
+            {
+                groupMember.IsConfirmed = true;
+                await _groupService.UpdateGroupAsync(group);
+                await _groupService.SaveAsync();
+            }
+
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction("RequestsUsers", new { groupId });
         }
 
         /// <summary>
@@ -466,7 +558,7 @@ namespace TextShare.UI.Controllers
 
             User currentUser = (await _userManager.GetUserAsync(User))!;
 
-            if(currentUser.Id == deleteUser.Id || group.CreatorId == currentUser.Id)
+            if( group.CreatorId == currentUser.Id)
             {
                 GroupMember? groupMember =  group.Members.Where(m => m.UserId == deleteUser.Id).FirstOrDefault();
                 if(groupMember != null)
@@ -490,6 +582,39 @@ namespace TextShare.UI.Controllers
 
             return RedirectToAction("GroupMembers", new { groupId });
         }
+
+        [HttpPost("group -{groupId}/leave-group")]
+        public async Task<IActionResult> LeaveGroup(int groupId, string? returnUrl = null)
+        {
+            Group? group = await _groupService.GetGroupByIdAsync(groupId, g => g.Creator, g => g.Members);
+            if (group == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Группа не найдена";
+                return BadRequest();
+            }
+
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+
+            if(group.Members != null )
+            {
+                GroupMember ?groupMember = group.Members.Where(m => m.UserId == currentUser.Id).FirstOrDefault();
+                if(groupMember != null)
+                {
+                    group.Members.Remove(groupMember);
+                    await _groupService.UpdateGroupAsync(group);
+                    await _groupService.SaveAsync();
+                }
+
+            }
+
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction("GroupMembers", new { groupId });
+        }
+
 
        
     }

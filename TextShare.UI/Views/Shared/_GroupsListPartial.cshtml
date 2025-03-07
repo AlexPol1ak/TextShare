@@ -10,7 +10,7 @@
     {
         <li class="list-group-item d-flex justify-content-between align-items-center p-3">
             <div class="d-flex align-items-center gap-3">
-                <a href="@Url.Action("DetailGroup", "Groups", new { groupId = group.GroupId })"
+                <a asp-action="DetailGroup" asp-controller="Groups" asp-route-groupId="@group.GroupId"
                    class="text-decoration-none text-dark d-flex align-items-center gap-3">
                     @if (!string.IsNullOrEmpty(group.ImageUri))
                     {
@@ -18,7 +18,7 @@
                              style="width: 50px; height: 50px; object-fit: cover;">
                     }
                     <div>
-                        <strong>@group.Name</strong>                      
+                        <strong>@group.Name</strong>
                     </div>
                 </a>
             </div>
@@ -27,27 +27,38 @@
                 @switch (group.UserGroupRelationStatus)
                 {
                     case UserGroupRelationStatus.Creator:
-                        <p>Вы организатор</p>                
+                        <p>Вы организатор</p>
                         break;
 
                     case UserGroupRelationStatus.Member:
-                        <a href="@Url.Action("LeaveGroup", "Groups", new { groupId = group.GroupId, returnUrl = returnUrl })"
-                           class="btn btn-danger btn-sm">Покинуть</a>
+                        <form asp-action="LeaveGroup" asp-controller="Groups" asp-route-groupId="@group.GroupId"
+                            method="post" class="d-inline">
+                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                            <button type="submit" class="btn btn-danger btn-sm">Покинуть</button>
+                        </form>
                         break;
 
                     case UserGroupRelationStatus.Requsted:
-                        <span class="badge bg-warning text-dark">Заявка отправлена</span>
-                        <a href="@Url.Action("CancelJoinRequest", "Groups", new { groupId = group.GroupId, returnUrl = returnUrl })"
-                           class="btn btn-warning btn-sm">Отменить</a>
+                        <p>Заявка отправлена</p>
+                        <form asp-action="LeaveGroup" asp-controller="Groups" asp-route-groupId="@group.GroupId"
+                            method="post" class="d-inline">
+                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                            <button type="submit" class="btn btn-warning btn-sm">Отменить</button>
+                        </form>
                         break;
 
                     case UserGroupRelationStatus.NotMember:
-                        <a href="@Url.Action("JoinGroup", "Groups", new { groupId = group.GroupId, returnUrl = returnUrl })"
-                           class="btn btn-primary btn-sm">Вступить</a>
+                        <form asp-action="JoinGroup" asp-controller="Groups" method="post" class="d-inline">
+                            <input type="hidden" name="groupId" value="@group.GroupId" />
+                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                            <button type="submit" class="btn btn-primary btn-sm">Вступить</button>
+                        </form>
                         break;
                 }
-                <a href="@Url.Action("DetailGroup", "Groups", new { groupId = group.GroupId })"
-                   class="btn btn-primary btn-sm" , target="_blank" rel="noopener noreferrer">Открыть</a>
+
+                <a asp-action="DetailGroup" asp-controller="Groups" asp-route-groupId="@group.GroupId"
+                   class="btn btn-primary btn-sm" target="_blank">Открыть</a>
+
             </div>
         </li>
     }
