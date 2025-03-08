@@ -1,0 +1,56 @@
+﻿@using TextShare.Domain.Models.EntityModels.GroupModels
+@model GroupUpdateModel
+
+@{
+    string groupName = Model.Name.Length > 10 ? Model.Name.Substring(0, 10) + "..." : Model.Name;
+    ViewData["Title"] = $"Обновление группы \"{groupName}\"";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="UpdateGroup" asp-controller="Groups" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="GroupId" />
+
+    <!-- Название группы -->
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Название группы</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <!-- Описание группы -->
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Описание</label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <!-- Текущее изображение -->
+    @if (!string.IsNullOrEmpty(Model.ImageUri))
+    {
+        <div class="mb-3">
+            <label class="form-label">Текущее изображение</label>
+            <div>
+                <img src="@Model.ImageUri" alt="Group Image" class="rounded" style="max-width: 150px; height: auto;">
+            </div>
+        </div>
+    }
+
+    <!-- Загрузка нового изображения -->
+    <div class="mb-3">
+        <label class="form-label">Обложка полки</label>
+        <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+    </div>
+
+    <!-- Кнопки -->
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a asp-action="DetailGroup" asp-controller="Groups" asp-route-groupId="@Model.GroupId" class="btn btn-secondary">Отмена</a>
+    </div>
+</form>
+<br />
+<a asp-action="DeleteGroup" asp-controller="Groups" asp-route-groupId="@Model.GroupId" class="btn btn-danger">Удалить группу</a>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

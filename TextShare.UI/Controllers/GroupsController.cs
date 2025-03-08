@@ -331,6 +331,11 @@ namespace TextShare.UI.Controllers
         }
 
 
+        /// <summary>
+        /// Обрабатывает POST и GET запрос удаления группы.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns>Перенаправляет на страницу групп</returns>
         [HttpGet("delete")]
         [HttpPost("delete")]
         public async Task<IActionResult> DeleteGroup(int groupId)
@@ -367,6 +372,7 @@ namespace TextShare.UI.Controllers
                     await this.DeleteImageByUri(group.ImageUri);
                 }
                 await _groupService.DeleteGroupAsync(group.GroupId);
+                await _groupService.SaveAsync();
             }
 
             return RedirectToAction("MyGroups");
@@ -401,19 +407,7 @@ namespace TextShare.UI.Controllers
                 groupDetailModel.UserGroupRelationStatus = UserGroupRelationStatus.NotMember;
 
             return View(groupDetailModel);
-        }
-
-        [HttpGet("group-{groupId}/shelves")]
-        public async Task<IActionResult> AvailableShelves(int groupId, int page = 1)
-        {
-            return Content("");
-        }
-
-        [HttpGet("group-{groupId}/files")]
-        public async Task<IActionResult> AvailableFiles(int groupId, int page = 1)
-        {
-            return Content("");
-        }
+        }   
 
         /// <summary>
         /// Отображает страницу с участниками группы.
@@ -445,6 +439,12 @@ namespace TextShare.UI.Controllers
             return View(groupMembersModel);
         }
 
+        /// <summary>
+        /// Отображает страницу с входящими заявками на встпление у группу.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
         [HttpGet("group-{groupId}/in-requests")]
         public async Task<IActionResult> RequestsUsers(int groupId, int page = 1)
         {
@@ -468,14 +468,7 @@ namespace TextShare.UI.Controllers
 
             return View(groupMembersModel);
         }
-
-        [HttpPost("group-{groupId}/update")]
-        [HttpGet("group-{groupId}/update")]
-        public async Task<IActionResult> UpdateGroup(int groupId)
-        {
-            return Content("");
-        }     
-
+        
         /// <summary>
         /// Обрабатывает POST запрос одобрения заявки участия в группе.
         /// </summary>
@@ -583,6 +576,12 @@ namespace TextShare.UI.Controllers
             return RedirectToAction("GroupMembers", new { groupId });
         }
 
+        /// <summary>
+        /// Обрабатывает POST запрос выхода пользователя из группы или отмены заявки на вступление
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="returnUrl"></param>
+        /// <returns></returns>
         [HttpPost("group -{groupId}/leave-group")]
         public async Task<IActionResult> LeaveGroup(int groupId, string? returnUrl = null)
         {
@@ -615,7 +614,117 @@ namespace TextShare.UI.Controllers
             return RedirectToAction("GroupMembers", new { groupId });
         }
 
+        /// <summary>
+        /// Отображает страницу обновления группы.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        [HttpGet("group-{groupId}/update")]
+        public async Task<IActionResult> UpdateGroup(int groupId)
+        {
+            Group? group = await _groupService.GetGroupByIdAsync(groupId, g=>g.Creator);
+            if (group == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Группа не найдена";
+                return BadRequest();
+            }
 
-       
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            if(group.CreatorId != currentUser.Id)
+            {
+                HttpContext.Items["ErrorMessage"] = "Нет права управления этой группок.";
+                return BadRequest();
+            }
+
+            GroupUpdateModel groupUpdateModel = new();
+            groupUpdateModel.GroupId = group.GroupId;
+            groupUpdateModel.Name = group.Name;
+            groupUpdateModel.Description = group.Description;
+            groupUpdateModel.ImageUri = group.ImageUri;
+
+            return View(groupUpdateModel);
+        }
+
+        /// <summary>
+        /// Обрабатывает POST запрос обновления группы.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="model"></param>
+        /// <param name="ImageFile"></param>
+        /// <returns></returns>
+        [HttpPost("group-{groupId}/update")]
+        public async Task<IActionResult> UpdateGroup(int groupId, GroupUpdateModel model, IFormFile? ImageFile)
+        {
+            Group? group = await _groupService.GetGroupByIdAsync(groupId, g => g.Creator);
+            if (group == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Группа не найдена";
+                return BadRequest();
+            }
+
+            // Проверяем, является ли пользователь создателем группы
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            if (group.CreatorId != currentUser.Id)
+            {
+                HttpContext.Items["ErrorMessage"] = "Нет права управления этой группой.";
+                return BadRequest();
+            }
+
+            // Проверяем корректность модели
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // Обновляем название и описание
+            group.Name = model.Name;
+            group.Description = model.Description;
+           
+            // Обрабатываем загрузку изображения (если загружен новый файл)
+            if (ImageFile != null)
+            {
+                var result = await validateImage(ImageFile);
+                if (!result.Success)
+                {
+                    ModelState.AddModelError("ImageFile", result.ErrorMessage);
+                    return View(model);
+                }
+
+                ResponseData<Dictionary<string, string>> data = await SaveImage(ImageFile);
+                if (data.Success && data.Data != null)
+                {
+                    // Удаляем старое изображение, если оно было
+                    if (!string.IsNullOrEmpty(group.ImageUri))
+                    {
+                        await DeleteImageByUri(group.ImageUri);
+                        group.ImageUri = null;
+                        DebugHelper.ShowData(group.ImageUri);
+                    }
+
+                    group.ImageUri = data.Data["uri"];
+                }
+            }
+
+            await _groupService.UpdateGroupAsync(group);
+            await _groupService.SaveAsync();
+
+            return RedirectToAction("DetailGroup", new { groupId = group.GroupId });
+        }
+
+
+        [HttpGet("group-{groupId}/shelves")]
+        public async Task<IActionResult> AvailableShelves(int groupId, int page = 1)
+        {
+            return Content("");
+        }
+
+        [HttpGet("group-{groupId}/files")]
+        public async Task<IActionResult> AvailableFiles(int groupId, int page = 1)
+        {
+            return Content("");
+        }
+
+
+
     }
 }
