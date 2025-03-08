@@ -11,6 +11,7 @@ using TextShare.DAL.Repositories;
 using TextShare.Domain.Settings;
 using Microsoft.DotNet.Scaffolding.Shared;
 using TextShare.UI.Data;
+using Microsoft.AspNetCore.DataProtection.KeyManagement.Internal;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +55,7 @@ builder.Services.AddRazorPages();
 builder.Services.Configure<ImageUploadSettings>(builder.Configuration.GetSection("ImageUploadSettings"));
 builder.Services.Configure<ShelvesSettings>(builder.Configuration.GetSection("ShelvesSettings"));
 builder.Services.Configure<GroupsSettings>(builder.Configuration.GetSection("GroupsSettings"));
+builder.Services.Configure<FileUploadSettings>(builder.Configuration.GetSection("FileUploadSettings"));
 
 // Business Services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -62,6 +64,7 @@ builder.Services.AddScoped<IAccessRuleService, AccessRuleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFriendshipService, FriendshipService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IPhysicalFile, PhysicalFileService>
 (
     provider =>

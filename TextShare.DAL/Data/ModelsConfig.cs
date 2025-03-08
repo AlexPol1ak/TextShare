@@ -217,8 +217,6 @@ namespace TextShare.DAL.Data
             builder.HasKey(c => c.CategoryId);
             builder.Property(c => c.Name).HasMaxLength(100).IsRequired();
             builder.HasIndex(c => c.Name).IsUnique();
-            builder.Property(c => c.TranslateName).HasMaxLength(100).IsRequired();
-            builder.HasIndex(c => c.TranslateName).IsUnique();
             builder.Property(c => c.Description).HasColumnType("TEXT").IsRequired(false);
 
             // Связь многие ко многим с TextFile через промежуточную таблицу
