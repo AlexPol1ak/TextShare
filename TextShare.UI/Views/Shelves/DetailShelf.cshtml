@@ -26,5 +26,6 @@
     </div>
 </div>
 
+<a asp-controller="TextFile" asp-action="Upload" asp-route-shelfId="@Model.ShelfId" class="btn btn-outline-success mt-3">Добавить файл</a>
 <a asp-action="EditShelf" asp-route-id="@Model.ShelfId" class="btn btn-primary mt-3">Редактировать</a>
 <a asp-action="DeleteShelf" asp-controller="Shelves" asp-route-id="@Model.ShelfId" class="btn btn-danger mt-3">Удалить</a>

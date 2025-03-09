@@ -1,0 +1,42 @@
+﻿@using TextShare.Domain.Models
+@model FileUploadModel
+
+@{
+    Shelf shelf = ViewBag.Shelf;
+    string shelfName = shelf.Name.Count() >10? shelf.Name.Substring(0, 9) + "..." : shelf.Name;
+
+    string allowedExtensionsStr = ViewBag.AllowedExtensionsStr;
+
+    ViewData["Title"] = $"Загрузка файла полку \"{shelfName}\"";    
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Upload" asp-controller="Files" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Описание файла</label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Категории</label>
+        <select asp-for="SelectedCategoryIds" class="form-select" asp-items="@(new MultiSelectList(Model.Categories, "CategoryId", "Name"))" multiple>
+        </select>
+        <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Файл</label>
+        <input type="file" name="File" class="form-control" accept="@allowedExtensionsStr"/>
+    </div>
+    <p>Поддерживаемые форматы: @allowedExtensionsStr.Replace(',', ' ')</p>
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Загрузить</button>
+        <a asp-action="DetailShelf" asp-controller="Shelves" asp-route-id="@shelf.ShelfId" class="btn btn-secondary">Отмена</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
