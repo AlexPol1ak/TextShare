@@ -3,11 +3,9 @@
 
 @{
     Shelf shelf = ViewBag.Shelf;
-    string shelfName = shelf.Name.Count() >10? shelf.Name.Substring(0, 9) + "..." : shelf.Name;
-
+    string shelfName = shelf.Name.Length > 10 ? shelf.Name.Substring(0, 9) + "..." : shelf.Name;
     string allowedExtensionsStr = ViewBag.AllowedExtensionsStr;
-
-    ViewData["Title"] = $"Загрузка файла полку \"{shelfName}\"";    
+    ViewData["Title"] = $"Загрузка файла на полку \"{shelfName}\"";
 }
 
 <h2>@ViewData["Title"]</h2>
@@ -19,18 +17,26 @@
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
 
+    <!-- Выбор категорий -->
     <div class="mb-3">
         <label class="form-label">Категории</label>
-        <select asp-for="SelectedCategoryIds" class="form-select" asp-items="@(new MultiSelectList(Model.Categories, "CategoryId", "Name"))" multiple>
+        <select id="categorySelect" asp-for="SelectedCategoryIds" class="form-select"
+                asp-items="@(new MultiSelectList(Model.Categories, "CategoryId", "Name"))" multiple>
         </select>
         <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span>
+
+        <!-- Отображаем выбранные категории -->
+        <p class="mt-2"><strong>Выбранные категории:</strong> <span id="selectedCategoriesText">Категории не выбраны</span></p>
     </div>
 
+    <!-- Выбор файла -->
     <div class="mb-3">
         <label class="form-label">Файл</label>
-        <input type="file" name="File" class="form-control" accept="@allowedExtensionsStr"/>
+        <input type="file" name="File" class="form-control" accept="@allowedExtensionsStr" />
     </div>
     <p>Поддерживаемые форматы: @allowedExtensionsStr.Replace(',', ' ')</p>
+
+    <!-- Кнопки -->
     <div class="d-flex gap-2">
         <button type="submit" class="btn btn-primary">Загрузить</button>
         <a asp-action="DetailShelf" asp-controller="Shelves" asp-route-id="@shelf.ShelfId" class="btn btn-secondary">Отмена</a>
@@ -38,5 +44,19 @@
 </form>
 
 @section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let categorySelect = document.getElementById("categorySelect");
+            let selectedCategoriesText = document.getElementById("selectedCategoriesText");
+
+            function updateSelectedCategories() {
+                let selectedOptions = [...categorySelect.selectedOptions].map(option => option.text);
+                selectedCategoriesText.textContent = selectedOptions.length > 0 ? selectedOptions.join(", ") : "Категории не выбраны";
+            }
+
+            categorySelect.addEventListener("change", updateSelectedCategories);
+            updateSelectedCategories();
+        });
+    </script>
     <partial name="_ValidationScriptsPartial" />
 }

@@ -9,6 +9,7 @@ using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
 using TextShare.Domain.Settings;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TextShare.UI.Controllers
 {
@@ -58,17 +59,43 @@ namespace TextShare.UI.Controllers
 
             List<Category> categories = await _categoryService.GetAllCategoriesAsync();
 
-            FileUploadModel model = new()
+            var model = new FileUploadModel
             {
                 Categories = categories
             };
-            string allowedExtensionsStr = string.Join(",", _fileUploadSettings.AllowedExtensions);
+
             ViewBag.Shelf = shelf;
-            ViewBag.AllowedExtensionsStr = allowedExtensionsStr;
+            ViewBag.AllowedExtensionsStr = string.Join(',', _fileUploadSettings.AllowedExtensions);
 
             return View(model);
 
         }
+
+        [Authorize]
+        [HttpPost("upload/shelf-{shelfId}/upload")]
+        public async Task<IActionResult> Upload(int shelfId, FileUploadModel fileUploadModel, IFormFile? file)
+        {
+            Shelf? shelf = await _shelfService.GetShelfByIdAsync(shelfId,
+                s => s.TextFiles, s => s.Creator, s=>s.AccessRule,
+                s=>s.AccessRule.AvailableUsers, s=>s.AccessRule.AvailableGroups
+                );
+
+            ResponseData<IActionResult> result = await canFileUpload(shelf);
+            if (result.Success == false && result.Data != null)
+            {
+                HttpContext.Items["ErrorMessage"] = result.ErrorMessage;
+                return result.Data;
+            }
+
+            if(file == null)
+            {
+                return View(fileUploadModel);
+            }
+
+
+            return Redirect("");
+        }
+
         public async Task<IActionResult> Download()
         {
             return View();
@@ -76,7 +103,36 @@ namespace TextShare.UI.Controllers
 
         private async Task<ResponseData<string>> validateFile(IFormFile file)
         {
+            await Task.CompletedTask;
             ResponseData<string> responseData = new();
+            responseData.Success = true;
+
+            string mimeTypes = file.ContentType;
+            string ext = Path.GetExtension(file.FileName);
+            string fileName = file.FileName;
+            long size = file.Length;
+
+            if (!_fileUploadSettings.AllowedMimeTypes.Contains(mimeTypes))
+            {
+                responseData.Success = false;
+                responseData.ErrorMessage = "Неверный тип файла";
+                return responseData;
+            }
+            if (!_fileUploadSettings.AllowedExtensions.Contains(ext))
+            {
+                responseData.Success = false;
+                responseData.ErrorMessage = $"Неверное расширение.";              
+                return responseData;
+            }
+            if (size > _fileUploadSettings.MaxFileSize)
+            {
+                int megabytes = (int)(_imageUploadSettings.MaxFileSize / (1024 * 1024));
+
+                responseData.Success = false;
+                responseData.ErrorMessage = $"Слишком  большой размер файла." +
+                    $" Файл должен быть до {megabytes} Mb.";
+                return responseData;
+            }
 
             return responseData;
         }
