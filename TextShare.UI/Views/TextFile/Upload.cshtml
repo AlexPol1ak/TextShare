@@ -1,16 +1,19 @@
-﻿@using TextShare.Domain.Models
-@model FileUploadModel
+﻿@model FilesUploadModel
 
 @{
-    Shelf shelf = ViewBag.Shelf;
-    string shelfName = shelf.Name.Length > 10 ? shelf.Name.Substring(0, 9) + "..." : shelf.Name;
-    string allowedExtensionsStr = ViewBag.AllowedExtensionsStr;
+    string shelfName = Model.ShelfName.Length > 10 ? Model.ShelfName.Substring(0, 9) + "..." : Model.ShelfName;
+    string allowedExtensionsStr = Model.AllowedExtensionsStr;
     ViewData["Title"] = $"Загрузка файла на полку \"{shelfName}\"";
 }
 
 <h2>@ViewData["Title"]</h2>
 
-<form asp-action="Upload" asp-controller="Files" method="post" enctype="multipart/form-data">
+<form asp-action="Upload" asp-controller="TextFile" asp-route-shelfId="@Model.ShelfId" method="post" enctype="multipart/form-data">
+    <!-- Добавляем скрытые поля -->
+    <input type="hidden" asp-for="ShelfId" />
+    <input type="hidden" asp-for="ShelfName" />
+    <input type="hidden" asp-for="AllowedExtensionsStr" />
+
     <div class="mb-3">
         <label asp-for="Description" class="form-label">Описание файла</label>
         <textarea asp-for="Description" class="form-control" rows="3"></textarea>
@@ -36,10 +39,11 @@
     </div>
     <p>Поддерживаемые форматы: @allowedExtensionsStr.Replace(',', ' ')</p>
 
+
     <!-- Кнопки -->
     <div class="d-flex gap-2">
         <button type="submit" class="btn btn-primary">Загрузить</button>
-        <a asp-action="DetailShelf" asp-controller="Shelves" asp-route-id="@shelf.ShelfId" class="btn btn-secondary">Отмена</a>
+        <a asp-action="DetailShelf" asp-controller="Shelves" asp-route-id="@Model.ShelfId" class="btn btn-secondary">Отмена</a>
     </div>
 </form>
 
