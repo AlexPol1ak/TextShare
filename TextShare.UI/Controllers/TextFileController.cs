@@ -17,6 +17,9 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TextShare.UI.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления файлами
+    /// </summary>
     [Route("file")]
     public class TextFileController : BaseController
     {
@@ -56,14 +59,21 @@ namespace TextShare.UI.Controllers
                
         }
 
+        /// <summary>
+        /// Отображает страницу загрузки файла.
+        /// </summary>
+        /// <param name="shelfId">Id полки</param>
+        /// <returns>Страницу загрузки файла.</returns>
         [Authorize]
         [HttpGet("upload/shelf-{shelfId}/upload")]
         public async Task<IActionResult> Upload(int shelfId)
         {
+            // Найти полку
             Shelf? shelf = await _shelfService.GetShelfByIdAsync(shelfId,
                 s=>s.TextFiles, s=>s.Creator
                 );
 
+            //Проверяет доступна ли загрузка файла на эту полку
             ResponseData<IActionResult> result = await canFileUpload(shelf);
             if (result.Success == false && result.Data != null)
             {
@@ -73,6 +83,7 @@ namespace TextShare.UI.Controllers
 
             List<Category> categories = await _categoryService.GetAllCategoriesAsync();
 
+            // Заполнение модели загрузки.
             var model = new FilesUploadModel
             {
                 Categories = categories,
@@ -85,16 +96,24 @@ namespace TextShare.UI.Controllers
 
         }
 
+        /// <summary>
+        /// Обрабатывает POST запрос загрузки файла на полку
+        /// </summary>
+        /// <param name="shelfId">Id полки</param>
+        /// <param name="filesUploadModel">Модель загрузки файла</param>
+        /// <returns>Сохраняет файл и перенаправляет на страницу файла.</returns>
         [Authorize]
         [HttpPost("upload/shelf-{shelfId}/upload")]
         public async Task<IActionResult> Upload(int shelfId, FilesUploadModel filesUploadModel)
         {
+            // Получить полку
             Shelf? shelf = await _shelfService.GetShelfByIdAsync(shelfId,
                 s => s.TextFiles, s => s.Creator, s=>s.AccessRule,
                 s=>s.AccessRule.AvailableUsers, s=>s.AccessRule.AvailableGroups
                 );
             User currentUser = (await _userManager.GetUserAsync(User))!;
 
+            // Проверить разрешена ли загрузка на полку
             ResponseData<IActionResult> result = await canFileUpload(shelf);
             if (result.Success == false && result.Data != null)
             {
@@ -102,7 +121,8 @@ namespace TextShare.UI.Controllers
                 return result.Data;
             }
 
-            // Если в случае ошибок форма будет возращена клиенту.
+
+            // Если в случае ошибок форма будет возращена клиенту -заполнить категории заново
             filesUploadModel.Categories = await _categoryService.GetAllCategoriesAsync();
             
 
@@ -111,13 +131,14 @@ namespace TextShare.UI.Controllers
                 return View(filesUploadModel);
             }
 
-
+            // Проверка наличия файла
             if (filesUploadModel.File == null || filesUploadModel.File.Length == 0)
             {
                 ModelState.AddModelError("File", "Файл обязателен.");
                 return View(filesUploadModel);
             }
 
+            // Проверка описания файла
             if (string.IsNullOrEmpty(filesUploadModel.Description))
             {
                 ModelState.AddModelError("Description", "Описание обязательно.");
@@ -125,31 +146,33 @@ namespace TextShare.UI.Controllers
 
             }
 
+            // Проверка выбора категории
             if(filesUploadModel.SelectedCategoryIds ==null || !filesUploadModel.SelectedCategoryIds.Any())
             {
                 ModelState.AddModelError("SelectedCategoryIds", "Выберите хотя бы одну категорию.");
                 return View(filesUploadModel);
             }
 
+            // Проверка допустимости файла
             ResponseData<string> validateResponseData = await validateFile(filesUploadModel.File);
             if(!validateResponseData.Success && validateResponseData.Data != null)
             {
-                //DebugHelper.ShowError(validateResponseData.ErrorMessage);
                 ModelState.AddModelError("File", validateResponseData.ErrorMessage);
                 return View(filesUploadModel);
             }
 
+            // Сохранение файла на сервере.
             ResponseData<Dictionary<string, string>> saveResponseData = new();
             saveResponseData = await saveFile(filesUploadModel.File);
             if(saveResponseData.Success == false || saveResponseData.Data == null)
             {
-                //DebugHelper.ShowError(saveResponseData.ErrorMessage);
                 ModelState.AddModelError("File", saveResponseData.ErrorMessage);
                 return View(filesUploadModel);
             }
 
             Dictionary<string, string> fileData = saveResponseData.Data;
 
+            // Сохранение данных в бд
             TextFile textFile = new();
             textFile.OriginalFileName = fileData["originalFileName"];
             textFile.UniqueFileName = fileData["uniqueFileName"];
@@ -170,6 +193,7 @@ namespace TextShare.UI.Controllers
                 c=> new TextFileCategory() { Category = c, TextFile = textFile }
                 ).ToList();
 
+            // Правило доступа для файла копируется от о правила доступа для полки.
             AccessRule accessRule = await _accessСontrolService.GetCopyAccessRule(shelf.AccessRule);
             await _accessRuleService.CreateAccessRuleAsync(accessRule);
             await _accessRuleService.SaveAsync();
@@ -194,6 +218,13 @@ namespace TextShare.UI.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Проверяет загруженный файл на соответствие допустимым типам, расширениям и размеру.
+        /// </summary>
+        /// <param name="file">Файл, загруженный пользователем.</param>
+        /// <returns>
+        /// Объект <see cref="ResponseData{string}"/>, содержащий флаг успеха и сообщение об ошибке, если файл не прошел проверку.
+        /// </returns>
         private async Task<ResponseData<string>> validateFile(IFormFile file)
         {
             await Task.CompletedTask;
@@ -229,6 +260,20 @@ namespace TextShare.UI.Controllers
 
             return responseData;
         }
+
+        /// <summary>
+        /// Сохраняет загруженный файл в файловой системе и возвращает информацию о сохранении.
+        /// </summary>
+        /// <param name="file">Файл, загруженный пользователем.</param>
+        /// <returns>
+        /// Объект <see cref="ResponseData{Dictionary{string, string}}"/> с данными о сохранении файла:<br/>
+        /// - "relativePath": относительный путь к файлу <br/>
+        /// - "uri": полный URI для доступа к файлу <br/>
+        /// - "originalFileName": оригинальное имя файла с расширением <br/>
+        /// - "uniqueFileName": уникальное имя файла с расширением <br/>
+        /// - "size": размер в байтах <br/>
+        /// - "type": расширение <br/>
+        /// </returns>
         private async Task<ResponseData<Dictionary<string, string>>> saveFile(IFormFile file)
         {
             ResponseData<Dictionary<string, string>> responseData = new();           

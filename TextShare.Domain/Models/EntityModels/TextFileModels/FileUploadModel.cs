@@ -4,6 +4,9 @@ using TextShare.Domain.Entities.TextFiles;
 
 namespace TextShare.Domain.Models
 {
+    /// <summary>
+    /// Модель загрузки файлов.
+    /// </summary>
     public class FileUploadModel
     {
         [Required(ErrorMessage = "Описание файла обязательно.")]

@@ -41,7 +41,13 @@ namespace TextShare.Business.Services
         /// <param name="fileStream">Поток файла</param>
         /// <param name="fileName">Имя файла с расширениемИмя файла с расширением</param>
         /// <param name="directoryName">Директория</param>
-        /// <returns></returns>
+        /// <returns>
+        ///  Объект <see cref="ResponseData{Dictionary{string, string}}"/> с данными о сохранении файла:<br/>
+        /// - "originalFileName": оригинальное имя файла с расширением <br/>
+        /// - "uniqueFileName": уникальное имя файла с расширением <br/>
+        /// - "size": размер в байтах <br/>
+        /// - "type": расширение <br/>
+        /// </returns>
         public async Task<Dictionary<string, string>> Save(Stream fileStream, string fileName, string? directoryName = null)
         {
             Dictionary<string, string> result = new();
@@ -81,9 +87,9 @@ namespace TextShare.Business.Services
         /// <summary>
         /// Генерирует уникальное имя.
         /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="directoryName"></param>
-        /// <returns></returns>
+        /// <param name="fileName">Имя файла</param>
+        /// <param name="directoryName">Директория</param>
+        /// <returns>Уникальное имя</returns>
         private async Task<string> _getRandomUniqueFileName(string fileName, string? directoryName = null)
         {
             string newName = string.Empty;
@@ -101,9 +107,9 @@ namespace TextShare.Business.Services
         /// <summary>
         /// Удаляет файл.
         /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="directory"></param>
-        /// <returns></returns>
+        /// <param name="fileName">Имя файла</param>
+        /// <param name="directory">Директория</param>
+        /// <returns>True- если успешно удалено, иначе false</returns>
         public async Task<bool> Delete(string fileName, string? directory = null)
         {
             await Task.CompletedTask;
@@ -124,11 +130,11 @@ namespace TextShare.Business.Services
         }
 
         /// <summary>
-        /// Поверяет сущесствует ли файл.
+        /// Поверяет существует ли файл.
         /// </summary>
         /// <param name="fileName">Имя файла с расширением</param>
         /// <param name="directoryName">Директория</param>
-        /// <returns></returns>
+        /// <returns>True- если существует, иначе false</returns>
         public async Task<bool> FileExist(string fileName, string? directoryName = null)
         {
             await Task.CompletedTask;

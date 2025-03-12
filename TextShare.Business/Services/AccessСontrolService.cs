@@ -13,6 +13,9 @@ using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Business.Services
 {
+    /// <summary>
+    /// Класс сервиса для управления доступом к файлам и полкам.
+    /// </summary>
     public class AccessСontrolService : BaseService, IAccessСontrolService
     {
         private readonly IRepository<AccessRule> _accessRuleRepository;
