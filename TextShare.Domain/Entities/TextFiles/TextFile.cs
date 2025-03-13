@@ -17,6 +17,7 @@ namespace TextShare.Domain.Entities.TextFiles
         public int TextFileId { get; set; }
         public string OriginalFileName { get; set; }
         public string UniqueFileName { get; set; }
+        public string UniqueFileNameWithoutExtension { get; set; }
         public string? Description { get; set; }
         public string? Tags { get; set; }
         public string Extention { get; set; }

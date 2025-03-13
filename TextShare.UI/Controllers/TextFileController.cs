@@ -10,6 +10,7 @@ using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
 using TextShare.Domain.Models.EntityModels.ShelfModels;
+using TextShare.Domain.Models.EntityModels.TextFileModels;
 using TextShare.Domain.Settings;
 using TextShare.Domain.Utils;
 using TextShare.UI.Models;
@@ -176,6 +177,7 @@ namespace TextShare.UI.Controllers
             TextFile textFile = new();
             textFile.OriginalFileName = fileData["originalFileName"];
             textFile.UniqueFileName = fileData["uniqueFileName"];
+            textFile.UniqueFileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileData["uniqueFileName"]);
             textFile.Extention = fileData["type"];
             textFile.Description = filesUploadModel.Description;     
             textFile.ContentType = filesUploadModel.File.ContentType;
@@ -204,18 +206,40 @@ namespace TextShare.UI.Controllers
             await _textFileService.SaveAsync();
 
 
-            return RedirectToAction("DetailTextFile", new { uniquename = textFile.UniqueFileName });
+            return RedirectToAction("DetailTextFile", new { uniquename = textFile.UniqueFileNameWithoutExtension });
         }
 
         [HttpGet("{uniquename}")]
         public async Task<IActionResult> DetailTextFile(string uniquename)
         {
-            return Content(uniquename);
+            TextFile? textFile = (await _textFileService.FindTextFilesAsync(
+                t => t.UniqueFileNameWithoutExtension == uniquename,
+                t=>t.Owner, t=>t.TextFileCategories, t=>t.Shelf
+                )).FirstOrDefault();          
+
+            if(textFile == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Файл не найден";
+                return BadRequest();
+            }
+
+            List<int> fileCategoriesIds = textFile.TextFileCategories.Select(c => c.CategoryId).ToList();
+            List<Category> fileCategories = await _categoryService.FindCategoriesAsync(
+                cat => fileCategoriesIds.Any(id => id == cat.CategoryId)
+                );
+
+            User? currentUser  = await _userManager.GetUserAsync(User);
+            TextFileDetailModel model = TextFileDetailModel.FromTextFile(textFile, currentUser?.Id ?? null );
+            model.Categories = fileCategories;
+
+
+            return View(model);
         }
 
-        public async Task<IActionResult> Download()
+        [HttpGet("download/{uniquename}")]
+        public async Task<IActionResult> Download(string uniquename)
         {
-            return View();
+            return Content(uniquename);
         }
 
         /// <summary>
@@ -305,6 +329,11 @@ namespace TextShare.UI.Controllers
             return true;
         }
 
+        /// <summary>
+        /// Проверяет возможность загрузки файла на полку.
+        /// </summary>
+        /// <param name="shelf">Полка</param>
+        /// <returns></returns>
         private async Task<ResponseData<IActionResult>> canFileUpload(Shelf? shelf)
         {
             ResponseData<IActionResult> responseData = new() { Success = true };

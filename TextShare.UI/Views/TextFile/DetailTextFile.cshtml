@@ -1,0 +1,52 @@
+﻿@model TextShare.Domain.Models.EntityModels.TextFileModels.TextFileDetailModel
+
+@{
+    ViewData["Title"] = "Просмотр файла";
+}
+
+<h2>Просмотр файла</h2>
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title">@Model.OriginalFileName</h4>
+
+        <p><strong>Описание:</strong> @(string.IsNullOrWhiteSpace(Model.Description) ? "Нет описания" : Model.Description)</p>
+        <p><strong>Расширение:</strong> @Model.Extention</p>
+        <p><strong>Размер:</strong> @(Model.Size / 1024) KB</p>
+
+        <p>
+            <strong>Владелец:</strong>
+            <a asp-action="Profile" asp-controller="Users" asp-route-username="@Model.Owner.UserName">@Model.Owner.UserName</a>
+        </p>
+
+        <p>
+            <strong>Полка:</strong>
+            <a asp-action="DetailShelf" asp-controller="Shelves" asp-route-id="@Model.Shelf.ShelfId">@Model.Shelf.Name</a>
+        </p>
+
+        <p>
+            <strong>Категории:</strong>
+            @if (Model.Categories.Count > 0)
+            {
+                @string.Join(", ", Model.Categories.Select(c => c.Name))
+            }
+            else
+            {
+                <span>Нет категорий</span>
+            }
+        </p>
+
+        <div class="mt-3">
+            <a asp-action="Download" asp-controller="TextFile"
+            asp-route-uniquename="@Model.UniqueFileNameWithoutExtension" class="btn btn-primary">Скачать</a>
+
+            @if (Model.CurrentUserId != null && Model.CurrentUserId == Model.Owner.Id)
+            {
+                <a asp-action="EditDescription" asp-controller="TextFile" asp-route-id="@Model.TextFileId" class="btn btn-secondary">Изменить описание</a>
+                <a asp-action="ManageAccess" asp-controller="TextFile" asp-route-id="@Model.TextFileId" class="btn btn-warning">Управление доступом</a>
+                <a asp-action="Delete" asp-controller="TextFile" asp-route-id="@Model.TextFileId" class="btn btn-danger"
+                   onclick="return confirm('Вы уверены, что хотите удалить этот файл?');">Удалить</a>
+            }
+        </div>
+    </div>
+</div>
