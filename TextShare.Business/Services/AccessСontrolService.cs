@@ -273,5 +273,24 @@ namespace TextShare.Business.Services
 
             return false;
         }
+
+        public async Task<List<Shelf>> AvailableShelvesForGroup(int groupId,
+            params Expression<Func<Shelf, object>>[] includes)
+        {
+            return (await _shelfRepository.FindAsync(
+                s => s.AccessRule.AvailableGroups.Any(g => g.GroupId == groupId),
+                includes
+            )).ToList();
+        }
+
+        public async Task<List<TextFile>> AvailableFilesForGroup(int groupId,
+            params Expression<Func<TextFile, object>>[] includes)
+        {
+            return (await _textFileRepository.FindAsync(
+                t => t.AccessRule.AvailableGroups.Any(g => g.GroupId == groupId),
+                includes
+            )).ToList();
+        }
+
     }
 }

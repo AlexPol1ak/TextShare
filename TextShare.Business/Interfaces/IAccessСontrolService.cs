@@ -79,20 +79,45 @@ namespace TextShare.Business.Interfaces
             params Expression<Func<Shelf, object>>[] includes);
 
         /// <summary>
-        /// Проверяет, если ли доступ у пользователя в к файлу.
+        /// Проверяет, имеет ли пользователь доступ к указанному файлу.
         /// </summary>
-        /// <param name="user">Пользователь</param>
-        /// <param name="textFile">Файл</param>
-        /// <returns>True- если пользователю разрешен доступ, false- если запрещен,
-        /// null- если не удалось проверить.</returns>
+        /// <param name="user">Пользователь, для которого проверяется доступ. Может быть null, если пользователь не авторизован.</param>
+        /// <param name="textFile">Файл, доступ к которому проверяется.</param>
+        /// <returns>
+        /// true – если пользователь имеет доступ к файлу,  
+        /// false – если пользователь не имеет доступа,  
+        /// null – если проверка не удалась (например, файл не найден).
+        /// </returns>
         public Task<bool?> CheckTextFileAccess(User? user, TextFile textFile);
 
         /// <summary>
-        /// Проверяет, если ли доступ у пользователя в к полке.
+        /// Проверяет, имеет ли пользователь доступ к указанной полке.
         /// </summary>
-        /// <param name="user">Пользователь</param>
-        /// <param name="textFile">Файл</param>
-        /// <returns>True- если пользователю разрешен доступ, иначе false</returns>
+        /// <param name="user">Пользователь, для которого проверяется доступ. Может быть null, если пользователь не авторизован.</param>
+        /// <param name="shelf">Полка, доступ к которой проверяется.</param>
+        /// <returns>
+        /// true – если пользователь имеет доступ к полке,  
+        /// false – если пользователь не имеет доступа,  
+        /// null – если проверка не удалась (например, полка не найдена).
+        /// </returns>
         public Task<bool?> CheckShelfAccess(User? user, Shelf shelf);
+
+        /// <summary>
+        /// Возвращает список полок, доступных указанной группе.
+        /// </summary>
+        /// <param name="groupId">ID группы, для которой проверяются доступные полки.</param>
+        /// <param name="includes">Дополнительные связанные сущности для загрузки.</param>
+        /// <returns>Список доступных полок.</returns>
+        public Task<List<Shelf>> AvailableShelvesForGroup(int groupId,
+            params Expression<Func<Shelf, object>>[] includes);
+
+        /// <summary>
+        /// Возвращает список файлов, доступных указанной группе.
+        /// </summary>
+        /// <param name="groupId">ID группы, для которой проверяются доступные файлы.</param>
+        /// <param name="includes">Дополнительные связанные сущности для загрузки.</param>
+        /// <returns>Список доступных файлов.</returns>
+        public Task<List<TextFile>> AvailableFilesForGroup(int groupId,
+            params Expression<Func<TextFile, object>>[] includes);
     }
 }
