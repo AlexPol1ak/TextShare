@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using TextShare.Business.Interfaces;
+using TextShare.Domain.Utils;
 
 namespace TextShare.Business.Services
 {

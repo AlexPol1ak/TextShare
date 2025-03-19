@@ -44,8 +44,13 @@
             {
                 <a asp-action="EditDescription" asp-controller="TextFile" asp-route-id="@Model.TextFileId" class="btn btn-secondary">Изменить описание</a>
                 <a asp-action="ManageAccess" asp-controller="TextFile" asp-route-id="@Model.TextFileId" class="btn btn-warning">Управление доступом</a>
-                <a asp-action="Delete" asp-controller="TextFile" asp-route-id="@Model.TextFileId" class="btn btn-danger"
-                   onclick="return confirm('Вы уверены, что хотите удалить этот файл?');">Удалить</a>
+                <p></p>
+                <form asp-action="Delete" asp-controller="TextFile"
+                      asp-route-uniquename="@Model.UniqueFileNameWithoutExtension"
+                      method="post"
+                      onsubmit="return confirm('Вы уверены, что хотите удалить этот файл?');">
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
             }
         </div>
     </div>

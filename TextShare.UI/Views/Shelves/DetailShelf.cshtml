@@ -16,6 +16,7 @@
 
         <h5 class="card-title">Автор</h5>
         <p class="card-text">@Model.Creator.UserName</p>
+        <p class="card-text">Файлов на полке: @Model.TextFiles.Count</p>
 
         @if (!string.IsNullOrEmpty(Model.ImageUri))
         {

@@ -460,7 +460,7 @@ namespace TextShare.UI.Controllers
         public async Task<IActionResult> DeleteShelf(int id)
         {
             // Получаем полку и пользователя
-            Shelf? shelf = await _shelfService.GetShelfByIdAsync(id);
+            Shelf? shelf = await _shelfService.GetShelfByIdAsync(id, s=>s.TextFiles);
             
             // если полка не найдена
             if(shelf == null)
@@ -498,6 +498,10 @@ namespace TextShare.UI.Controllers
                 if (!string.IsNullOrEmpty(shelf.ImageUri))
                 {
                     await DeleteImageByUri(shelf.ImageUri);
+                }
+                foreach(TextFile file in shelf.TextFiles)
+                {
+                    await _physicalFile.Delete(file.UniqueFileName, "TextFiles");
                 }
                 await _shelfService.DeleteShelfAsync(shelf.ShelfId);
                 await _shelfService.SaveAsync();

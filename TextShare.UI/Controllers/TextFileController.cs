@@ -273,6 +273,36 @@ namespace TextShare.UI.Controllers
             { FileDownloadName = textFile.OriginalFileName };
         }
 
+        [Authorize]
+        [HttpPost("delete/{uniquename}")]
+        public async Task<IActionResult> Delete(string uniquename)
+        {
+            var files = await _textFileService.FindTextFilesAsync(
+                t=>t.UniqueFileNameWithoutExtension == uniquename,
+                t=>t.Shelf);
+            if(files.Count() < 1)
+            {
+                HttpContext.Items["ErrorMessage"] = "Файл не найден";
+                return BadRequest();
+            }
+
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            TextFile textFile = files[0];
+            int shelfId = textFile.ShelfId;
+            
+            if(textFile.OwnerId !=  currentUser.Id)
+            {
+                HttpContext.Items["ErrorMessage"] = "Нет разрешения на действие в этим файлом!";
+                return BadRequest();
+            }
+
+            var res = await _physicalFile.Delete(textFile.UniqueFileName, "TextFiles");
+            await _textFileService.DeleteTextFileAsync(textFile.TextFileId);
+            await _textFileService.SaveAsync();
+
+            return RedirectToAction("DetailShelf", "Shelves", new {id=shelfId});
+        }
+
          
         private async Task<ResponseData<string>> validateFile(IFormFile file)
         {
@@ -347,11 +377,6 @@ namespace TextShare.UI.Controllers
             dataDict.Add("uri", uri);
             responseData.Data = dataDict;
             return responseData;
-        }
-
-        private async Task<bool> DeleteFileByUniqueName(string uniqueFileName)
-        {
-            return true;
         }
 
         /// <summary>
