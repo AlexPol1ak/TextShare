@@ -91,7 +91,7 @@ else
     app.UseHsts();
 }
 // раскомментировать в прод
-//app.UseStatusCodePagesWithReExecute("/Error/{0}");
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
 
 app.UseHttpsRedirection();

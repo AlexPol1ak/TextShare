@@ -14,6 +14,8 @@ namespace TextShare.Domain.Models.EntityModels.ShelfModels
     {
         public int ShelfId { get; set; }
 
+        public int? CurrentUserId { get; set; } = null;
+
         public string Name { get; set; }
 
         public string Description { get; set; }

@@ -204,6 +204,8 @@ namespace TextShare.Business.Services
 
             // Если пользователь не авторизован, а доступ не открыт всем, запрещаем доступ
             if (user == null) return false;
+            // Если пользователь не авторизован и является владельцем файла.
+            if (textFile.OwnerId == user.Id) return true;
 
             // Если у пользователя не загружены группы, загружаем их
             if (user.Groups == null || user.GroupMemberships == null)
@@ -249,6 +251,8 @@ namespace TextShare.Business.Services
 
             // Если пользователь не авторизован, а доступ не открыт всем, запрещаем доступ
             if (user == null) return false;
+            // Если пользователь авторизован и является владельцем полки.
+            if (shelf.CreatorId == user.Id) return true;
 
             // Если у пользователя не загружены группы, загружаем их
             if (user.Groups == null || user.GroupMemberships == null)

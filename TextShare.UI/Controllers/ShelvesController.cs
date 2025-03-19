@@ -19,6 +19,7 @@ using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
 using TextShare.Domain.Models.EntityModels.ShelfModels;
+using TextShare.Domain.Models.EntityModels.TextFileModels;
 using TextShare.Domain.Settings;
 using TextShare.Domain.Utils;
 using TextShare.UI.Models;
@@ -41,6 +42,7 @@ namespace TextShare.UI.Controllers
         private readonly IGroupService _groupService;
         private readonly ShelvesSettings _shelvesSettings;
         private readonly UserManager<User> _userManager;
+        private readonly IAccessСontrolService _accessСontrolService;
 
         public ShelvesController(IShelfService shelfService,
             UserManager<User> userManager,
@@ -49,6 +51,7 @@ namespace TextShare.UI.Controllers
             IOptions<ShelvesSettings> shelvesSettingsOptions,
             IFriendshipService friendshipService,
             IGroupService groupService,
+            IAccessСontrolService accessСontrolService,
             // В базовый контроллер
             IPhysicalFile physicalFile,
             IOptions<ImageUploadSettings> imageUploadSettingsOptions
@@ -61,6 +64,7 @@ namespace TextShare.UI.Controllers
             _shelvesSettings = shelvesSettingsOptions.Value;
             _friendshipService = friendshipService;
             _groupService = groupService;
+            _accessСontrolService = accessСontrolService;
                      
         }
 
@@ -295,7 +299,6 @@ namespace TextShare.UI.Controllers
             Shelf shelf = shelfCreateModel.ToShelf();        
             shelf.Creator = user;
             shelf.CreatorId = user.Id;
-
             if(avatarFile != null)
             {
                 ResponseData<Dictionary<string, string>> data = new();
@@ -305,8 +308,8 @@ namespace TextShare.UI.Controllers
                     ModelState.AddModelError("AvatarFile", data.ErrorMessage);
                     return View(shelfCreateModel);
                 }
-
-                shelf.ImageUri = data.Data.GetValueOrDefault("uri", null);
+                string? avatarUri = data.Data.GetValueOrDefault("uri", null);
+                shelf.ImageUri = avatarUri;
                 shelf.MimeType = avatarFile.ContentType;                                          
             }
             shelfAccessRule = await taskCreateAccessRule;
@@ -338,25 +341,22 @@ namespace TextShare.UI.Controllers
             
             // Если полка не найдена
             if (shelf == null) return NotFound();
-            ShelfDetailModel shelfDetailModel = ShelfDetailModel.FromShelf(shelf);
+            User? currentUser = await _userManager.GetUserAsync(User);
+            var result = await _accessСontrolService.CheckShelfAccess(currentUser, shelf);
+            if (result == true)
+            {
+                ShelfDetailModel shelfDetailModel = ShelfDetailModel.FromShelf(shelf);
+                shelfDetailModel.CurrentUserId = currentUser?.Id ?? null;
+                return View(shelfDetailModel);
 
-            // Если доступна всем
-            if (shelf.AccessRule.AvailableAll == true) return View(shelfDetailModel);
+            }else if(currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            DebugHelper.ShowData(result);
 
-            if (!User.Identity.IsAuthenticated) return Challenge();
-
-            User userDb = await _userService.GetUserByIdAsync((await _userManager.GetUserAsync(User)).Id,
-                u=>u.GroupMemberships);
-
-            if(shelf.CreatorId == userDb.Id) return View(shelfDetailModel);
-            if(shelf.AccessRule.AvailableUsers.Any(u=>u.Id == userDb.Id)) return View(shelfDetailModel);
-
-            var ids = new HashSet<int>((shelf.AccessRule.AvailableGroups.Select(g => g.GroupId)));
-            bool hasIntersection = userDb.GroupMemberships.Any(g => ids.Contains(g.GroupId));
-            if (hasIntersection) return View(shelfDetailModel);
-
-            return RedirectToAction("Login", "Account");
-
+            HttpContext.Items["ErrorMessage"] = "У вас нет доступа к этой полке";
+            return BadRequest(); ;
         }
 
         /// <summary>
@@ -504,6 +504,48 @@ namespace TextShare.UI.Controllers
             }
 
             return RedirectToAction("MyShelves");
+        }
+
+        [HttpGet("/shelf-{shelfId}/files")]
+        public async Task<IActionResult> FilesInShelf(int shelfId, int page = 1)
+        {
+            Shelf? shelf = await _shelfService.GetShelfByIdAsync(shelfId,
+                s=>s.TextFiles, s=>s.Creator,
+                s=>s.AccessRule, s=>s.AccessRule.AvailableGroups, s=>s.AccessRule.AvailableUsers);
+
+            if(shelf == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Полка не найдена";
+                return BadRequest();
+            }
+
+            User? user = await _userManager.GetUserAsync(User);
+
+            var result = await _accessСontrolService.CheckShelfAccess(user, shelf);
+            if(result != true)
+            {
+                if(user == null)
+                {
+                    return Challenge();
+                }
+                HttpContext.Items["ErrorMessage"] = "У вас нет доступа к файлам на этой полке";
+                return BadRequest();
+            }
+
+            List<TextFile> files = new();
+
+            foreach (var t in shelf.TextFiles)
+            {
+                if (await _accessСontrolService.CheckTextFileAccess(user, t) == true)
+                {
+                    files.Add(t);
+                }
+            }
+            List<TextFileDetailShortModel> models = await TextFileDetailShortModel.FromTextFiles(files);
+            ViewBag.ShelfName = shelf.Name;
+
+
+            return View(models.ToPagedList(page, 5));
         }
 
         [Authorize]

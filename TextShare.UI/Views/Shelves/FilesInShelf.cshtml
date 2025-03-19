@@ -1,0 +1,25 @@
+﻿@using TextShare.Domain.Models.EntityModels.TextFileModels
+@model IPagedList<TextFileDetailShortModel>
+
+@{
+    ViewData["Title"] = "Файлы на полке";
+}
+
+<h2>Файлы на полке:</h2>
+<h3>@ViewBag.ShelfName</h3>
+
+@if (!Model.Any())
+{
+    <p>Нет доступных файлов.</p>
+}
+else
+{
+    await Html.RenderPartialAsync("_TextFilesListPartial", Model.ToList());
+    <div class="mt-3">
+        @Html.PagedListPager(
+                Model,
+                page => Url.Action("FilesInShelf", new { page }),
+                PagedListRenderOptions.OnlyShowFivePagesAtATime
+                )
+    </div>
+}

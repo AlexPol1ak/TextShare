@@ -1,0 +1,28 @@
+﻿@using TextShare.Domain.Models.EntityModels.TextFileModels
+@model List<TextFileDetailShortModel>
+
+@if (!Model.Any())
+{
+    <p>Нет доступных файлов.</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var file in Model)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <div>
+                    <strong>@file.OriginalFileName</strong>
+                    <p>Размер: @((file.Size / (1024.0 * 1024)).ToString("0.##")) MB</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a asp-action="Download" asp-controller="TextFile" asp-route-uniquename="@file.UniqueFileNameWithoutExtension"
+                       class="btn btn-success btn-sm">Скачать</a>
+
+                    <a asp-action="DetailTextFile" asp-controller="TextFile" asp-route-uniquename="@file.UniqueFileNameWithoutExtension"
+                       class="btn btn-primary btn-sm">Подробнее</a>
+                </div>
+            </li>
+        }
+    </ul>
+}
