@@ -239,16 +239,41 @@ namespace TextShare.UI.Controllers
         [HttpGet("download/{uniquename}")]
         public async Task<IActionResult> Download(string uniquename)
         {
-            return Content(uniquename);
+            List<TextFile> textFiles = await _textFileService.FindTextFilesAsync(
+                t => t.UniqueFileNameWithoutExtension == uniquename,
+                t => t.AccessRule, t => t.AccessRule.AvailableGroups, t => t.AccessRule.AvailableUsers,
+                t => t.Owner
+                );
+            if(textFiles.Count < 0)
+            {
+                HttpContext.Items["ErrorMessage"] = "Файл не найден";
+                return BadRequest();
+
+            }
+            TextFile textFile = textFiles[0];
+            User? currentUser = await _userManager.GetUserAsync(User);
+            var result = await _accessСontrolService.CheckTextFileAccess(currentUser, textFile);
+            if(result != true)
+            {
+                HttpContext.Items["ErrorMessage"] = "У вас нет доступа к этому файлу";
+                return BadRequest();
+            }
+
+            Dictionary<string, string?> filePaths = await _physicalFile.GetFile(
+                textFile.UniqueFileName, "TextFiles"
+                );
+            string? relativePath = filePaths.GetValueOrDefault("relativePath");
+
+            if(relativePath == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Файл не найден!";
+                return BadRequest();
+            }
+            return new VirtualFileResult(relativePath, textFile.ContentType) 
+            { FileDownloadName = textFile.OriginalFileName };
         }
 
-        /// <summary>
-        /// Проверяет загруженный файл на соответствие допустимым типам, расширениям и размеру.
-        /// </summary>
-        /// <param name="file">Файл, загруженный пользователем.</param>
-        /// <returns>
-        /// Объект <see cref="ResponseData{string}"/>, содержащий флаг успеха и сообщение об ошибке, если файл не прошел проверку.
-        /// </returns>
+         
         private async Task<ResponseData<string>> validateFile(IFormFile file)
         {
             await Task.CompletedTask;

@@ -15,6 +15,26 @@ namespace TextShare.Business.Services
             this._root = root;
         }
 
+        public async Task<Dictionary<string, string?>> GetFile(string fileName, string? directoryName = null)
+        {
+            Dictionary<string, string?> result = new() { 
+                {"relativePath", null},
+                {"fullPath", null }
+            };
+            if(await FileExist(fileName, directoryName))
+            {
+                if(directoryName != null)
+                    result["relativePath"] = Path.Combine(directoryName, fileName);
+                else
+                    result["relativePath"] = Path.Combine(fileName);
+            }
+            string? fullPath = await GetFullPath(fileName, directoryName);
+            if(fullPath != null)
+                result["fullPath"] = fullPath;
+
+            return result;
+        }
+
         /// <summary>
         /// Возвращает полный путь к файлу
         /// </summary>
