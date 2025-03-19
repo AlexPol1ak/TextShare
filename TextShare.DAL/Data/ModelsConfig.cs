@@ -167,8 +167,8 @@ namespace TextShare.DAL.Data
             builder.ToTable("TextFiles");
 
             builder.HasKey(t => t.TextFileId);
-            builder.Property(t => t.OriginalFileName).HasMaxLength(45).IsRequired();
-            builder.Property(t => t.UniqueFileName).HasMaxLength(100).IsRequired();
+            builder.Property(t => t.OriginalFileName).HasMaxLength(255).IsRequired();
+            builder.Property(t => t.UniqueFileName).HasMaxLength(255).IsRequired();
             builder.HasIndex(t => t.UniqueFileName).IsUnique();
             builder.Property(t => t.Description).HasColumnType("TEXT")
                 .IsRequired(false)
