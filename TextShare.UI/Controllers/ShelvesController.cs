@@ -499,9 +499,11 @@ namespace TextShare.UI.Controllers
                 {
                     await DeleteImageByUri(shelf.ImageUri);
                 }
-                foreach(TextFile file in shelf.TextFiles)
+
+                List<string> filesUniqueFileNames = shelf.TextFiles.Select(t=>t.UniqueFileName).ToList();
+                foreach(var fileName in filesUniqueFileNames)
                 {
-                    await _physicalFile.Delete(file.UniqueFileName, "TextFiles");
+                    _physicalFile.Delete(fileName, "TextFiles");
                 }
                 await _shelfService.DeleteShelfAsync(shelf.ShelfId);
                 await _shelfService.SaveAsync();

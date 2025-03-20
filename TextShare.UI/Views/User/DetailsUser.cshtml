@@ -1,9 +1,43 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-    User user = Model.Data;
+﻿@using TextShare.Domain.Models.EntityModels.UserModels
+@model UserModel
+
+@{
+    ViewData["Title"] = "Профиль пользователя";
 }
-<h1>Детальная информация пользователя</h1>
-<h2>@user.UserName</h2>
-<h2>Id @user.Id</h2>
-<h2>@user.Email</h2>
-<h2>@user.FirstName</h2>
+
+<div class="container mt-4">
+    <div class="d-flex align-items-start">
+        <!-- Левая колонка: Фото -->
+        <div class="me-4">
+            <img src="@(Model.AvatarUri ?? "/DefaultImages/default_user.png")"
+                 class="img-fluid rounded-circle border"
+                 alt="Аватар"
+                 style="width: 150px; height: 150px; object-fit: cover;">
+        </div>
+
+        <!-- Правая колонка: Информация + Кнопка -->
+        <div class="flex-grow-1">
+            <!-- Юзернейм (жирный) -->
+            <h3>@Model.UserName</h3>
+
+            <!-- Имя, Отчество, Фамилия (в одну строку) -->
+            <p class="fw-bold mb-1">@Model.FirstName @Model.Patronymic @Model.LastName</p>
+
+            <!-- Описание -->
+            @if (!string.IsNullOrEmpty(Model.SelfDescription))
+            {
+                <p class="text-muted">@Model.SelfDescription</p>
+            }
+            else
+            {
+                <p class="text-muted">Описание отсутствует.</p>
+            }
+
+            <!-- Кнопка изменения данных (прижата вправо) -->
+            <div class="text-end">
+                <a asp-action="EditProfile" asp-controller="User"
+                   class="btn btn-primary">Изменить данные</a>
+            </div>
+        </div>
+    </div>
+</div>
