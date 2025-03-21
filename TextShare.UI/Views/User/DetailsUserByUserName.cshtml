@@ -61,13 +61,16 @@
             @if (Model.RelationshipTocurrentUser == FriendStatus.Iam || Model.RelationshipTocurrentUser == FriendStatus.Accepted)
             {
                 <div class="mb-3">
-                    <a asp-action="UserShelves" asp-controller="Shelf" asp-route-userId="@Model.Id" class="d-block text-decoration-none text-primary">
+                    <a asp-action="UserShelves" asp-controller="Shelf" asp-route-username="@Model.UserName"
+                    class="d-block text-decoration-none text-primary">
                         📚 Общедоступные полки (@Model.CountAvailableShelves)
                     </a>
-                    <a asp-action="UserFiles" asp-controller="TextFile" asp-route-userId="@Model.Id" class="d-block text-decoration-none text-primary">
+                    <a asp-action="UserFiles" asp-controller="TextFile" asp-route-username="@Model.UserName"
+                    class="d-block text-decoration-none text-primary">
                         📄 Общедоступные файлы (@Model.CountAvailableTextFiles)
                     </a>
-                    <a asp-action="UserFriends" asp-controller="Friend" asp-route-userId="@Model.Id" class="d-block text-decoration-none text-primary">
+                    <a asp-action="UserFriends" asp-controller="Friends" asp-route-username="@Model.UserName"
+                    class="d-block text-decoration-none text-primary">
                         👥 Друзья (@Model.CountFriends)
                     </a>
                 </div>
