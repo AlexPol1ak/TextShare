@@ -25,6 +25,7 @@ namespace TextShare.UI.Controllers
         private readonly ITextFileService _textFileService;
         private readonly IUserService _userService;
         private readonly IFriendshipService _friendshipService;
+        private readonly IAccessСontrolService _accessControlService;
 
         public UserController(
             UserManager<User> userManager,
@@ -33,7 +34,8 @@ namespace TextShare.UI.Controllers
             IShelfService shelfService,
             IFriendshipService friendshipService,
             IPhysicalFile physicalFile,
-            IOptions<ImageUploadSettings> imageUploadSettings
+            IOptions<ImageUploadSettings> imageUploadSettings,
+            IAccessСontrolService accessСontrolService
             
 
             ): base(physicalFile, imageUploadSettings)
@@ -43,13 +45,63 @@ namespace TextShare.UI.Controllers
             _userService = userService;
             _shelfService = shelfService;
             _friendshipService = friendshipService;
+            _accessControlService = accessСontrolService;
         }
 
         [HttpGet("{username}")]
         [Authorize]
         public async Task<IActionResult> DetailsUserByUserName(string username)
         {
-            return Content(username);
+            User? viewedUser = await _userService.GetUserByUsernameAsync(username);
+            if(viewedUser == null)
+            {
+                HttpContext.Items["ErrorMessage"] = $"Пользователь \"{username}\" не найден";
+                return NotFound();
+            }
+            UserDetailModel modelViewedUser = UserDetailModel.FromUser(viewedUser);
+
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            //Если пользователь просматривает сам себя
+            if (currentUser.Id == viewedUser.Id)
+                modelViewedUser.RelationshipTocurrentUser = FriendStatus.Iam;
+            else
+            {
+                // Проверяем статус дружбы между просматриваемым пользователем и текущим пользователем
+                var friendships = await _friendshipService.FindFriendshipsAsync(
+                    f =>
+                    (f.UserId == currentUser.Id && f.FriendId == viewedUser.Id) ||
+                    (f.UserId == viewedUser.Id && f.FriendId == currentUser.Id)
+                    );
+                if (friendships != null && friendships.Count() > 0)
+                {
+                    Friendship friendship = friendships[0];
+                    if (friendship.IsConfirmed)
+                        modelViewedUser.RelationshipTocurrentUser = FriendStatus.Accepted;
+                    else if (friendship.UserId == currentUser.Id && friendship.FriendId == viewedUser.Id)
+                        modelViewedUser.RelationshipTocurrentUser = FriendStatus.Requested;
+                    else if (friendship.UserId == viewedUser.Id && friendship.FriendId == currentUser.Id)
+                        modelViewedUser.RelationshipTocurrentUser = FriendStatus.Pending;
+
+                }
+                else
+                    modelViewedUser.RelationshipTocurrentUser = FriendStatus.None;
+            }
+
+            int countViewedUserFriends = (await _friendshipService.GetFriendsUser(viewedUser.Id)).Count();
+            int countViewedUserAvvShelf = (await _shelfService.FindShelvesAsync(
+                s=> s.CreatorId == viewedUser.Id && s.AccessRule.AvailableAll == true
+                )
+                ).Count();
+            int countViewedUserAvvTextFiles = ( await _textFileService.FindTextFilesAsync(
+                t=>t.OwnerId == viewedUser.Id && t.AccessRule.AvailableAll == true
+                )
+                ).Count();
+
+            modelViewedUser.CountAvailableShelves = countViewedUserAvvShelf;
+            modelViewedUser.CountAvailableTextFiles = countViewedUserAvvTextFiles;
+            modelViewedUser.CountFriends = countViewedUserFriends;
+                
+            return View(modelViewedUser);
         }
 
         /// <summary>
@@ -62,8 +114,9 @@ namespace TextShare.UI.Controllers
         public async Task<IActionResult> DetailsUser()
         {
             User currentUser = (await _userManager.GetUserAsync(User))!;
-            UserModel userModel = UserModel.FromUser(currentUser);           
-            return View(userModel);
+            //UserModel userModel = UserModel.FromUser(currentUser);           
+            //return View(userModel);
+            return RedirectToAction("DetailsUserByUserName", new { username = currentUser.UserName});
         }
 
         

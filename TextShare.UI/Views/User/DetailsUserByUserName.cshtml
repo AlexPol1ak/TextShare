@@ -1,0 +1,88 @@
+﻿@using TextShare.Domain.Models.EntityModels.FriendsModels
+@using TextShare.Domain.Models.EntityModels.UserModels
+@model UserDetailModel
+
+@{
+    ViewData["Title"] = "Профиль пользователя";
+    var retrunUrl = Context.Request.Path;
+}
+
+<div class="container mt-4">
+    <div class="d-flex align-items-start">
+        <!-- Левая колонка: Аватар -->
+        <div class="me-4">
+            <img src="@(Model.AvatarUri ?? "/DefaultImages/default_user.png")"
+                 class="img-fluid border"
+                 alt="Аватар"
+                 style="width: 240px; height: 280px; object-fit: cover;">
+        </div>
+
+        <!-- Правая колонка: Информация + кнопки -->
+        <div class="flex-grow-1">
+            <!-- Юзернейм (жирный) -->
+            <h3 class="mb-1">@Model.UserName</h3>
+
+            <!-- Имя, Отчество, Фамилия -->
+            <p class="fw-bold mb-2">@Model.FirstName @Model.Patronymic @Model.LastName</p>
+
+            <!-- Кнопки взаимодействия (выравниваем справа) -->
+            <div class="text-end mb-3">
+                @if (Model.RelationshipTocurrentUser == FriendStatus.Iam)
+                {
+                    <a asp-action="UpdateUser" asp-controller="User"
+                       class="btn btn-primary">Изменить данные</a>
+                }
+                else if (Model.RelationshipTocurrentUser == FriendStatus.Accepted)
+                {
+                    <a href="@Url.Action("DeleteFriend", "Friends", new { username =Model.UserName, returnUrl = retrunUrl})"
+                       class="btn btn-danger btn-sm">Удалить из друзей</a>
+                }
+                else if (Model.RelationshipTocurrentUser == FriendStatus.Requested)
+                {
+                    <a href="@Url.Action("DeleteFriend", "Friends", new { username = Model.UserName, returnUrl = retrunUrl })"
+                       class="btn btn-warning btn-sm">Отменить</a>
+                }
+                else if (Model.RelationshipTocurrentUser == FriendStatus.Pending)
+                {
+                    <a href="@Url.Action("AcceptFriendRequest", "Friends", new { username =Model.UserName, returnUrl = retrunUrl })"
+                       class="btn btn-success btn-sm">✅Принять</a>
+                    <a href="@Url.Action("DeleteFriend", "Friends", new { username = Model.UserName, returnUrl = retrunUrl })"
+                       class="btn btn-danger btn-sm">Удалить</a>
+                }
+                else if (Model.RelationshipTocurrentUser == FriendStatus.None)
+                {
+                    <a href="@Url.Action("SendFriendRequest", "Friends", new { username = Model.UserName, returnUrl = retrunUrl })"
+                       class="btn btn-primary btn-sm">➕ Добавить в друзья</a>
+                   
+                }
+            </div>
+
+            <!-- Кликабельные ссылки (только при Iam и Accepted) -->
+            @if (Model.RelationshipTocurrentUser == FriendStatus.Iam || Model.RelationshipTocurrentUser == FriendStatus.Accepted)
+            {
+                <div class="mb-3">
+                    <a asp-action="UserShelves" asp-controller="Shelf" asp-route-userId="@Model.Id" class="d-block text-decoration-none text-primary">
+                        📚 Общедоступные полки (@Model.CountAvailableShelves)
+                    </a>
+                    <a asp-action="UserFiles" asp-controller="TextFile" asp-route-userId="@Model.Id" class="d-block text-decoration-none text-primary">
+                        📄 Общедоступные файлы (@Model.CountAvailableTextFiles)
+                    </a>
+                    <a asp-action="UserFriends" asp-controller="Friend" asp-route-userId="@Model.Id" class="d-block text-decoration-none text-primary">
+                        👥 Друзья (@Model.CountFriends)
+                    </a>
+                </div>
+            }
+
+            <!-- Информация о себе (если статус Iam или Accepted) -->
+            @if (Model.RelationshipTocurrentUser == FriendStatus.Iam || Model.RelationshipTocurrentUser == FriendStatus.Accepted)
+            {
+                <div class="p-3 border rounded bg-light">
+                    <h5 class="mb-2">О себе</h5>
+                    <p class="text-muted mb-0">
+                        @(string.IsNullOrWhiteSpace(Model.SelfDescription) ? "Информация отсутствует." : Model.SelfDescription)
+                    </p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
