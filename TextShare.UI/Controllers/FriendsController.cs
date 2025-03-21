@@ -77,10 +77,10 @@ namespace TextShare.UI.Controllers
             Friendship? frViewedUser = viewedUser.Friendships.Where(
                 f => (f.UserId == currentUser.Id || f.FriendId == currentUser.Id) && f.IsConfirmed == true
                 ).FirstOrDefault();
-            if(frViewedUser == null)
+            if(frViewedUser == null && currentUser.Id != viewedUser.Id)
             {
                 HttpContext.Items["ErrorMessage"] = $"Вы не можете просматривать эту страницу";
-                return NotFound();
+                return BadRequest();
             }
         
             List<User> friendsViewedUser = await _friendshipService.GetFriendsUser(viewedUser.Id, u=>u.Friendships);
@@ -90,9 +90,11 @@ namespace TextShare.UI.Controllers
             {
                 FriendshipSatusModel friendModel = await FriendshipSatusModel.FromUser(friend);
 
-                Friendship? fr = friend.Friendships.Where(f=>
+                Friendship? fr = friend.Friendships.Where(f =>
                 f.UserId == currentUser.Id || f.FriendId == currentUser.Id)
                     .FirstOrDefault();
+
+
 
                 if (friend.Id == currentUser.Id) friendModel.FriendStatus = FriendStatus.Iam;
                 else if (fr == null) friendModel.FriendStatus = FriendStatus.None;
