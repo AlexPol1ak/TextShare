@@ -15,7 +15,9 @@
         <p class="card-text">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</p>
 
         <h5 class="card-title">Автор</h5>
-        <p class="card-text">@Model.Creator.UserName</p>
+        <p class="card-text">
+            <a href="@Url.Action("DetailsUserByUserName", "User", new { username = @Model.Creator.UserName})">@Model.Creator.UserName</a>
+        </p>
         <p class="card-text">Файлов на полке: @Model.TextFiles.Count</p>
 
         @if (!string.IsNullOrEmpty(Model.ImageUri))

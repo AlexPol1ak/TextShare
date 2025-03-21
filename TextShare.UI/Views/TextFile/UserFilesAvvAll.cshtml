@@ -1,0 +1,35 @@
+﻿@using TextShare.Domain.Models.EntityModels.TextFileModels
+@using X.PagedList.Mvc.Core
+@model IPagedList<TextFileDetailShortModel>
+
+@{
+    string Title = "Доступные файлы пользователя";
+    ViewData["Title"] = Title;
+
+    string? viewedUsername = ViewData["viewedUsername"]?.ToString();
+}
+
+<div class="d-flex align-items-start">
+    <!-- Результат справа -->
+    <div class="w-50 border rounded p-3 overflow-auto ms-3">
+        <h2>
+            Файлы
+            <a href="@Url.Action("DetailsUserByUserName", "User", new { username = viewedUsername })">@viewedUsername</a>
+        </h2>
+
+        @if (Model.Any())
+        {
+            await Html.RenderPartialAsync("_TextFilesListPartial", Model.ToList());
+
+            @Html.PagedListPager(
+                     Model,
+                     page => Url.Action("UserFilesAvvAll", new { username = viewedUsername, page }),
+                     PagedListRenderOptions.OnlyShowFivePagesAtATime
+                     )
+        }
+        else
+        {
+            <p>У пользователя нет доступных файлов.</p>
+        }
+    </div>
+</div>

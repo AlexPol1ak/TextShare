@@ -14,6 +14,7 @@ using TextShare.Domain.Models.EntityModels.TextFileModels;
 using TextShare.Domain.Settings;
 using TextShare.Domain.Utils;
 using TextShare.UI.Models;
+using X.PagedList.Extensions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TextShare.UI.Controllers
@@ -303,7 +304,39 @@ namespace TextShare.UI.Controllers
             return RedirectToAction("DetailShelf", "Shelves", new {id=shelfId});
         }
 
-         
+
+        [Authorize]
+        [HttpGet("{username}/available-all")]
+        public async Task<IActionResult> UserFilesAvvAll(string username, int page = 1)
+        {
+            User? viewedUser = await _userService.GetUserByUsernameAsync(username, u => u.Friendships);
+            if (viewedUser == null)
+            {
+                HttpContext.Items["ErrorMessage"] = $"Пользователь \"{username}\" не найден";
+                return NotFound();
+            }
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+
+            Friendship? frViewedUser = viewedUser.Friendships.Where(
+                f => (f.UserId == currentUser.Id || f.FriendId == currentUser.Id) && f.IsConfirmed == true
+                ).FirstOrDefault();
+            if (frViewedUser == null)
+            {
+                HttpContext.Items["ErrorMessage"] = $"Вы не можете просматривать эту страницу";
+                return NotFound();
+            }
+
+            List<TextFile> files = await _textFileService.FindTextFilesAsync(
+                t => t.OwnerId == viewedUser.Id && t.AccessRule.AvailableAll == true
+                );
+            List<TextFileDetailShortModel> filesModel = await  TextFileDetailShortModel.FromTextFiles(files);
+            ViewData["viewedUsername"] = viewedUser.UserName;
+
+            return View(filesModel.ToPagedList(page, 5));
+        }
+
+
+
         private async Task<ResponseData<string>> validateFile(IFormFile file)
         {
             await Task.CompletedTask;
