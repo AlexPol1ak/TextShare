@@ -5,7 +5,7 @@ using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Models.EntityModels.UserModels;
 
 
-namespace TextShare.Domain.Models.EntityModels
+namespace TextShare.Domain.Models.EntityModels.AccessRuleModels
 {
     /// <summary>
     /// DTO-класс для правила доступа.

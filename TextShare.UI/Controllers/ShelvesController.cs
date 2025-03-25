@@ -188,12 +188,7 @@ namespace TextShare.UI.Controllers
                 g => g.AccessRules);
 
             // Полки, доступные группам, в которых состоит пользователь
-            List<Shelf> availableShelves = userGroups
-                .SelectMany(g => g.AccessRules)
-                .Where(ar => ar.Shelf != null)
-                .Select(ar => ar.Shelf)
-                .Distinct()
-                .ToList();
+            List<Shelf> availableShelves = await _accessСontrolService.AvailableShelvesFromGroups(userDb.Id);
 
             AvailableShelvesModel<User, IPagedList<Shelf>> responseModel = new();
             responseModel.User = userDb;
