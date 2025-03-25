@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="TextShare.Domain.Entities.Users.User">
+    <Position X="0.75" Y="2" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAOIAQgEASAAMAAAAAAQAAAJCAAAAACAAACAAAQg=</HashCode>
+      <FileName>Entities\Users\User.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TextShare.Domain.Entities.Users.Friendship">
+    <Position X="4.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAADAAAAAAAAAAAEACAAAAgAAAABAAAACAAgAAAAAAA=</HashCode>
+      <FileName>Entities\Users\Friendship.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TextShare.Domain.Entities.TextFiles.Shelf">
+    <Position X="6.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAEgAAQGACAAAAQAACAAAAgAECAQAAAEAAA=</HashCode>
+      <FileName>Entities\TextFiles\Shelf.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TextShare.Domain.Entities.TextFiles.Category">
+    <Position X="12.75" Y="2" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAgAgAEAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\TextFiles\Category.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TextShare.Domain.Entities.TextFiles.TextFile">
+    <Position X="9.5" Y="2" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AACQAACIgAAggAAEACAAAAAAACAAAVAQCKAQCAAEAAA=</HashCode>
+      <FileName>Entities\TextFiles\TextFile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TextShare.Domain.Entities.Groups.Group">
+    <Position X="4" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAgCAQGACAAAAQAAAAAAAgAEAAEAAAAAAA=</HashCode>
+      <FileName>Entities\Groups\Group.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TextShare.Domain.Entities.Complaints.ComplaintReasons">
+    <Position X="16.25" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQEAAAAAAgAAAEAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\Complaints\ComplaintReasons.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TextShare.Domain.Entities.Complaints.Complaint">
+    <Position X="13.25" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAEAAAAAEAAIAEgCAAAAAAAAAAAAAQABAgAAAAAAA=</HashCode>
+      <FileName>Entities\Complaints\Complaint.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TextShare.Domain.Entities.AccessRules.AccessRule">
+    <Position X="9.75" Y="8.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AACAAgAIAAEAAAAEAAAAAAAAACAAAAAQAKAEAAAAAAA=</HashCode>
+      <FileName>Entities\AccessRules\AccessRule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

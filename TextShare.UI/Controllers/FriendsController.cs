@@ -66,45 +66,64 @@ namespace TextShare.UI.Controllers
         [Authorize]
         public async Task<IActionResult> UserFriends(string username, int page = 1)
         {
+            // Просматриваемый поль-ль
             User? viewedUser = await _userService.GetUserByUsernameAsync(username, u=>u.Friendships);
             if (viewedUser == null)
             {
                 HttpContext.Items["ErrorMessage"] = $"Пользователь \"{username}\" не найден";
                 return NotFound();
             }
-            User currentUser = (await _userManager.GetUserAsync(User))!;
 
-            Friendship? frViewedUser = viewedUser.Friendships.Where(
-                f => (f.UserId == currentUser.Id || f.FriendId == currentUser.Id) && f.IsConfirmed == true
-                ).FirstOrDefault();
+            // Текущий поль-ль
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            List<int> currentUserFriends = (await _friendshipService.GetFriendsUser(currentUser.Id))
+                .Select(u=>u.Id).ToList();
+            List<int> currentUserOutRequestFrineds = (await _friendshipService.GetOutFriendRequestsUsers(currentUser.Id))
+                .Select(u => u.Id).ToList();
+            List<int> currentUserInRequestFrineds = (await _friendshipService.GetInFriendRequestsUsers(currentUser.Id))
+                .Select(u => u.Id).ToList();
+
+            // Дружба авторизованного польз-ля и просматриваемого.
+            Friendship? frViewedUser = (await _friendshipService.FindFriendshipsAsync(
+                fr =>
+                ((fr.UserId == currentUser.Id && fr.FriendId == viewedUser.Id)
+                || (fr.UserId == viewedUser.Id && fr.FriendId == currentUser.Id))
+                && fr.IsConfirmed == true
+                )).FirstOrDefault();
+            DebugHelper.ShowData(frViewedUser);
             if(frViewedUser == null && currentUser.Id != viewedUser.Id)
             {
                 HttpContext.Items["ErrorMessage"] = $"Вы не можете просматривать эту страницу";
                 return BadRequest();
             }
-        
+            
+            // Друзья просматриваемого по-ля.
             List<User> friendsViewedUser = await _friendshipService.GetFriendsUser(viewedUser.Id, u=>u.Friendships);
             List<FriendshipSatusModel> friendsModels = new();
             
+            // Перебор друзей просматриваемого пользователя и формирование моделей.
             foreach(var friend in friendsViewedUser)
             {
                 FriendshipSatusModel friendModel = await FriendshipSatusModel.FromUser(friend);
+                
+                int frindId = friend.Id;
+                // Определение отношения текущего пользователя к другу просмтариваемого пользователя
+                if (frindId == currentUser.Id)
+                    friendModel.FriendStatus = FriendStatus.Iam;
+                else if (currentUserFriends.Any(id => id == friend.Id))
+                    friendModel.FriendStatus = FriendStatus.Accepted;
+                else if (currentUserInRequestFrineds.Any(id => id == friend.Id))
+                    friendModel.FriendStatus = FriendStatus.Pending;
+                else if (currentUserOutRequestFrineds.Any(id => id == friend.Id))
+                    friendModel.FriendStatus = FriendStatus.Requested;
+                else
+                    friendModel.FriendStatus = FriendStatus.None;
 
-                Friendship? fr = friend.Friendships.Where(f =>
-                f.UserId == currentUser.Id || f.FriendId == currentUser.Id)
-                    .FirstOrDefault();
-
-
-
-                if (friend.Id == currentUser.Id) friendModel.FriendStatus = FriendStatus.Iam;
-                else if (fr == null) friendModel.FriendStatus = FriendStatus.None;
-                else if(fr != null && fr.IsConfirmed == true) friendModel.FriendStatus = FriendStatus.Accepted;
-                else if (fr != null && fr.UserId==currentUser.Id) friendModel.FriendStatus = FriendStatus.Requested;
-                else if (fr != null && fr.FriendId == currentUser.Id) friendModel.FriendStatus = FriendStatus.Pending;
                 friendsModels.Add(friendModel);
 
             }
-            ViewData["viewedUsername"] = viewedUser.UserName;
+
+            ViewData["viewedUsername"] = viewedUser.UserName;          
             return View(friendsModels.ToPagedList(page, 5));
 
         }
@@ -231,6 +250,12 @@ namespace TextShare.UI.Controllers
         }
 
 
+        /// <summary>
+        /// Одобряет запрос дружбы
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="returnUrl"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpGet("accept-friend")]
         public async Task<IActionResult> AcceptFriendRequest(string username, string? returnUrl = null)
