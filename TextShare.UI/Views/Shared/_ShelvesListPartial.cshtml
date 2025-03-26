@@ -1,0 +1,31 @@
+﻿@using TextShare.Domain.Models.EntityModels.ShelfModels
+@model List<ShelfDetailShort>
+
+@if (!Model.Any())
+{
+    <p>Нет доступных полок.</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var shelf in Model)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                <div class="d-flex align-items-center">
+                    @if (!string.IsNullOrEmpty(shelf.AvatarUri))
+                    {
+                        <img src="@shelf.AvatarUri" alt="Аватар полки" class="rounded-circle me-3" width="40" height="40">
+                    }
+                    <div>
+                        <strong>@shelf.Name</strong>
+                        <p class="mb-0 text-muted">Создатель: @shelf.Creator.UserName</p>
+                    </div>
+                </div>
+                <div>
+                    <a asp-action="DetailShelf" asp-controller="Shelves" asp-route-id="@shelf.ShelfId"
+                       class="btn btn-primary btn-sm">Подробнее</a>
+                </div>
+            </li>
+        }
+    </ul>
+}

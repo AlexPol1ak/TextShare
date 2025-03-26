@@ -12,6 +12,7 @@ using TextShare.Domain.Entities.Complaints;
 using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
+using TextShare.Domain.Utils;
 
 namespace TextShare.Business.Services
 {
@@ -208,7 +209,7 @@ namespace TextShare.Business.Services
             if (textFile.OwnerId == user.Id) return true;
 
             // Если у пользователя не загружены группы, загружаем их
-            if (user.Groups == null || user.GroupMemberships == null)
+            if (user.Groups == null || user.GroupMemberships == null || user.Groups.Count < 1 || user.GroupMemberships.Count < 1)
             {
                 user = await _userRepository.GetAsync(user.Id, u => u.Groups, u => u.GroupMemberships);
                 if (user == null) return null;
@@ -255,7 +256,7 @@ namespace TextShare.Business.Services
             if (shelf.CreatorId == user.Id) return true;
 
             // Если у пользователя не загружены группы, загружаем их
-            if (user.Groups == null || user.GroupMemberships == null)
+            if (user.Groups == null || user.GroupMemberships == null || user.Groups.Count <1 || user.GroupMemberships.Count<1)
             {
                 user = await _userRepository.GetAsync(user.Id, u => u.Groups, u => u.GroupMemberships);
                 if (user == null) return null;
@@ -270,11 +271,10 @@ namespace TextShare.Business.Services
             );
 
             // Проверяем, есть ли пользователь в списке разрешённых
-            if (shelf.AccessRule.AvailableUsers.Any(u => u.Id == user.Id)) return true;
+            if (shelf.AccessRule.AvailableUsers.Any(u => u.Id == user.Id)) return true;           
 
             // Проверяем, пересекаются ли группы пользователя с доступными группами
             if (shelf.AccessRule.AvailableGroups.Any(g => userGroupsIds.Contains(g.GroupId))) return true;
-
             return false;
         }
 

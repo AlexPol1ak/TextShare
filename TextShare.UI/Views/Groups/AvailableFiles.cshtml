@@ -1,0 +1,28 @@
+﻿@using TextShare.Domain.Models.EntityModels.TextFileModels
+@using X.PagedList.Mvc.Core
+@using X.PagedList
+
+@model IPagedList<TextFileDetailShortModel>
+
+<div class="d-flex align-items-start">
+    <!-- Ссылки слева -->
+    <div class="w-20 ms-0 ps-2">
+        <partial name="_GroupDetailLinksPartial" model="@ViewBag.GroupDetailModel" />
+    </div>
+
+    <!-- Файлы справа -->
+    <div class="w-80 ms-5">
+        <h2>Файлы, доступные группе "@ViewBag.GroupDetailModel.Name"</h2>
+
+        <partial name="_TextFilesListPartial" model="Model.ToList()" />
+
+        @if (Model.TotalItemCount > 0)
+        {
+            @Html.PagedListPager(
+                     Model,
+                     page => Url.Action("AvailableTextFiles", new { page }),
+                     PagedListRenderOptions.OnlyShowFivePagesAtATime
+                     )
+        }
+    </div>
+</div>

@@ -5,10 +5,12 @@ using Microsoft.Extensions.Options;
 using TextShare.Business.Interfaces;
 using TextShare.Business.Services;
 using TextShare.Domain.Entities.Groups;
+using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
 using TextShare.Domain.Models.EntityModels.GroupModels;
 using TextShare.Domain.Models.EntityModels.ShelfModels;
+using TextShare.Domain.Models.EntityModels.TextFileModels;
 using TextShare.Domain.Models.EntityModels.UserModels;
 using TextShare.Domain.Settings;
 using TextShare.Domain.Utils;
@@ -29,6 +31,9 @@ namespace TextShare.UI.Controllers
         private readonly IGroupService _groupService;
         private readonly IUserService _userService;
         private readonly IFriendshipService _friendshipService;
+        private readonly ITextFileService _textFileService;
+        private readonly IShelfService _shelfService;
+        private readonly IAccessСontrolService _accessControlService;
         public GroupsController(
             IPhysicalFile physicalFile,
             IOptions<ImageUploadSettings> imageUploadSettingsOptions,
@@ -36,7 +41,10 @@ namespace TextShare.UI.Controllers
             IGroupService groupService,
             IUserService userService,
             IOptions<GroupsSettings> groupsSettings,
-            IFriendshipService friendshipService
+            IFriendshipService friendshipService,
+            ITextFileService textFileService,
+            IShelfService shelfService,
+            IAccessСontrolService accessСontrolService
             ) 
             : base(physicalFile, imageUploadSettingsOptions)
         {
@@ -45,6 +53,9 @@ namespace TextShare.UI.Controllers
             _userService = userService;
             _groupsSettings = groupsSettings.Value;
             _friendshipService = friendshipService;
+            _textFileService = textFileService; 
+            _shelfService = shelfService;
+            _accessControlService = accessСontrolService;
         }
 
         /// <summary>
@@ -723,17 +734,92 @@ namespace TextShare.UI.Controllers
             return RedirectToAction("DetailGroup", new { groupId = group.GroupId });
         }
 
-
+        /// <summary>
+        /// Возвращает страницу с полками доступными группе.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
         [HttpGet("group-{groupId}/shelves")]
         public async Task<IActionResult> AvailableShelves(int groupId, int page = 1)
         {
-            return Content("");
+
+            Group? group = await _groupService.GetGroupByIdAsync(groupId,
+                g=>g.Members, g=>g.Creator
+                );
+
+            if(group == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Группа не найдена";
+                return NotFound();
+            }
+
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            List<int> groupMemberIds = group.Members.
+                Where(g=>g.IsConfirmed == true)
+                .Select(gm=>gm.UserId)
+                .ToList();
+            if (!groupMemberIds.Any(id => id == currentUser.Id))
+            {
+                HttpContext.Items["ErrorMessage"] = "Недостаточно прав просматривать эту страницу.";
+                return BadRequest();
+            }
+
+            List<Shelf> shelves = await _accessControlService.AvailableShelvesForGroup(
+                group.GroupId, g => g.Creator
+                );
+
+            List<ShelfDetailShort> shelvesModels = await ShelfDetailShort.FromShelves(shelves);
+
+            // Модель для боковых ссылок
+            GroupDetailModel groupDetailModel = await GroupDetailModel.FromGroup(group);
+            if (group.CreatorId == currentUser.Id) groupDetailModel.UserGroupRelationStatus = UserGroupRelationStatus.Creator;
+            else groupDetailModel.UserGroupRelationStatus = UserGroupRelationStatus.Member;
+            ViewBag.GroupDetailModel = groupDetailModel;
+
+            return View(shelvesModels.ToPagedList(page, 5));
         }
 
+        /// <summary>
+        ///  Возвращает страницу с файлами доступными группе
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
         [HttpGet("group-{groupId}/files")]
         public async Task<IActionResult> AvailableFiles(int groupId, int page = 1)
         {
-            return Content("");
+            Group? group = await _groupService.GetGroupByIdAsync(groupId,
+               g => g.Members, g => g.Creator
+               );
+
+            if (group == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Группа не найдена";
+                return NotFound();
+            }
+
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            List<int> groupMemberIds = group.Members.
+                Where(g => g.IsConfirmed == true)
+                .Select(gm => gm.UserId)
+                .ToList();
+            if (!groupMemberIds.Any(id => id == currentUser.Id))
+            {
+                HttpContext.Items["ErrorMessage"] = "Недостаточно прав просматривать эту страницу.";
+                return BadRequest();
+            }
+
+            // Модель для боковых ссылок
+            GroupDetailModel groupDetailModel = await GroupDetailModel.FromGroup(group);
+            if (group.CreatorId == currentUser.Id) groupDetailModel.UserGroupRelationStatus = UserGroupRelationStatus.Creator;
+            else groupDetailModel.UserGroupRelationStatus = UserGroupRelationStatus.Member;
+            ViewBag.GroupDetailModel = groupDetailModel;
+
+            List<TextFile> files = await _accessControlService.AvailableFilesForGroup(groupId, f => f.Owner);
+            List<TextFileDetailShortModel> textFilesModels =  await TextFileDetailShortModel.FromTextFiles(files);
+
+            return View(textFilesModels.ToPagedList(page, 5));
         }
 
 
