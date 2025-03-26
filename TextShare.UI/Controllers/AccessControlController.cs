@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.ComponentModel.Design;
 using TextShare.Business.Interfaces;
 using TextShare.Domain.Entities.AccessRules;
@@ -50,6 +51,11 @@ namespace TextShare.UI.Controllers
             _textFileService = textFileService;
         }
 
+        /// <summary>
+        /// Возвращает страницу управления  доступом полки.
+        /// </summary>
+        /// <param name="shelfId"></param>
+        /// <returns></returns>
         [HttpGet("shelf-{shelfId}/edit")]
         public async Task<IActionResult> ShelfAccessRuleEdit(int shelfId)
         {
@@ -68,8 +74,34 @@ namespace TextShare.UI.Controllers
             return View(accessRuleEditModel);
         }
 
-        
+        /// <summary>
+        /// Отображает страницу управления доступом файла.
+        /// </summary>
+        /// <param name="uniqueName"></param>
+        /// <returns></returns>
+        [HttpGet("file-{uniqueName}/edit")]
+        public async Task<IActionResult> TextFileAccessRuleEdit(string uniqueName)
+        {
+            User currentUser = (await _userManager.GetUserAsync(User))!;            
+            ResponseData<TextFileAccessRuleEditModel?>  responseData = await CreateAccessRuleEditFileModel(
+                currentUser.Id, uniqueName);
 
+            if (responseData.Success == false || responseData.Data == null)
+            {
+                HttpContext.Items["ErrorMessage"] = responseData.ErrorMessage;
+                return BadRequest();
+            }
+
+            TextFileAccessRuleEditModel textFileAccessRuleEditModel = responseData.Data;
+            return View(textFileAccessRuleEditModel);
+        }
+        
+        /// <summary>
+        /// Обрабатывает POST запрос на изменение я доступа к полке
+        /// </summary>
+        /// <param name="shelfId"></param>
+        /// <param name="accessRuleEditModel"></param>
+        /// <returns></returns>
         [HttpPost("shelf-{shelfId}/edit")]
         public async Task<IActionResult> ShelfAccessRuleEdit(int shelfId,
             ShelfAccessRuleEditModel accessRuleEditModel)
@@ -101,7 +133,6 @@ namespace TextShare.UI.Controllers
                 DebugHelper.ShowData(ModelState.IsValid);
                 return View(accessRuleEditModelnew);
             }
-            DebugHelper.ShowData(accessRuleEditModel.AvailableGroupIds.Count);
 
             Shelf? shelf = await _shelfService.GetShelfByIdAsync(shelfId,
                 s => s.Creator,
@@ -144,9 +175,6 @@ namespace TextShare.UI.Controllers
             await _accessRuleService.UpdateAccessRuleAsync(accessRule);
             await _accessRuleService.SaveAsync();
 
-            DebugHelper.ShowData(accessRuleEditModel.ApplyToFiles);
-            DebugHelper.ShowData(accessRuleEditModel.AvailableAll);
-
             if (accessRuleEditModel.ApplyToFiles)
             {
                 List<TextFile> files = (await _textFileService.FindTextFilesAsync(
@@ -173,6 +201,92 @@ namespace TextShare.UI.Controllers
             }
 
             return RedirectToAction("DetailShelf","Shelves", new { id=shelf.ShelfId});
+        }
+
+        /// <summary>
+        /// Обрабатывает POST запрос на изменение я доступа к файлу
+        /// </summary>
+        /// <param name="shelfId"></param>
+        /// <param name="accessRuleEditModel"></param>
+        /// <returns></returns>
+        [HttpPost("file-{uniqueName}/edit")]
+        public async Task<IActionResult> TextFileAccessRuleEdit(string uniqueName, 
+            TextFileAccessRuleEditModel textFileAccessRuleEditModel)
+        {
+            if (string.IsNullOrEmpty(uniqueName))
+            {
+                HttpContext.Items["ErrorMessage"] = "Пустое имя файла";
+                return BadRequest();
+            }
+
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            if (!ModelState.IsValid)
+            {
+                ResponseData<TextFileAccessRuleEditModel?> responseData = await CreateAccessRuleEditFileModel(
+                    currentUser.Id, uniqueName
+                    );
+                if (responseData.Success == false || responseData.Data == null)
+                {
+                    HttpContext.Items["ErrorMessage"] = responseData.ErrorMessage;
+                    return BadRequest();
+                }
+
+                foreach (var modelStateKey in ModelState.Keys)
+                {
+                    var value = ModelState[modelStateKey];
+                    foreach (var error in value.Errors)
+                    {
+                        DebugHelper.ShowData($"Ошибка в {modelStateKey}: {error.ErrorMessage}");
+                    }
+                }
+
+                TextFileAccessRuleEditModel textFileAccessRuleEditModelNew = responseData.Data;
+                return View(textFileAccessRuleEditModelNew);
+            }
+
+            TextFile? file =( await _textFileService.FindTextFilesAsync(
+                t=>t.UniqueFileNameWithoutExtension == uniqueName,
+                t => t.Owner,
+                t => t.AccessRule, t => t.AccessRule.AvailableUsers, t => t.AccessRule.AvailableGroups
+                )).FirstOrDefault();
+
+            if (file == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Файл не найдена.";
+                return NotFound();
+            }
+
+            if (file.OwnerId != currentUser.Id)
+            {
+                HttpContext.Items["ErrorMessage"] = "У вас нет прав для управления доступом этой полки.";
+                return NotFound();
+            }
+            AccessRule? accessRule = await _accessRuleService.GetAccessRuleByIdAsync(textFileAccessRuleEditModel.AccessRuleId);
+            if (accessRule == null)
+            {
+                HttpContext.Items["ErrorMessage"] = "Настройки доступа не найдены.";
+                return NotFound();
+            }
+
+            // Изменение "Доступно всем"
+            accessRule.AvailableAll = textFileAccessRuleEditModel.AvailableAll;
+
+            // Изменение "Доступно пользователям
+            List<User> AvailableUsers = await _userService.FindUsersAsync(
+                u => textFileAccessRuleEditModel.AvailableUserIds.Any(id => id == u.Id)
+                );
+            accessRule.AvailableUsers = AvailableUsers;
+
+            // Изменение "Доступно группам"
+            List<Group> AvailableGroups = await _groupService.FindGroupsAsync(
+                g => textFileAccessRuleEditModel.AvailableGroupIds.Any(id => id == g.GroupId)
+                );
+            accessRule.AvailableGroups = AvailableGroups;
+
+            await _accessRuleService.UpdateAccessRuleAsync(accessRule);
+            await _accessRuleService.SaveAsync();
+
+            return RedirectToAction("DetailTextFile", "TextFile", new { uniquename = uniqueName});
         }
 
         /// <summary>
@@ -224,6 +338,68 @@ namespace TextShare.UI.Controllers
             responseData.Success = true;
             responseData.Data = accessRuleEditModel;
             return responseData;
+        }
+
+        /// <summary>
+        /// Создает модель для изменения правила доступа файла.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="uniqueName"></param>
+        /// <returns></returns>
+        private async Task<ResponseData<TextFileAccessRuleEditModel?>> CreateAccessRuleEditFileModel(
+            int userId, string uniqueName
+            )
+        {
+            ResponseData<TextFileAccessRuleEditModel?> responseData = new();
+            if (string.IsNullOrEmpty(uniqueName))
+            {
+                responseData.Success = false;
+                responseData.ErrorMessage = "Пустое имя файла";
+                return responseData;
+
+            }
+          
+            TextFile? file = (await _textFileService.FindTextFilesAsync(
+                t=>t.UniqueFileNameWithoutExtension == uniqueName,
+                t=>t.Owner, t=>t.AccessRule, t=>t.AccessRule.AvailableGroups, t=>t.AccessRule.AvailableUsers
+                )).FirstOrDefault();
+
+            if( file == null )
+            {
+                responseData.Success = false;
+                responseData.Data = null;
+                responseData.ErrorMessage = "Файл не найден";
+                return responseData;
+            }
+
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+            if (file.OwnerId != currentUser.Id)
+            {
+                responseData.ErrorMessage = "У вас нет прав для управления доступом этой полки.";
+                responseData.Data = null;
+                responseData.Success = false;
+                return responseData;
+            }
+
+            List<User> currentUserFriends = await _friendshipService.GetFriendsUser(currentUser.Id);
+            List<Group> currentUserGroups = (await _groupService.GetUserCreatedGroupsAsync(currentUser.Id)).ToList();
+            currentUserGroups.AddRange(await _groupService.GetUserMemberGroupsAsync(currentUser.Id));
+
+            TextFileAccessRuleEditModel model = new();
+            model.TextFileId = file.TextFileId;
+            model.TextFileName = file.OriginalFileName;
+            model.AccessRuleId = file.AccessRuleId;
+            model.AvailableAll = file.AccessRule.AvailableAll;
+            model.AvailableGroups = file.AccessRule.AvailableGroups.ToList();
+            model.AvailableUsers = file.AccessRule.AvailableUsers.ToList();
+            model.CreatorUserFriends = currentUserFriends;
+            model.CreatorUserGroups = currentUserGroups;
+            model.UniqueFileNameWithoutExtension = file.UniqueFileNameWithoutExtension;
+
+            responseData.Success = true;
+            responseData.Data = model;
+            return responseData;
+
         }
     }
 }

@@ -335,8 +335,6 @@ namespace TextShare.UI.Controllers
             return View(filesModel.ToPagedList(page, 5));
         }
 
-
-
         private async Task<ResponseData<string>> validateFile(IFormFile file)
         {
             await Task.CompletedTask;

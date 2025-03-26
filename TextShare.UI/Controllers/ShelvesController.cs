@@ -578,22 +578,7 @@ namespace TextShare.UI.Controllers
 
             return View(models.ToPagedList(page, 5));
         }
-
-        [Authorize]
-        [HttpGet("access-control/{id}")]
-        public async Task<IActionResult> AccessControl(int id)
-        {
-            return Content("EditShelf Post");
-        }
-
-        [Authorize]
-        [HttpPost("access-control/{id}")]
-        public async Task<IActionResult> AccessControl(int id, ShelfDetailModel shelfModel)
-        {
-            return Content("EditShelf Post");
-        }
-        #endregion
-
-        
+     
+        #endregion       
     }
 }

@@ -1,0 +1,148 @@
+﻿@using TextShare.Domain.Models.EntityModels.AccessRuleModels
+@model TextFileAccessRuleEditModel
+
+@{
+    ViewData["Title"] = $"Управление доступом для файла \"{Model.TextFileName}\"";
+}
+
+<h2>@ViewData["Title"]</h2>
+<br />
+
+<form asp-action="TextFileAccessRuleEdit" method="post">
+    <input type="hidden" asp-for="TextFileId" />
+    <input type="hidden" asp-for="TextFileName" /> <!-- Добавлено -->
+    <input type="hidden" asp-for="AccessRuleId" />
+    <input type="hidden" asp-for="AvailableAll" />
+    <input type="hidden" asp-for="UniqueFileNameWithoutExtension"/>
+
+    <input type="hidden" name="AvailableUsers" value="" />
+    <input type="hidden" name="AvailableGroups" value="" />
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Доступ для пользователей</h4>
+            <div class="d-flex">
+                <div class="w-50">
+                    <h5>Друзья</h5>
+                    <select id="friendsList" class="form-select" size="5">
+                        @foreach (var friend in Model.CreatorUserFriends)
+                        {
+                            <option value="@friend.Id">@friend.UserName</option>
+                        }
+                    </select>
+                    <button type="button" class="btn btn-primary mt-2" id="addUserBtn">Добавить</button>
+                </div>
+
+                <div class="w-50 ms-3">
+                    <h5>Разрешенные пользователи</h5>
+                    <select id="allowedUsersList" name="AvailableUserIds" class="form-select" size="5" multiple>
+                        @foreach (var user in Model.AvailableUsers)
+                        {
+                            <option value="@user.Id" selected>@user.UserName</option>
+                        }
+                    </select>
+                    <button type="button" class="btn btn-danger mt-2" id="removeUserBtn">Удалить</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <h4>Доступ для групп</h4>
+            <div class="d-flex">
+                <div class="w-50">
+                    <h5>Доступные группы</h5>
+                    <select id="groupsList" class="form-select" size="5">
+                        @foreach (var group in Model.CreatorUserGroups)
+                        {
+                            <option value="@group.GroupId">@group.Name</option>
+                        }
+                    </select>
+                    <button type="button" class="btn btn-primary mt-2" id="addGroupBtn">Добавить</button>
+                </div>
+
+                <div class="w-50 ms-3">
+                    <h5>Разрешенные группы</h5>
+                    <select id="allowedGroupsList" name="AvailableGroupIds" class="form-select" size="5" multiple>
+                        @foreach (var group in Model.AvailableGroups)
+                        {
+                            <option value="@group.GroupId">@group.Name</option>
+                        }
+                    </select>
+                    <button type="button" class="btn btn-danger mt-2" id="removeGroupBtn">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-check mt-3">
+        <input type="checkbox" class="form-check-input" asp-for="AvailableAll" id="availableAll">
+        <label class="form-check-label" for="availableAll">Разрешить доступ всем</label>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-success">Сохранить</button>
+        <a href="@Url.Action("DetailTextFile", "TextFile", 
+            new { uniquename = Model.UniqueFileNameWithoutExtension})" class="btn btn-secondary">Отмена</a>
+    </div>
+</form>
+
+
+@section Scripts {
+    <script>
+
+            // Когда форма отправляется, выбираются все элементы в списках
+        document.querySelector("form").addEventListener("submit", function () {
+            let allowedUsersList = document.getElementById("allowedUsersList");
+            for (let option of allowedUsersList.options) {
+                option.selected = true;
+            }
+
+            let allowedGroupsList = document.getElementById("allowedGroupsList");
+            for (let option of allowedGroupsList.options) {
+                option.selected = true;
+            }
+
+            // Проверка состояния чекбоксов и передача их значений
+            let availableAllCheckbox = document.getElementById("availableAll");
+            let applyToFilesCheckbox = document.getElementById("applyToFiles");
+
+            // Если чекбокс установлен, установим его значение в 1, иначе 0
+            document.querySelector("input[name='AvailableAll']").value = availableAllCheckbox.checked ? true : false;
+        });
+
+
+        document.getElementById("addUserBtn").addEventListener("click", function () {
+            var friendsList = document.getElementById("friendsList");
+            var allowedUsersList = document.getElementById("allowedUsersList");
+            var selectedOption = friendsList.options[friendsList.selectedIndex];
+
+            if (selectedOption && !Array.from(allowedUsersList.options).some(opt => opt.value === selectedOption.value)) {
+                var newOption = new Option(selectedOption.text, selectedOption.value);
+                allowedUsersList.add(newOption);
+            }
+        });
+
+        document.getElementById("removeUserBtn").addEventListener("click", function () {
+            var allowedUsersList = document.getElementById("allowedUsersList");
+            allowedUsersList.remove(allowedUsersList.selectedIndex);
+        });
+
+        document.getElementById("addGroupBtn").addEventListener("click", function () {
+            var groupsList = document.getElementById("groupsList");
+            var allowedGroupsList = document.getElementById("allowedGroupsList");
+            var selectedOption = groupsList.options[groupsList.selectedIndex];
+
+            if (selectedOption && !Array.from(allowedGroupsList.options).some(opt => opt.value === selectedOption.value)) {
+                var newOption = new Option(selectedOption.text, selectedOption.value);
+                allowedGroupsList.add(newOption);
+            }
+        });
+
+        document.getElementById("removeGroupBtn").addEventListener("click", function () {
+            var allowedGroupsList = document.getElementById("allowedGroupsList");
+            allowedGroupsList.remove(allowedGroupsList.selectedIndex);
+        });
+
+
+    </script>
+}
