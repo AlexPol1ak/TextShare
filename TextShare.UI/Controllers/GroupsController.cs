@@ -426,6 +426,13 @@ namespace TextShare.UI.Controllers
             }
             User currentUser = (await _userManager.GetUserAsync(User))!;
             List<int> membersIds = group.Members.Where(m => m.IsConfirmed == true).Select(m => m.UserId).ToList();
+
+            if (!membersIds.Any(id=> currentUser.Id == id))
+            {
+                HttpContext.Items["ErrorMessage"] = "Данную страницу могут просматривать только участники группы.";
+                return BadRequest();
+
+            }
             List<User> members = await _userService.FindUsersAsync(
                 u=> membersIds.Any(id => id == u.Id)
                 );
@@ -433,6 +440,11 @@ namespace TextShare.UI.Controllers
             GroupMembersModel groupMembersModel = new();
             groupMembersModel.CurrentUser = UserModel.FromUser(currentUser);
             groupMembersModel.Group = await  GroupDetailModel.FromGroup(group);
+            if(group.CreatorId == currentUser.Id)
+                groupMembersModel.Group.UserGroupRelationStatus = UserGroupRelationStatus.Creator;
+            else
+                groupMembersModel.Group.UserGroupRelationStatus = UserGroupRelationStatus.Member;
+
             groupMembersModel.Members = (await UserModel.FromUsers(members)).ToPagedList(page, 10);
 
 
