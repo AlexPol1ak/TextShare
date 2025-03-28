@@ -30,7 +30,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace TextShare.UI.Controllers
 {
     /// <summary>
-    /// Котроллер для управления полками.
+    /// Контроллер для управления полками.
     /// </summary>
     [Route("shelves")]
     public class ShelvesController : BaseController
@@ -93,6 +93,12 @@ namespace TextShare.UI.Controllers
             return View(responseModel);
         }
 
+        /// <summary>
+        /// Получает список всех полок пользователя, доступных всем, с учётом дружбы между пользователями.
+        /// </summary>
+        /// <param name="username">Имя пользователя, чьи полки будут отображаться.</param>
+        /// <param name="page">Номер страницы для пагинации (по умолчанию 1).</param>
+        /// <returns>Представление с моделью полок, доступных всем пользователям.</returns>
         [Authorize]
         [HttpGet("{username}/available-all")]
         public async Task<IActionResult> UserShelvesAvAll(string username, int page = 1)
@@ -537,6 +543,12 @@ namespace TextShare.UI.Controllers
             return RedirectToAction("MyShelves");
         }
 
+        /// <summary>
+        /// Отображает страницу с списком файлов, размещённых на полке, с учётом доступа пользователя.
+        /// </summary>
+        /// <param name="shelfId">Идентификатор полки.</param>
+        /// <param name="page">Номер страницы для пагинации (по умолчанию 1).</param>
+        /// <returns>Представление с моделью файлов, доступных пользователю, на указанной полке.</returns>
         [HttpGet("/shelf-{shelfId}/files")]
         public async Task<IActionResult> FilesInShelf(int shelfId, int page = 1)
         {

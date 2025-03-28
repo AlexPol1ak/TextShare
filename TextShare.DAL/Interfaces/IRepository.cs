@@ -3,6 +3,9 @@ using System.Linq.Expressions;
 
 namespace TextShare.DAL.Interfaces
 {
+    /// <summary>
+    /// Универсальный репозиторий для работы с сущностями в базе данных.
+    /// </summary>
     public interface IRepository<TEntity> where TEntity : class
     {
 

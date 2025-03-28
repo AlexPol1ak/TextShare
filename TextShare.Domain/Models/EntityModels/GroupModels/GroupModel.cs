@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Entities.Groups;
 
-namespace TextShare.Domain.Models.EntityModels
+namespace TextShare.Domain.Models.EntityModels.GroupModels
 {
     /// <summary>
-    /// DTO-класс для группы пользователей.
+    /// Модель для группы пользователей.
     /// </summary>
     public class GroupModel
     {
@@ -24,6 +24,11 @@ namespace TextShare.Domain.Models.EntityModels
         [Required]
         public int CreatorId { get; set; }
 
+        /// <summary>
+        /// Создает объект <see cref="GroupModel"/> из сущности <see cref="Group"/>.
+        /// </summary>
+        /// <param name="group">Сущность группы.</param>
+        /// <returns>Модель группы.</returns>
         public static GroupModel FromGroup(Group group)
         {
             return new GroupModel
@@ -37,6 +42,10 @@ namespace TextShare.Domain.Models.EntityModels
             };
         }
 
+        /// <summary>
+        /// Преобразует модель группы в сущность <see cref="Group"/>.
+        /// </summary>
+        /// <returns>Сущность группы.</returns>
         public Group ToGroup()
         {
             return new Group

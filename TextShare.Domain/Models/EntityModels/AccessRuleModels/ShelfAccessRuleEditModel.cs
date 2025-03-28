@@ -20,14 +20,31 @@ namespace TextShare.Domain.Models.EntityModels.AccessRuleModels
 
         public int AccessRuleId { get; set; }
 
+        /// <summary>
+        /// Список друзей пользователя
+        /// </summary>
         public List<User> CreatorUserFriends { get; set; } = new();
+        /// <summary>
+        /// Список групп в которых состоит пользователь или является создателем.
+        /// </summary>
         public List<Group> CreatorUserGroups { get; set; } = new();
 
-        public List<int> AvailableUserIds { get; set; } = new(); // Список ID для передачи
-        public List<User> AvailableUsers { get; set; } = new(); //  Список User для отображения
-
+        /// <summary>
+        /// Список ID для передачи в POST запросе
+        /// </summary>
+        public List<int> AvailableUserIds { get; set; } = new();
+        /// <summary>
+        /// Список User для отображения в представлении
+        /// </summary>
+        public List<User> AvailableUsers { get; set; } = new();
+        /// <summary>
+        /// Список ID для передачи в POST запросе
+        /// </summary>
         public List<int> AvailableGroupIds { get; set; } = new();
-        public List<Group> AvailableGroups { get; set; } = new();
+        /// <summary>
+        /// Список Group для отображения в представлении
+        /// </summary>
+        public List<Group> AvailableGroups { get; set; } = new(); 
 
         public bool AvailableAll { get; set; }
 

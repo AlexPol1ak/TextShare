@@ -37,6 +37,8 @@ namespace TextShare.Domain.Models.EntityModels.GroupModels
         public string? ImageUri { get; set; }
         public User Creator { get; set; }
 
+        public int CountRequests { get; set; } = 0;
+
         public UserGroupRelationStatus UserGroupRelationStatus { get; set; }
 
         public static async Task<GroupDetailModel> FromGroup(Group group)
@@ -49,6 +51,11 @@ namespace TextShare.Domain.Models.EntityModels.GroupModels
             groupDetailModel.CreatedAt = group.CreatedAt;
             groupDetailModel.ImageUri = group.ImageUri;
             groupDetailModel.Creator = group.Creator;
+
+            if(group.Members != null && group.Members.Count > 0)
+            {
+                groupDetailModel.CountRequests = group.Members.Where(m=>m.IsConfirmed ==false).Count();
+            }
 
             return groupDetailModel;
         }

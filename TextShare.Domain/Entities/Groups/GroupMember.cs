@@ -7,6 +7,9 @@ using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Domain.Entities.Groups
 {
+    /// <summary>
+    /// Представляет связь между пользователем и группой, включая статус подтверждения участия.
+    /// </summary>
     public class GroupMember
     {
         public int GroupId { get; set; }

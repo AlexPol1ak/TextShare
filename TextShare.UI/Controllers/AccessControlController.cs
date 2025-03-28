@@ -52,15 +52,16 @@ namespace TextShare.UI.Controllers
         }
 
         /// <summary>
-        /// Возвращает страницу управления  доступом полки.
+        /// Возвращает страницу управления доступом полки.
+        /// Позволяет пользователю изменить правила доступа к полке.
         /// </summary>
-        /// <param name="shelfId"></param>
-        /// <returns></returns>
+        /// <param name="shelfId">Идентификатор полки, для которой нужно изменить правила доступа.</param>
+        /// <returns>Представление с моделью для редактирования правил доступа полки.</returns>
         [HttpGet("shelf-{shelfId}/edit")]
         public async Task<IActionResult> ShelfAccessRuleEdit(int shelfId)
         {
             User currentUser = (await _userManager.GetUserAsync(User))!;
-
+            // Создать модель. Осуществить проверку.
             ResponseData<ShelfAccessRuleEditModel?> responseData = await CreateAccessRuleEditModel(
                 currentUser.Id, shelfId
                 );
@@ -76,13 +77,15 @@ namespace TextShare.UI.Controllers
 
         /// <summary>
         /// Отображает страницу управления доступом файла.
+        /// Позволяет пользователю изменить правила доступа к текстовому файлу.
         /// </summary>
-        /// <param name="uniqueName"></param>
-        /// <returns></returns>
+        /// <param name="uniqueName">Уникальное имя файла, для которого нужно изменить правила доступа.</param>
+        /// <returns>Представление с моделью для редактирования правил доступа к файлу.</returns>
         [HttpGet("file-{uniqueName}/edit")]
         public async Task<IActionResult> TextFileAccessRuleEdit(string uniqueName)
         {
-            User currentUser = (await _userManager.GetUserAsync(User))!;            
+            User currentUser = (await _userManager.GetUserAsync(User))!;    
+            // Создать модель для представления. Осуществить проверку 
             ResponseData<TextFileAccessRuleEditModel?>  responseData = await CreateAccessRuleEditFileModel(
                 currentUser.Id, uniqueName);
 
@@ -95,13 +98,14 @@ namespace TextShare.UI.Controllers
             TextFileAccessRuleEditModel textFileAccessRuleEditModel = responseData.Data;
             return View(textFileAccessRuleEditModel);
         }
-        
+
         /// <summary>
-        /// Обрабатывает POST запрос на изменение я доступа к полке
+        /// Обрабатывает POST запрос на изменение доступа к полке.
+        /// Выполняет обновление правил доступа для полки на основе данных из формы.
         /// </summary>
-        /// <param name="shelfId"></param>
-        /// <param name="accessRuleEditModel"></param>
-        /// <returns></returns>
+        /// <param name="shelfId">Идентификатор полки, для которой изменяются правила доступа.</param>
+        /// <param name="accessRuleEditModel">Модель, содержащая обновленные данные для правил доступа.</param>
+        /// <returns>Реализация действий по обновлению и перенаправлению на страницу полки.</returns>
         [HttpPost("shelf-{shelfId}/edit")]
         public async Task<IActionResult> ShelfAccessRuleEdit(int shelfId,
             ShelfAccessRuleEditModel accessRuleEditModel)
@@ -204,11 +208,12 @@ namespace TextShare.UI.Controllers
         }
 
         /// <summary>
-        /// Обрабатывает POST запрос на изменение я доступа к файлу
+        /// Обрабатывает POST запрос на изменение доступа к файлу.
+        /// Выполняет обновление правил доступа для текстового файла на основе данных из формы.
         /// </summary>
-        /// <param name="shelfId"></param>
-        /// <param name="accessRuleEditModel"></param>
-        /// <returns></returns>
+        /// <param name="uniqueName">Уникальное имя файла, для которого изменяются правила доступа.</param>
+        /// <param name="textFileAccessRuleEditModel">Модель, содержащая обновленные данные для правил доступа к файлу.</param>
+        /// <returns>Реализация действий по обновлению и перенаправлению на страницу файла.</returns>
         [HttpPost("file-{uniqueName}/edit")]
         public async Task<IActionResult> TextFileAccessRuleEdit(string uniqueName, 
             TextFileAccessRuleEditModel textFileAccessRuleEditModel)
@@ -290,11 +295,11 @@ namespace TextShare.UI.Controllers
         }
 
         /// <summary>
-        /// Создает модель для изменения правила доступа полки.
+        /// Создает модель для редактирования доступа полки.
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="shelfId"></param>
-        /// <returns></returns>
+        /// <param name="userId">Идентификатор текущего пользователя.</param>
+        /// <param name="shelfId">Идентификатор полки для которой создается модель.</param>
+        /// <returns>Модель для редактирования правил доступа полки.</returns>
         private async Task<ResponseData<ShelfAccessRuleEditModel?>> CreateAccessRuleEditModel(int userId, int shelfId)
         {
             ResponseData<ShelfAccessRuleEditModel?> responseData = new();
@@ -341,16 +346,18 @@ namespace TextShare.UI.Controllers
         }
 
         /// <summary>
-        /// Создает модель для изменения правила доступа файла.
+        /// Создает модель для редактирования доступа файла.
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="uniqueName"></param>
-        /// <returns></returns>
+        /// <param name="userId">Идентификатор текущего пользователя.</param>
+        /// <param name="uniqueName">Уникальное имя файла для которого создается модель.</param>
+        /// <returns>Модель для редактирования правил доступа файла.</returns>
         private async Task<ResponseData<TextFileAccessRuleEditModel?>> CreateAccessRuleEditFileModel(
             int userId, string uniqueName
             )
         {
+            // Ответ метода
             ResponseData<TextFileAccessRuleEditModel?> responseData = new();
+
             if (string.IsNullOrEmpty(uniqueName))
             {
                 responseData.Success = false;
@@ -358,7 +365,8 @@ namespace TextShare.UI.Controllers
                 return responseData;
 
             }
-          
+            
+            
             TextFile? file = (await _textFileService.FindTextFilesAsync(
                 t=>t.UniqueFileNameWithoutExtension == uniqueName,
                 t=>t.Owner, t=>t.AccessRule, t=>t.AccessRule.AvailableGroups, t=>t.AccessRule.AvailableUsers
@@ -372,6 +380,7 @@ namespace TextShare.UI.Controllers
                 return responseData;
             }
 
+            //Если пользователь не владелец полки
             User currentUser = (await _userManager.GetUserAsync(User))!;
             if (file.OwnerId != currentUser.Id)
             {

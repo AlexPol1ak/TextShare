@@ -17,6 +17,11 @@ namespace TextShare.Domain.Models.EntityModels.GroupModels
 
         public int CountMembers { get; set; }
 
+        /// <summary>
+        /// Создает экземпляр <see cref="GroupDeleteModel"/> на основе сущности <see cref="Group"/>.
+        /// </summary>
+        /// <param name="group">Сущность группы.</param>
+        /// <returns>Объект <see cref="GroupDeleteModel"/>.</returns>
         public static GroupDeleteModel FromGroup(Group group)
         {
             GroupDeleteModel groupDeleteModel = new();

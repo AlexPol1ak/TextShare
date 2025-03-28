@@ -38,7 +38,11 @@ namespace TextShare.Domain.Models.EntityModels.FriendsModels
 
         public FriendStatus FriendStatus { get; set; }
 
-
+        /// <summary>
+        /// Создает модель дружбы на основе пользователя.
+        /// </summary>
+        /// <param name="user">Пользователь, на основе которого создается модель.</param>
+        /// <returns>Экземпляр <see cref="FriendshipSatusModel"/>.</returns>
         public static async Task<FriendshipSatusModel> FromUser(User user)
         {
             await Task.CompletedTask;
@@ -51,6 +55,11 @@ namespace TextShare.Domain.Models.EntityModels.FriendsModels
             return friendshipSatusModel;
         }
 
+        /// <summary>
+        /// Создает коллекцию моделей дружбы на основе списка пользователей.
+        /// </summary>
+        /// <param name="users">Список пользователей.</param>
+        /// <returns>Коллекция экземпляров <see cref="FriendshipSatusModel"/>.</returns>
         public static async Task<IEnumerable<FriendshipSatusModel>> FromUsers(IEnumerable<User> users)
         {
             List<FriendshipSatusModel> friendshipSatusModels = new();

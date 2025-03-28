@@ -4,7 +4,7 @@ using TextShare.Domain.Entities.Complaints;
 namespace TextShare.Domain.Models.EntityModels
 {
     /// <summary>
-    /// DTO-класс для причины жалобы.
+    ///Модель для причины жалобы.
     /// </summary>
     public class ComplaintReasonsModel
     {

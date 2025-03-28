@@ -8,6 +8,9 @@ using X.PagedList;
 
 namespace TextShare.Domain.Models.EntityModels.GroupModels
 {
+    /// <summary>
+    /// Модель, представляющая участников группы.
+    /// </summary>
     public class GroupMembersModel
     {
         public UserModel CurrentUser { get; set; }

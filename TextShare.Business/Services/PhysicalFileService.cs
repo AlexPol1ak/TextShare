@@ -16,6 +16,16 @@ namespace TextShare.Business.Services
             this._root = root;
         }
 
+        /// <summary>
+        /// Получает относительный и полный путь к файлу, если он существует.
+        /// </summary>
+        /// <param name="fileName">Имя файла.</param>
+        /// <param name="directoryName">Имя директории (необязательно).</param>
+        /// <returns>
+        /// Словарь с ключами:
+        /// - "relativePath": относительный путь к файлу (или <c>null</c>, если файл не найден).
+        /// - "fullPath": полный путь к файлу (или <c>null</c>, если файл не найден).
+        /// </returns>
         public async Task<Dictionary<string, string?>> GetFile(string fileName, string? directoryName = null)
         {
             Dictionary<string, string?> result = new() { 

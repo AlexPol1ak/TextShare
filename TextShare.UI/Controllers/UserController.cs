@@ -119,7 +119,10 @@ namespace TextShare.UI.Controllers
             return RedirectToAction("DetailsUserByUserName", new { username = currentUser.UserName});
         }
 
-        
+        /// <summary>
+        /// Отображает страницу обновления информации пользователя
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("update")]
         [Authorize]
         public async Task<IActionResult> UpdateUser()
@@ -130,6 +133,11 @@ namespace TextShare.UI.Controllers
             return View(userUpdateModel);
         }
 
+        /// <summary>
+        /// Обрабатывает POST запрос обновления информации пользователя.
+        /// </summary>
+        /// <param name="userUpdateModel"></param>
+        /// <returns></returns>
         [HttpPost("update")]
         [Authorize]
         public async Task<IActionResult> UpdateUser(UserUpdateModel userUpdateModel)
@@ -182,6 +190,11 @@ namespace TextShare.UI.Controllers
             return RedirectToAction("DetailsUser");
         }
 
+        /// <summary>
+        /// Обрабатывает POST запрос обновления аватара пользователя
+        /// </summary>
+        /// <param name="avatar"></param>
+        /// <returns></returns>
         [HttpPost("update/upload-avatar")]
         [Authorize]
         public async Task<IActionResult> UploadAvatar(IFormFile? avatar)

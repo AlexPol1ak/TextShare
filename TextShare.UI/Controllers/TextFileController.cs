@@ -210,6 +210,12 @@ namespace TextShare.UI.Controllers
             return RedirectToAction("DetailTextFile", new { uniquename = textFile.UniqueFileNameWithoutExtension });
         }
 
+        /// <summary>
+        /// Отображает страницу с детальной информацией о файле
+        /// </summary>
+        /// <param name="uniquename"></param>
+        /// <returns></returns>
+
         [HttpGet("{uniquename}")]
         public async Task<IActionResult> DetailTextFile(string uniquename)
         {
@@ -237,6 +243,11 @@ namespace TextShare.UI.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Скачивание файла
+        /// </summary>
+        /// <param name="uniquename"></param>
+        /// <returns></returns>
         [HttpGet("download/{uniquename}")]
         public async Task<IActionResult> Download(string uniquename)
         {
@@ -274,6 +285,11 @@ namespace TextShare.UI.Controllers
             { FileDownloadName = textFile.OriginalFileName };
         }
 
+        /// <summary>
+        /// Удаление файла.
+        /// </summary>
+        /// <param name="uniquename"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpPost("delete/{uniquename}")]
         public async Task<IActionResult> Delete(string uniquename)
@@ -305,6 +321,12 @@ namespace TextShare.UI.Controllers
         }
 
 
+        /// <summary>
+        /// Отображает страницу с файлами доступными всем.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpGet("{username}/available-all")]
         public async Task<IActionResult> UserFilesAvvAll(string username, int page = 1)
@@ -335,6 +357,11 @@ namespace TextShare.UI.Controllers
             return View(filesModel.ToPagedList(page, 5));
         }
 
+        /// <summary>
+        /// Проверяет загружаемый файл в систему
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         private async Task<ResponseData<string>> validateFile(IFormFile file)
         {
             await Task.CompletedTask;

@@ -4,6 +4,9 @@ using TextShare.Domain.Entities.Groups;
 
 namespace TextShare.Domain.Models.EntityModels.GroupModels
 {
+    /// <summary>
+    /// Модель для создания группы.
+    /// </summary>
     public class GroupCreateModel
     {
         [Required(ErrorMessage = "Поле обязательно для заполнения.")]
@@ -15,6 +18,10 @@ namespace TextShare.Domain.Models.EntityModels.GroupModels
         [StringLength(500, ErrorMessage = "Описание должно содержать не более 500 символов.")]
         public string? Description { get; set; }
 
+        /// <summary>
+        /// Преобразует модель в сущность <see cref="Group"/>.
+        /// </summary>
+        /// <returns>Экземпляр <see cref="Group"/>.</returns>
         public Group ToGroup()
         {
             return new Group

@@ -24,6 +24,10 @@ namespace TextShare.Domain.Models.EntityModels.ShelfModels
             ErrorMessage = "Описание полки может содержать буквы, цифры, пробелы и спецсимволы.")]
         public string? Description { get; set; }
 
+        /// <summary>
+        /// Преобразует модель создания полки в сущность <see cref="Shelf"/>.
+        /// </summary>
+        /// <returns>Сущность полки.</returns>
         public Shelf ToShelf()
         {
             Shelf shelf = new();
@@ -33,6 +37,11 @@ namespace TextShare.Domain.Models.EntityModels.ShelfModels
             return shelf;
         }
 
+        /// <summary>
+        /// Преобразует сущность <see cref="Shelf"/> в модель создания полки.
+        /// </summary>
+        /// <param name="shelf">Сущность полки.</param>
+        /// <returns>Модель создания полки.</returns>
         static public ShelfCreateModel FromShelf(Shelf shelf)
         {
             ShelfCreateModel shelfCreateModel = new();

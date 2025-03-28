@@ -18,6 +18,9 @@ namespace TextShare.Domain.Models.EntityModels
         [Required]
         public string Description { get; set; }
 
+        /// <summary>
+        /// Модель категории.
+        /// </summary>
         public virtual Category ToCategory()
         {
             Category category = new Category()
@@ -29,6 +32,11 @@ namespace TextShare.Domain.Models.EntityModels
             return category;
         }
 
+        // <summary>
+        /// Преобразует сущность <see cref="Category"/> в модель категории.
+        /// </summary>
+        /// <param name="category">Сущность категории.</param>
+        /// <returns>Модель категории.</returns>
         public static CategoryModel FromCategory(Category category)
         {
             CategoryModel dto = new CategoryModel();
