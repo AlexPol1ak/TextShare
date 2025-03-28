@@ -75,8 +75,8 @@ namespace TextShare.UI.Controllers
                 );
             groups.AddRange(
                 (await _groupService.GetUserMemberGroupsAsync(currentUser.Id, g => g.Creator, g => g.Members))
-                .OrderBy(g=>g.Members.Select(m=>m.JoinedAt))
-                );
+                .OrderBy(g => g.Members.Min(m => m.JoinedAt))
+            );
 
             List<GroupDetailModel> groupDetailsList = (await GroupDetailModel.FromGroup(groups))
                 .Select(
@@ -86,7 +86,7 @@ namespace TextShare.UI.Controllers
                     else model.UserGroupRelationStatus = UserGroupRelationStatus.Member;
                     return model;
                 }         
-                ).ToList();
+                ).DistinctBy(g=>g.GroupId).ToList();
 
 
             return View(groupDetailsList.ToPagedList(page, _groupsSettings.MaxGroupInPage));
