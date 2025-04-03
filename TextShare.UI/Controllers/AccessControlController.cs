@@ -118,6 +118,7 @@ namespace TextShare.UI.Controllers
                 ResponseData<ShelfAccessRuleEditModel?> responseData = await CreateAccessRuleEditModel(
                     currentUser.Id, shelfId
                     );
+
                 if (responseData.Success == false || responseData.Data == null)
                 {
                     HttpContext.Items["ErrorMessage"] = responseData.ErrorMessage;

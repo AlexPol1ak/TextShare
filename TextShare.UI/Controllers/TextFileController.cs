@@ -95,7 +95,6 @@ namespace TextShare.UI.Controllers
             };
 
             return View(model);
-
         }
 
         /// <summary>
@@ -123,11 +122,9 @@ namespace TextShare.UI.Controllers
                 return result.Data;
             }
 
-
             // Если в случае ошибок форма будет возращена клиенту -заполнить категории заново
             filesUploadModel.Categories = await _categoryService.GetAllCategoriesAsync();
             
-
             if (!ModelState.IsValid)
             {
                 return View(filesUploadModel);
@@ -174,7 +171,7 @@ namespace TextShare.UI.Controllers
 
             Dictionary<string, string> fileData = saveResponseData.Data;
 
-            // Сохранение данных в бд
+            // Сохранение данных в базу
             TextFile textFile = new();
             textFile.OriginalFileName = fileData["originalFileName"];
             textFile.UniqueFileName = fileData["uniqueFileName"];
@@ -196,7 +193,7 @@ namespace TextShare.UI.Controllers
                 c=> new TextFileCategory() { Category = c, TextFile = textFile }
                 ).ToList();
 
-            // Правило доступа для файла копируется от о правила доступа для полки.
+            // Правило доступа для файла копируется от правила доступа для полки.
             AccessRule accessRule = await _accessСontrolService.GetCopyAccessRule(shelf.AccessRule);
             await _accessRuleService.CreateAccessRuleAsync(accessRule);
             await _accessRuleService.SaveAsync();
@@ -205,7 +202,6 @@ namespace TextShare.UI.Controllers
 
             await _textFileService.CreateTextFileAsync(textFile);
             await _textFileService.SaveAsync();
-
 
             return RedirectToAction("DetailTextFile", new { uniquename = textFile.UniqueFileNameWithoutExtension });
         }

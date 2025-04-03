@@ -7,6 +7,9 @@ using TextShare.Domain.Entities.TextFiles;
 
 namespace TextShare.UI.Data
 {
+    /// <summary>
+    /// Класс  инициализации категорий в базе данных.
+    /// </summary>
     public class CategoryDbInit : DbInitDataAbstract
     {
         private readonly ICategoryService categoryService;

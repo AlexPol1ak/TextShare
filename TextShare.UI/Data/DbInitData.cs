@@ -18,10 +18,18 @@ namespace TextShare.UI.Data
             set => categoryDbInit.InstallCategories = value;
         }
 
+        private ComplaintReasonsDbInit complaintReasonsDbInit;
+        public bool InstallComplaintReasons
+        {
+            get => complaintReasonsDbInit.InstallComplaintReasons;
+            set => complaintReasonsDbInit.InstallComplaintReasons = value;
+        }
+
         public DbInitData(WebApplication webApp)
         {
             userDbInit = new(webApp);
             categoryDbInit = new(webApp);
+            complaintReasonsDbInit = new(webApp);
         }
 
         public async Task<bool> SeedData()
@@ -37,6 +45,12 @@ namespace TextShare.UI.Data
             if (InstallCategories)
             {
                 bool res = await categoryDbInit.SeedData();
+                flags.Add(res);
+            }
+
+            if (InstallComplaintReasons)
+            {
+                bool res = await complaintReasonsDbInit.SeedData();
                 flags.Add(res);
             }
 

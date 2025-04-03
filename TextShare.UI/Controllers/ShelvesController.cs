@@ -290,13 +290,15 @@ namespace TextShare.UI.Controllers
         /// <summary>
         /// Отображает страницу создания новой полки.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Страница создания полки</returns>
         /// <remarks>GET shelves/create-shelf</remarks>
         [Authorize]
         [HttpGet("create-shelf")]
         public async Task<IActionResult> CreateShelf()
         {
+            // Текущий пользователь
             User user = (await _userManager.GetUserAsync(User))!;
+            // Проверка достижения лимита количества  полок пользователя.
             var shelf = await _shelfService.GetAllUserShelvesAsync(user.Id);
             if (shelf.Count >= _shelvesSettings.MaxNumberUserShelves)
             {

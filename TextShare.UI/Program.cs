@@ -65,6 +65,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFriendshipService, FriendshipService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IComplaintReasonService, ComplaintReasonService>();
+builder.Services.AddScoped<IComplaintService, ComplaintService>();
 builder.Services.AddScoped<IPhysicalFile, PhysicalFileService>
 (
     provider =>
@@ -107,6 +109,6 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 DbInitData initData = new(app);
-//await initData.SeedData();
+await initData.SeedData();
 
 app.Run();
