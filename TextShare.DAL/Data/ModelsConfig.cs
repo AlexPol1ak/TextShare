@@ -167,8 +167,8 @@ namespace TextShare.DAL.Data
             builder.ToTable("TextFiles");
 
             builder.HasKey(t => t.TextFileId);
-            builder.Property(t => t.OriginalFileName).HasMaxLength(255).IsRequired();
-            builder.Property(t => t.UniqueFileName).HasMaxLength(255).IsRequired();
+            builder.Property(t => t.OriginalFileName).HasMaxLength(500).IsRequired();
+            builder.Property(t => t.UniqueFileName).HasMaxLength(500).IsRequired();
             builder.HasIndex(t => t.UniqueFileName).IsUnique();
             builder.Property(t => t.Description).HasColumnType("TEXT")
                 .IsRequired(false)
@@ -252,10 +252,22 @@ namespace TextShare.DAL.Data
         {
             builder.HasKey(c => c.ComplaintId);
 
+            // Связь с файлом (не обязательная)
             builder.HasOne(c => c.TextFile)
                 .WithMany(t => t.Complaints)
                 .HasForeignKey(c => c.TextFileId)
-                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Связь с полкой (не обязательная)
+            builder.HasOne(c => c.Shelf)
+                .WithMany(s => s.Complaints)
+                .HasForeignKey(c => c.ShelfId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Связь с группой (не обязательная)
+            builder.HasOne(c => c.Group)
+                .WithMany(g => g.Complaints)
+                .HasForeignKey(c => c.GroupId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // Связь с ComplaintReasons (обязательная)

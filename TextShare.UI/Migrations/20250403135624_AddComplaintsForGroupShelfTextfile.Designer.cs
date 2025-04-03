@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TextShare.DAL.Data;
 
@@ -11,9 +12,11 @@ using TextShare.DAL.Data;
 namespace TextShare.UI.Migrations
 {
     [DbContext(typeof(TextShareContext))]
-    partial class TextShareContextModelSnapshot : ModelSnapshot
+    [Migration("20250403135624_AddComplaintsForGroupShelfTextfile")]
+    partial class AddComplaintsForGroupShelfTextfile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -232,13 +235,7 @@ namespace TextShare.UI.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int?>("GroupId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ShelfId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TextFileId")
+                    b.Property<int>("TextFileId")
                         .HasColumnType("int");
 
                     b.HasKey("ComplaintId");
@@ -246,10 +243,6 @@ namespace TextShare.UI.Migrations
                     b.HasIndex("AuthorId");
 
                     b.HasIndex("ComplaintReasonsId");
-
-                    b.HasIndex("GroupId");
-
-                    b.HasIndex("ShelfId");
 
                     b.HasIndex("TextFileId");
 
@@ -436,8 +429,8 @@ namespace TextShare.UI.Migrations
 
                     b.Property<string>("OriginalFileName")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("OwnerId")
                         .HasColumnType("int");
@@ -454,8 +447,8 @@ namespace TextShare.UI.Migrations
 
                     b.Property<string>("UniqueFileName")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("UniqueFileNameWithoutExtension")
                         .IsRequired()
@@ -746,28 +739,15 @@ namespace TextShare.UI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TextShare.Domain.Entities.Groups.Group", "Group")
-                        .WithMany("Complaints")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("TextShare.Domain.Entities.TextFiles.Shelf", "Shelf")
-                        .WithMany("Complaints")
-                        .HasForeignKey("ShelfId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("TextShare.Domain.Entities.TextFiles.TextFile", "TextFile")
                         .WithMany("Complaints")
                         .HasForeignKey("TextFileId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Author");
 
                     b.Navigation("ComplaintReasons");
-
-                    b.Navigation("Group");
-
-                    b.Navigation("Shelf");
 
                     b.Navigation("TextFile");
                 });
@@ -877,8 +857,6 @@ namespace TextShare.UI.Migrations
 
             modelBuilder.Entity("TextShare.Domain.Entities.Groups.Group", b =>
                 {
-                    b.Navigation("Complaints");
-
                     b.Navigation("Members");
                 });
 
@@ -891,8 +869,6 @@ namespace TextShare.UI.Migrations
                 {
                     b.Navigation("AccessRule")
                         .IsRequired();
-
-                    b.Navigation("Complaints");
 
                     b.Navigation("TextFiles");
                 });

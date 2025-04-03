@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TextShare.Domain.Entities.AccessRules;
+using TextShare.Domain.Entities.Complaints;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Domain.Entities.TextFiles
@@ -32,6 +33,9 @@ namespace TextShare.Domain.Entities.TextFiles
 
         // Размещенные файлы
         public ICollection<TextFile> TextFiles { get; set; } = new List<TextFile>();
+
+        // Жалобы
+        public ICollection<Complaint> Complaints { get; set; } = new List<Complaint>();
 
         public override string ToString()
         {

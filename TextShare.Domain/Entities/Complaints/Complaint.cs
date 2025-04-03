@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 
@@ -18,8 +19,16 @@ namespace TextShare.Domain.Entities.Complaints
         public bool Confirmed { get; set; } = false;
 
         // Файл
-        public int TextFileId { get; set; }
-        public TextFile TextFile { get; set; }
+        public int? TextFileId { get; set; }
+        public TextFile? TextFile { get; set; }
+
+        // Полка
+        public int? ShelfId { get; set; }
+        public Shelf? Shelf { get; set; }
+
+        // Группа
+        public int? GroupId { get; set; }
+        public Group? Group { get; set; }
 
         // Причина
         public int ComplaintReasonsId { get; set; }

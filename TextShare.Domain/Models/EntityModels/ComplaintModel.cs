@@ -5,7 +5,7 @@ using TextShare.Domain.Entities.Complaints;
 namespace TextShare.Domain.Models.EntityModels
 {
     /// <summary>
-    /// DTO-класс для жалобы на файл.
+    /// Модель для жалобы на файл.
     /// </summary>
     public class ComplaintModel
     {
@@ -15,8 +15,9 @@ namespace TextShare.Domain.Models.EntityModels
 
         public bool Confirmed { get; set; } = false;
 
-        [Required]
-        public int TextFileId { get; set; }
+        public int? TextFileId { get; set; }
+        public int? ShelfId { get; set; }
+        public int? GroupId { get; set; }
 
         [Required]
         public int ComplaintReasonsId { get; set; }
@@ -26,15 +27,21 @@ namespace TextShare.Domain.Models.EntityModels
 
         public static ComplaintModel FromComplaint(Complaint complaint)
         {
-            return new ComplaintModel
-            {
-                ComplaintId = complaint.ComplaintId,
-                CreatedAt = complaint.CreatedAt,
-                Confirmed = complaint.Confirmed,
-                TextFileId = complaint.TextFileId,
-                ComplaintReasonsId = complaint.ComplaintReasonsId,
-                AuthorId = complaint.AuthorId
-            };
+            var complaintModel = new ComplaintModel();
+            complaintModel.ComplaintId = complaint.ComplaintId;
+            complaintModel.CreatedAt = complaint.CreatedAt;
+            complaintModel.Confirmed = complaint.Confirmed;
+            complaintModel.ComplaintReasonsId = complaint.ComplaintReasonsId;
+            complaintModel.AuthorId = complaint.AuthorId;
+
+            if(complaint.TextFile != null) 
+                complaintModel.TextFileId = complaint.TextFileId;
+            else if(complaint.ShelfId != null)
+                complaintModel.ShelfId = complaint.ShelfId;
+            else if(complaintModel.GroupId != null)
+                complaint.GroupId = complaintModel.GroupId; 
+
+                return complaintModel;
         }
 
         public Complaint ToComplaint()
