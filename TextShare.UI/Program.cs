@@ -79,6 +79,7 @@ builder.Services.AddScoped<IPhysicalFile, PhysicalFileService>
 builder.Services.AddScoped<IAccessÑontrolService, AccessÑontrolService>();
 builder.Services.AddScoped<ITextFileService, TextFileService>();
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -108,7 +109,8 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
-DbInitData initData = new(app);
-await initData.SeedData();
+
+//DbInitData initData = new(app);
+//await initData.SeedData();
 
 app.Run();

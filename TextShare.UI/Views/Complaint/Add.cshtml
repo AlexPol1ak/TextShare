@@ -1,0 +1,71 @@
+﻿@{
+    ViewData["Title"] = "Добавить жалобу";
+    var message = ViewBag.Message as string ?? "";
+    var reasons = ViewBag.ComplaintReasons as List<TextShare.Domain.Entities.Complaints.ComplaintReasons> ?? new();
+    var selectList = ViewBag.SelectListItem as List<SelectListItem> ?? new();
+
+    int? shelfId = ViewBag.ShelfId as int?;
+    int? groupId = ViewBag.GroupId as int?;
+    string? uniqueName = ViewBag.UniqueName as string;
+}
+
+<h2 class="mt-4">@message</h2>
+
+<form method="post">
+    <div class="mb-3">
+        <label for="SelectedReasonId" class="form-label">Причина жалобы</label>
+        <select name="SelectedReasonId" class="form-select" required>
+            <option value="">-- Выберите причину --</option>
+            @foreach (var item in selectList)
+            {
+                <option value="@item.Value">@item.Text</option>
+            }
+        </select>
+    </div>
+
+    @* Скрытые поля для сохранения маршрутных параметров *@
+    @if (shelfId != null)
+    {
+        <input type="hidden" name="shelfId" value="@shelfId" />
+    }
+    else if (groupId != null)
+    {
+        <input type="hidden" name="groupId" value="@groupId" />
+    }
+    else if (!string.IsNullOrEmpty(uniqueName))
+    {
+        <input type="hidden" name="uniquename" value="@uniqueName" />
+    }
+
+    <div class="mb-3">
+        <label class="form-label">Описание причины</label>
+        <div id="reason-description" class="form-control" style="min-height: 80px;"></div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Отправить</button>
+        <a href="/" class="btn btn-secondary">Отмена</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        const reasons = @Html.Raw(Json.Serialize(reasons));
+
+        function showDescription(select) {
+            const selectedId = parseInt(select.value);
+            const descriptionDiv = document.getElementById("reason-description");
+            const reason = reasons.find(r => r.complaintReasonsId === selectedId);
+            descriptionDiv.textContent = reason ? reason.description : "";
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const select = document.querySelector('select[name="SelectedReasonId"]');
+            if (select) {
+                select.addEventListener('change', function () {
+                    showDescription(this);
+                });
+            }
+        });
+    </script>
+}
