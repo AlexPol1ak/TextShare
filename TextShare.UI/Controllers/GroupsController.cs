@@ -343,50 +343,61 @@ namespace TextShare.UI.Controllers
 
 
         /// <summary>
-        /// Обрабатывает POST и GET запрос удаления группы.
+        /// Обрабатывает POST и GET запросы удаления группы.
+        /// Администратор может удалить любую группу без ограничений,
+        /// обычный пользователь — только свою.
         /// </summary>
-        /// <param name="groupId"></param>
-        /// <returns>Перенаправляет на страницу групп</returns>
+        /// <param name="groupId">Идентификатор группы</param>
+        /// <returns>Результат удаления и перенаправление</returns>
+        [Authorize]
         [HttpGet("delete")]
         [HttpPost("delete")]
         public async Task<IActionResult> DeleteGroup(int groupId)
         {
-            Group? group = await _groupService.GetGroupByIdAsync(groupId, g=>g.Creator);
-            if(group == null)
+            Group? group = await _groupService.GetGroupByIdAsync(groupId, g => g.Creator);
+            if (group == null)
             {
                 HttpContext.Items["ErrorMessage"] = "Группа не найдена";
                 return BadRequest();
             }
 
+            bool isAdmin = User.IsInRole("Admin");
             User currentUser = (await _userManager.GetUserAsync(User))!;
-            if(Request.Method == HttpMethods.Get)
+
+            if (Request.Method == HttpMethods.Get)
             {
-                if(group.CreatorId != currentUser.Id)
+                if (!isAdmin && group.CreatorId != currentUser.Id)
                 {
-                    HttpContext.Items["ErrorMessage"] = "У вас нет прав для управления  этой группой";
+                    HttpContext.Items["ErrorMessage"] = "У вас нет прав для управления этой группой";
                     return BadRequest();
                 }
+
                 GroupDeleteModel groupDeleteModel = GroupDeleteModel.FromGroup(group);
-                return View(groupDeleteModel);                               
+                return View(groupDeleteModel);
             }
 
-            if(Request.Method == HttpMethods.Post)
+            if (Request.Method == HttpMethods.Post)
             {
-                if (group.CreatorId != currentUser.Id)
+                if (!isAdmin && group.CreatorId != currentUser.Id)
                 {
-                    HttpContext.Items["ErrorMessage"] = "У вас нет прав для управления  этой группой";
+                    HttpContext.Items["ErrorMessage"] = "У вас нет прав для управления этой группой";
                     return BadRequest();
                 }
 
-                if(group.ImageUri != null)
+                if (group.ImageUri != null)
                 {
                     await this.DeleteImageByUri(group.ImageUri);
                 }
+
                 await _groupService.DeleteGroupAsync(group.GroupId);
                 await _groupService.SaveAsync();
             }
 
-            return RedirectToAction("MyGroups");
+            // Перенаправление в зависимости от роли
+            if (isAdmin)
+                return RedirectToAction("ViewComplaints", "Complaint", new { type = "groups" });
+            else
+                return RedirectToAction("MyGroups");
         }
 
         /// <summary>
