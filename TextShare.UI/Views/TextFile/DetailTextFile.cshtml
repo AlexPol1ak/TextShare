@@ -47,11 +47,16 @@
                 asp-route-uniqueName="@Model.UniqueFileNameWithoutExtension" class="btn btn-warning">Управление доступом</a>
                 <p></p>
                 <form asp-action="Delete" asp-controller="TextFile"
-                      asp-route-uniquename="@Model.UniqueFileNameWithoutExtension"
-                      method="post"
-                      onsubmit="return confirm('Вы уверены, что хотите удалить этот файл?');">
+                asp-route-uniquename="@Model.UniqueFileNameWithoutExtension"
+                method="post"
+                onsubmit="return confirm('Вы уверены, что хотите удалить этот файл?');">
                     <button type="submit" class="btn btn-danger">Удалить</button>
                 </form>
+            }
+            else
+            {
+                <a class="btn btn-danger mt-3"
+                   asp-action="Add" asp-controller="Complaint" asp-route-uniquename="@Model.UniqueFileNameWithoutExtension">Пожаловаться</a>
             }
         </div>
     </div>

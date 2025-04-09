@@ -11,14 +11,14 @@
 <div class="d-flex align-items-start">
     <!-- Ссылки слева -->
     @if (Model.UserGroupRelationStatus == UserGroupRelationStatus.Member || 
-         Model.UserGroupRelationStatus == UserGroupRelationStatus.Creator
+       Model.UserGroupRelationStatus == UserGroupRelationStatus.Creator
     )
     {
         <div class="w-25 me-3">
             <partial name="_GroupDetailLinksPartial" model="Model" />
         </div>       
     }
-    
+
     <!-- Информация о группе справа -->
     <div class="w-50 p-3 border rounded">
         <h2>@Model.Name</h2>
@@ -29,7 +29,7 @@
         }
 
         @if (Model.UserGroupRelationStatus == UserGroupRelationStatus.Member ||
-            Model.UserGroupRelationStatus == UserGroupRelationStatus.Creator
+          Model.UserGroupRelationStatus == UserGroupRelationStatus.Creator
         )
         {
             <p><strong>Описание:</strong> @Model.Description</p>
@@ -39,6 +39,13 @@
                     @Model.Creator.UserName
                 </a>
             </p>
+
+            if (Model.UserGroupRelationStatus == UserGroupRelationStatus.Member)
+            {
+                <a class="btn btn-danger mt-3"
+                   asp-action="Add" asp-controller="Complaint" asp-route-groupId="@Model.GroupId">Пожаловаться</a>
+                
+            }         
         }
 
         @if (Model.UserGroupRelationStatus == UserGroupRelationStatus.NotMember)
@@ -55,10 +62,11 @@
         {
             <p class="text-warning">Заявка отправлена</p>
             <form asp-controller="Groups" asp-action="LeaveGroup" asp-route-groupId="@Model.GroupId"
-                  class="d-inline" method="post">
+            class="d-inline" method="post">
                 <input type="hidden" name="returnUrl" value="@returnUrl" />
                 <button type="submit" class="btn btn-danger">Отменить заявку</button>
             </form>
         }
+
     </div>
 </div>

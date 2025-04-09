@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using TextShare.Domain.Entities.Complaints;
 using TextShare.Domain.Utils;
 using Microsoft.CodeAnalysis.Text;
+using X.PagedList.Extensions;
 
 namespace TextShare.UI.Controllers
 {
@@ -46,6 +47,14 @@ namespace TextShare.UI.Controllers
             _complaintReasonService = complaintReasonService;
         }
 
+        #region Add Complaint
+        /// <summary>
+        /// Отображает форму добавления жалобы на полку, группу или файл в зависимости от переданного параметра.
+        /// </summary>
+        /// <param name="shelfId">Идентификатор полки, если жалоба подаётся на полку.</param>
+        /// <param name="groupId">Идентификатор группы, если жалоба подаётся на группу.</param>
+        /// <param name="uniquename">Уникальное имя файла, если жалоба подаётся на файл.</param>
+        /// <returns>Представление формы жалобы или код ошибки.</returns>
         [HttpGet("complaint/add/shelf-{shelfId:int}")]
         [HttpGet("complaint/add/group-{groupId:int}")]
         [HttpGet("complaint/add/file-{uniquename}")]
@@ -132,6 +141,14 @@ namespace TextShare.UI.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Обрабатывает отправку формы жалобы и сохраняет жалобу на полку, группу или файл.
+        /// </summary>
+        /// <param name="SelectedReasonId">Идентификатор выбранной причины жалобы.</param>
+        /// <param name="shelfId">Идентификатор полки, если жалоба подаётся на полку.</param>
+        /// <param name="groupId">Идентификатор группы, если жалоба подаётся на группу.</param>
+        /// <param name="uniquename">Уникальное имя файла, если жалоба подаётся на файл.</param>
+        /// <returns>Редирект на страницу объекта жалобы или код ошибки.</returns>
         [HttpPost("complaint/add/shelf-{shelfId:int}")]
         [HttpPost("complaint/add/group-{groupId:int}")]
         [HttpPost("complaint/add/file-{uniquename}")]
@@ -225,8 +242,73 @@ namespace TextShare.UI.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        #endregion
+
+        #region Moderation
+        /// <summary>
+        /// Отображает список объектов (полки, группы, файлы), содержащих хотя бы одну жалобу.
+        /// Позволяет фильтровать объекты по типу и постранично просматривать их.
+        /// </summary>
+        /// <param name="type">Тип объекта: shelves (по умолчанию), groups или files.</param>
+        /// <param name="page">Номер страницы для пагинации. Значение по умолчанию — 1.</param>
+        /// <returns>Представление со списком объектов и жалобами на них.</returns>
+        [Authorize(Roles = "Admin")]
+        [HttpGet("complaints/view")]
+        public async Task<IActionResult> ViewComplaints(string type = "shelves", int page =1)
+        {
+            List<object> objList = new();
+
+            if(string.IsNullOrEmpty(type)) return BadRequest();
+            if(type == "shelves")
+            {
+                List<Shelf> shelves = (await _shelfService.FindShelvesAsync(
+                    s => s.Complaints.Count() > 0,
+                    s => s.Complaints,
+                    s => s.Creator)).OrderByDescending(s=>s.Complaints.Count()).ToList();
+
+                objList.AddRange(shelves);
+
+            }
+            else if(type == "groups")
+            {
+                List<Group> groups = (await _groupService.FindGroupsAsync(
+                    s => s.Complaints.Count() > 0,
+                    s => s.Complaints,
+                    s => s.Creator)).OrderByDescending(s => s.Complaints.Count()).ToList();
+
+                objList.AddRange(groups);
+                
+            }
+            else if (type == "files")
+            {
+                List<TextFile> files = (await _textFileService.FindTextFilesAsync(
+                    s => s.Complaints.Count() > 0,
+                    s => s.Complaints,
+                    s => s.Owner)).OrderByDescending(s => s.Complaints.Count()).ToList();
+
+                objList.AddRange(files);
+            }
+            else
+            {
+                HttpContext.Items["ErrorMessage"] = "Неверная категория";
+                return BadRequest();
+            }
+            
+            ViewBag.ObjPageList = objList.ToPagedList(page, 10);
+
+            return View();
+        }
+        #endregion
+
         #region Check access methods
-         
+        /// <summary>
+        /// Проверяет, может ли текущий пользователь оставить жалобу на указанную полку.
+        /// </summary>
+        /// <param name="shelfId">Идентификатор полки.</param>
+        /// <param name="currentUser">Текущий пользователь.</param>
+        /// <returns>
+        /// Объект <see cref="ResponseData{Object}"/>, содержащий результат проверки.
+        /// </returns>
         private async Task<ResponseData<object>> CanAddComplaintToShelfAsync(int shelfId, User currentUser)
         {
             var shelf = await _shelfService.GetShelfByIdAsync(shelfId,
