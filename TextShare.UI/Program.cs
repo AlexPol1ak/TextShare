@@ -12,6 +12,7 @@ using TextShare.Domain.Settings;
 using Microsoft.DotNet.Scaffolding.Shared;
 using TextShare.UI.Data;
 using Microsoft.AspNetCore.DataProtection.KeyManagement.Internal;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,10 +37,10 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
 
 builder.Services.AddSingleton<IEmailSender, NoOpEmailSender>();
 
-builder.Services.AddAuthorization(opt =>
-{
-    opt.AddPolicy("admin", p => p.RequireClaim(ClaimTypes.Role, "admin"));
-});
+//builder.Services.AddAuthorization(opt =>
+//{
+//    opt.AddPolicy("admin", p => p.RequireClaim(ClaimTypes.Role, "admin"));
+//});
 
 builder.Services.AddLogging(logging =>
 {
@@ -79,7 +80,6 @@ builder.Services.AddScoped<IPhysicalFile, PhysicalFileService>
 builder.Services.AddScoped<IAccessÑontrolService, AccessÑontrolService>();
 builder.Services.AddScoped<ITextFileService, TextFileService>();
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -110,7 +110,7 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 
-//DbInitData initData = new(app);
-//await initData.SeedData();
+DbInitData initData = new(app);
+await initData.SeedData();
 
 app.Run();

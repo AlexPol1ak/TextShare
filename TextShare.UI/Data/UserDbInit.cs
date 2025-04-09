@@ -17,12 +17,14 @@ namespace TextShare.UI.Data
         protected IShelfService shelfService;
         protected IAccessRuleService accessRuleService;
         protected IUserService userService;
+        protected RoleManager<IdentityRole<int>> roleManager;
         public UserDbInit(WebApplication webApp) : base(webApp)
         {
             userManager = this.scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             shelfService = this.scope.ServiceProvider.GetRequiredService<IShelfService>();
             accessRuleService = this.scope.ServiceProvider.GetRequiredService<IAccessRuleService>();
             userService = this.scope.ServiceProvider.GetRequiredService<IUserService>();
+            roleManager = this.scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
 
         }
 
@@ -57,6 +59,31 @@ namespace TextShare.UI.Data
                 await userManager.CreateAsync(newUser, "123456");
                 await createBaseShelf(newUser);
                 userCount++;            
+            }
+
+            //Admin
+            var adminRole = await roleManager.FindByNameAsync("Admin");
+            if (adminRole == null)
+            {
+                adminRole = new IdentityRole<int>("Admin");
+                await roleManager.CreateAsync(adminRole);
+            }
+            User admin = new();
+            admin.UserName = $"Admin";
+            admin.FirstName = $"Alex";
+            admin.LastName = $"Poliak";
+            admin.BirthDate = new(2000, 01, 01);
+            admin.Email = $"admin@mail.ru";
+            admin.EmailConfirmed = true;
+
+            var res = await userService.FindUsersAsync(u => u.Email == admin.Email
+                || u.UserName == admin.UserName);
+
+            if (res.Count < 1)
+            {
+                await userManager.CreateAsync(admin,"123456");
+                await createBaseShelf(admin);
+                await userManager.AddToRoleAsync(admin, "Admin");
             }
 
             return userCount;
