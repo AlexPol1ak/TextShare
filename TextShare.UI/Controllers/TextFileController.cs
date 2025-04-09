@@ -282,18 +282,20 @@ namespace TextShare.UI.Controllers
         }
 
         /// <summary>
-        /// Удаление файла.
+        /// Удаление файла. Администратор может удалить любой файл, 
+        /// обычный пользователь — только свой.
         /// </summary>
-        /// <param name="uniquename"></param>
-        /// <returns></returns>
+        /// <param name="uniquename">Уникальное имя файла</param>
+        /// <returns>Результат удаления файла и перенаправление</returns>
         [Authorize]
         [HttpPost("delete/{uniquename}")]
         public async Task<IActionResult> Delete(string uniquename)
         {
             var files = await _textFileService.FindTextFilesAsync(
-                t=>t.UniqueFileNameWithoutExtension == uniquename,
-                t=>t.Shelf);
-            if(files.Count() < 1)
+                t => t.UniqueFileNameWithoutExtension == uniquename,
+                t => t.Shelf);
+
+            if (files.Count() < 1)
             {
                 HttpContext.Items["ErrorMessage"] = "Файл не найден";
                 return BadRequest();
@@ -302,19 +304,25 @@ namespace TextShare.UI.Controllers
             User currentUser = (await _userManager.GetUserAsync(User))!;
             TextFile textFile = files[0];
             int shelfId = textFile.ShelfId;
-            
-            if(textFile.OwnerId !=  currentUser.Id)
+
+            bool isAdmin = User.IsInRole("Admin");
+
+            // Если пользователь не админ и не является владельцем файла
+            if (!isAdmin && textFile.OwnerId != currentUser.Id)
             {
-                HttpContext.Items["ErrorMessage"] = "Нет разрешения на действие в этим файлом!";
+                HttpContext.Items["ErrorMessage"] = "Нет разрешения на действие с этим файлом!";
                 return BadRequest();
             }
 
+            // Удаление файла
             var res = await _physicalFile.Delete(textFile.UniqueFileName, "TextFiles");
             await _textFileService.DeleteTextFileAsync(textFile.TextFileId);
             await _textFileService.SaveAsync();
 
-            return RedirectToAction("DetailShelf", "Shelves", new {id=shelfId});
+            // Перенаправление после удаления
+            return RedirectToAction("DetailShelf", "Shelves", new { id = shelfId });
         }
+
 
 
         /// <summary>
