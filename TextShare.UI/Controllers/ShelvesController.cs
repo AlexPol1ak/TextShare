@@ -492,57 +492,64 @@ namespace TextShare.UI.Controllers
         [HttpPost("delete/{id}")]
         public async Task<IActionResult> DeleteShelf(int id)
         {
-            // Получаем полку и пользователя
-            Shelf? shelf = await _shelfService.GetShelfByIdAsync(id, s=>s.TextFiles);
-            
-            // если полка не найдена
-            if(shelf == null)
+            // Получаем полку и файлы
+            Shelf? shelf = await _shelfService.GetShelfByIdAsync(id, s => s.TextFiles);
+
+            if (shelf == null)
             {
                 HttpContext.Items["ErrorMessage"] = "Полка не найдена";
-                
                 return NotFound();
             }
 
-            // Если полка базовая и не может быть удалена
-            if (!shelf.CanDeleted)
-            {
-                HttpContext.Items["ErrorMessage"] = "Эта полка не может быть удалена";
-                DebugHelper.ShowData(shelf);
-                return BadRequest();
-            }
+            bool isAdmin = User.IsInRole("Admin");
 
+            // Получаем текущего пользователя
             User user = (await _userManager.GetUserAsync(User))!;
-            // Если  авторизованный пользователь не владелец полки
-            if (shelf.CreatorId != user.Id)
+
+            // Если не админ, проверяем, может ли пользователь удалить полку
+            if (!isAdmin)
             {
-                HttpContext.Items["ErrorMessage"] = "Вы не можете удалить чужую полку.";
-                return BadRequest();
+                if (!shelf.CanDeleted)
+                {
+                    HttpContext.Items["ErrorMessage"] = "Эта полка не может быть удалена";
+                    DebugHelper.ShowData(shelf);
+                    return BadRequest();
+                }
+
+                if (shelf.CreatorId != user.Id)
+                {
+                    HttpContext.Items["ErrorMessage"] = "Вы не можете удалить чужую полку.";
+                    return BadRequest();
+                }
             }
 
-            // Если метод GET - вернуть страницу подтверждения действия удаления
-            if(HttpContext.Request.Method == HttpMethods.Get)
+            // Если метод GET — показать подтверждение удаления
+            if (HttpContext.Request.Method == HttpMethods.Get)
             {
                 ShelfDeleteModel shelfDelete = ShelfDeleteModel.FromShelf(shelf);
                 return View(shelfDelete);
             }
-            
-            if(HttpContext.Request.Method == HttpMethods.Post)
-            {
-                if (!string.IsNullOrEmpty(shelf.ImageUri))
-                {
-                    await DeleteImageByUri(shelf.ImageUri);
-                }
 
-                List<string> filesUniqueFileNames = shelf.TextFiles.Select(t=>t.UniqueFileName).ToList();
-                foreach(var fileName in filesUniqueFileNames)
-                {
-                    _physicalFile.Delete(fileName, "TextFiles");
-                }
-                await _shelfService.DeleteShelfAsync(shelf.ShelfId);
-                await _shelfService.SaveAsync();
+            // Метод POST — удаление
+            if (!string.IsNullOrEmpty(shelf.ImageUri))
+            {
+                await DeleteImageByUri(shelf.ImageUri);
             }
 
-            return RedirectToAction("MyShelves");
+            List<string> filesUniqueFileNames = shelf.TextFiles.Select(t => t.UniqueFileName).ToList();
+            foreach (var fileName in filesUniqueFileNames)
+            {
+                _physicalFile.Delete(fileName, "TextFiles");
+            }
+
+            await _shelfService.DeleteShelfAsync(shelf.ShelfId);
+            await _shelfService.SaveAsync();
+
+            // Перенаправление в зависимости от роли
+            if (isAdmin)
+                return RedirectToAction("ViewComplaints", "Complaint", new { type = "shelves" });
+            else
+                return RedirectToAction("MyShelves");
         }
 
         /// <summary>
