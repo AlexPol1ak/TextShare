@@ -20,7 +20,7 @@
         {
             @Html.PagedListPager(
                      Model,
-                     page => Url.Action("AvailableTextFiles", new { page }),
+                     page => Url.Action("AvailableFiles", new { page }),
                      PagedListRenderOptions.OnlyShowFivePagesAtATime
                      )
         }

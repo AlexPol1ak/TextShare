@@ -24,6 +24,25 @@
 
             <!-- Имя, Отчество, Фамилия -->
             <p class="fw-bold mb-2">@Model.FirstName @Model.Patronymic @Model.LastName</p>
+            <div class="mb-3">
+                <a asp-action="UserShelvesAvAll" asp-controller="Shelves" asp-route-username="@Model.UserName"
+                   class="d-block text-decoration-none text-primary">
+                    📚 Общедоступные полки (@Model.CountAvailableShelves)
+                </a>
+                <a asp-action="UserFilesAvvAll" asp-controller="TextFile" asp-route-username="@Model.UserName"
+                   class="d-block text-decoration-none text-primary">
+                    📄 Общедоступные файлы (@Model.CountAvailableTextFiles)
+                </a>
+                <!-- только при Iam и Accepted -->
+                @if (Model.RelationshipTocurrentUser == FriendStatus.Iam || Model.RelationshipTocurrentUser == FriendStatus.Accepted)
+                {
+                    <a asp-action="UserFriends" asp-controller="Friends" asp-route-username="@Model.UserName"
+                       class="d-block text-decoration-none text-primary">
+                        👥 Друзья (@Model.CountFriends)
+                    </a>
+
+                }          
+            </div>
 
             <!-- Кнопки взаимодействия (выравниваем справа) -->
             <div class="text-end mb-3">
@@ -56,25 +75,6 @@
                    
                 }
             </div>
-
-            <!-- Кликабельные ссылки (только при Iam и Accepted) -->
-            @if (Model.RelationshipTocurrentUser == FriendStatus.Iam || Model.RelationshipTocurrentUser == FriendStatus.Accepted)
-            {
-                <div class="mb-3">
-                    <a asp-action="UserShelvesAvAll" asp-controller="Shelves" asp-route-username="@Model.UserName"
-                    class="d-block text-decoration-none text-primary">
-                        📚 Общедоступные полки (@Model.CountAvailableShelves)
-                    </a>
-                    <a asp-action="UserFilesAvvAll" asp-controller="TextFile" asp-route-username="@Model.UserName"
-                    class="d-block text-decoration-none text-primary">
-                        📄 Общедоступные файлы (@Model.CountAvailableTextFiles)
-                    </a>
-                    <a asp-action="UserFriends" asp-controller="Friends" asp-route-username="@Model.UserName"
-                    class="d-block text-decoration-none text-primary">
-                        👥 Друзья (@Model.CountFriends)
-                    </a>
-                </div>
-            }
 
             <!-- Информация о себе (если статус Iam или Accepted) -->
             @if (Model.RelationshipTocurrentUser == FriendStatus.Iam || Model.RelationshipTocurrentUser == FriendStatus.Accepted)

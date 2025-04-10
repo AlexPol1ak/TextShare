@@ -103,26 +103,25 @@ namespace TextShare.UI.Controllers
         [HttpGet("{username}/available-all")]
         public async Task<IActionResult> UserShelvesAvAll(string username, int page = 1)
         {
+            // Получаем информацию о пользователе
             User? viewedUser = await _userService.GetUserByUsernameAsync(username, u => u.Friendships);
             if (viewedUser == null)
             {
                 HttpContext.Items["ErrorMessage"] = $"Пользователь \"{username}\" не найден";
                 return NotFound();
             }
-            User currentUser = (await _userManager.GetUserAsync(User))!;
 
-            Friendship? frViewedUser = viewedUser.Friendships.Where(
-                f => (f.UserId == currentUser.Id || f.FriendId == currentUser.Id) && f.IsConfirmed == true
-                ).FirstOrDefault();
-            if (frViewedUser == null)
+            // Получаем все полки, доступные для всех (не только для друзей)
+            List<Shelf> shelvesViewedUser = (await _shelfService.GetAllUserShelvesAsync(viewedUser.Id, s => s.AccessRule))
+                .Where(s => s.AccessRule.AvailableAll == true) // Фильтрация общедоступных полок
+                .ToList();
+
+            // Если полок нет, показываем ошибку
+            if (shelvesViewedUser.Count == 0)
             {
-                HttpContext.Items["ErrorMessage"] = $"Вы не можете просматривать эту страницу";
+                HttpContext.Items["ErrorMessage"] = $"У пользователя нет общедоступных полок.";
                 return NotFound();
             }
-
-            // Все полки созданные пользователем и доступные всем.
-            List<Shelf> shelvesViewedUser = (await _shelfService.GetAllUserShelvesAsync(viewedUser.Id, s=>s.AccessRule))
-                .Where(s=>s.AccessRule.AvailableAll == true).ToList();
 
             ViewData["viewedUsername"] = viewedUser.UserName;
             return View(shelvesViewedUser.ToPagedList(page, 5));

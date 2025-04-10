@@ -381,39 +381,35 @@ namespace TextShare.UI.Controllers
         /// <summary>
         /// Отображает страницу с файлами доступными всем.
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="page"></param>
-        /// <returns></returns>
+        /// <param name="username">Имя пользователя, чьи файлы будут отображаться.</param>
+        /// <param name="page">Номер страницы для пагинации (по умолчанию 1).</param>
+        /// <returns>Представление с моделью файлов, доступных всем пользователям.</returns>
         [Authorize]
         [HttpGet("{username}/available-all")]
         public async Task<IActionResult> UserFilesAvvAll(string username, int page = 1)
         {
+            // Получаем информацию о пользователе
             User? viewedUser = await _userService.GetUserByUsernameAsync(username, u => u.Friendships);
             if (viewedUser == null)
             {
                 HttpContext.Items["ErrorMessage"] = $"Пользователь \"{username}\" не найден";
                 return NotFound();
             }
-            User currentUser = (await _userManager.GetUserAsync(User))!;
 
-            Friendship? frViewedUser = viewedUser.Friendships.Where(
-                f => (f.UserId == currentUser.Id || f.FriendId == currentUser.Id) && f.IsConfirmed == true
-                ).FirstOrDefault();
-            if (frViewedUser == null)
-            {
-                HttpContext.Items["ErrorMessage"] = $"Вы не можете просматривать эту страницу";
-                return NotFound();
-            }
-
+            // Получаем все файлы пользователя, доступные всем
             List<TextFile> files = await _textFileService.FindTextFilesAsync(
                 t => t.OwnerId == viewedUser.Id && t.AccessRule.AvailableAll == true
-                );
-            List<TextFileDetailShortModel> filesModel = await  TextFileDetailShortModel.FromTextFiles(files);
+            );
+
+            // Преобразуем в модель представления
+            List<TextFileDetailShortModel> filesModel = await TextFileDetailShortModel.FromTextFiles(files);
+
+            // Передаем имя пользователя в представление для отображения
             ViewData["viewedUsername"] = viewedUser.UserName;
 
+            // Возвращаем представление с пагинацией
             return View(filesModel.ToPagedList(page, 5));
         }
-
 
         /// <summary>
         /// Получает список файлов, доступных от друзей текущего пользователя.
@@ -462,7 +458,6 @@ namespace TextShare.UI.Controllers
             return View(avvFilesModel.ToPagedList(page, _fileUploadSettings.FilesPerPage));
 
         }
-
 
         /// <summary>
         /// Проверяет загружаемый файл в систему

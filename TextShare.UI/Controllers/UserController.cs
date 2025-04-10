@@ -235,10 +235,5 @@ namespace TextShare.UI.Controllers
             return View("UpdateUser", userUpdateModel);
 
         }
-
-
-
-
-
     }
 }
