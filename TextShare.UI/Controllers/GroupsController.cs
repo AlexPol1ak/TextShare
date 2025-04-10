@@ -417,11 +417,12 @@ namespace TextShare.UI.Controllers
             }
 
             User currentUser = (await _userManager.GetUserAsync(User))!;
+            bool isAdmin = User.IsInRole("Admin");
             GroupDetailModel groupDetailModel = await GroupDetailModel.FromGroup(group);
 
             if (group.CreatorId == currentUser.Id)
                 groupDetailModel.UserGroupRelationStatus = UserGroupRelationStatus.Creator;
-            else if (group.Members.Any(m => m.UserId == currentUser.Id && m.IsConfirmed == true))
+            else if ((group.Members.Any(m => m.UserId == currentUser.Id && m.IsConfirmed == true)) || isAdmin ==true)
                 groupDetailModel.UserGroupRelationStatus = UserGroupRelationStatus.Member;
             else if (group.Members.Any(m => m.UserId == currentUser.Id && m.IsConfirmed == false))
                 groupDetailModel.UserGroupRelationStatus = UserGroupRelationStatus.Requsted;
