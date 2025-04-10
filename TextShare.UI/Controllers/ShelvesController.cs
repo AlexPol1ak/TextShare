@@ -375,8 +375,10 @@ namespace TextShare.UI.Controllers
             // Если полка не найдена
             if (shelf == null) return NotFound();
             User? currentUser = await _userManager.GetUserAsync(User);
+            bool isAdmin = User.IsInRole("Admin");
+
             var result = await _accessСontrolService.CheckShelfAccess(currentUser, shelf);
-            if (result == true)
+            if (result == true || isAdmin ==true)
             {
                 ShelfDetailModel shelfDetailModel = ShelfDetailModel.FromShelf(shelf);
                 shelfDetailModel.CurrentUserId = currentUser?.Id ?? null;
@@ -386,7 +388,6 @@ namespace TextShare.UI.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
-            DebugHelper.ShowData(result);
 
             HttpContext.Items["ErrorMessage"] = "У вас нет доступа к этой полке";
             return BadRequest(); ;
