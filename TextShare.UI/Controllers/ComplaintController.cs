@@ -92,7 +92,7 @@ namespace TextShare.UI.Controllers
 
                 if (resp.Data is Group group)
                 {
-                    string name = group.Name.Count() > 1 ? group.Name.Substring(0, 20) : group.Name;
+                    string name = group.Name.Count() > 20 ? group.Name.Substring(0, 20) : group.Name;
                     message = $"Жалоба на полку\n{name}";
                 }
             }
@@ -108,7 +108,7 @@ namespace TextShare.UI.Controllers
 
                 if (resp.Data is TextFile file)
                 {
-                    string name = file.OriginalFileName.Count() > 1
+                    string name = file.OriginalFileName.Count() > 20
                         ? file.OriginalFileName.Substring(0, 20) : file.OriginalFileName;
                     message = $"Жалоба на полку\n{name}";
                 }

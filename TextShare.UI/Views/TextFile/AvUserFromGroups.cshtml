@@ -1,0 +1,32 @@
+﻿@using TextShare.Domain.Models.EntityModels.TextFileModels
+@using X.PagedList
+@model IPagedList<TextFileDetailShortModel>
+
+@{
+    ViewData["Title"] = "Файлы, доступные от групп";
+}
+
+<h2 class="mb-4">Файлы, доступные от групп</h2>
+
+<div class="mb-3">
+    <a asp-action="AvUserFromFriends" asp-controller="TextFile">
+        Файлы, доступные от друзей
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <p>Нет доступных файлов от групп.</p>
+}
+else
+{
+    await Html.RenderPartialAsync("_TextFilesListPartial", Model.ToList());
+
+    <div class="mt-3">
+        @Html.PagedListPager(
+                Model,
+                page => Url.Action("AvUserFromGroups", new { page }),
+                PagedListRenderOptions.OnlyShowFivePagesAtATime
+                )
+    </div>
+}

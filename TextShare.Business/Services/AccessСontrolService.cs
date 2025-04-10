@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -51,30 +52,37 @@ namespace TextShare.Business.Services
         public async Task<List<TextFile>> AvailableFilesFromGroups(int userId,
             params Expression<Func<TextFile, object>>[] includes)
         {
-            List<TextFile> files = new();
-
+            // Получаем пользователя с его группами и членствами
             User? user = await _userRepository.GetAsync(userId,
-                u => u.Groups, u => u.GroupMemberships
-                );
-            if (user == null)
-            {
-                return new List<TextFile>();
-            }
+                u => u.Groups, u => u.GroupMemberships);
 
-            // id групп в которых пользователь состоит
-            List<int> userGroupsIds = user.GroupMemberships
-                .Where(gm => gm.IsConfirmed == true)
+            if (user == null)
+                return new List<TextFile>();
+
+            // Собираем Id групп, в которых пользователь состоит и которые он создал
+            var groupIdsConfirmed = user.GroupMemberships
+                .Where(gm => gm.IsConfirmed)
                 .Select(gm => gm.GroupId)
                 .ToList();
 
-            // id групп созданных пользователем
-            userGroupsIds.AddRange(user.Groups.Select(g => g.GroupId));
-            userGroupsIds.Distinct();
+            var groupIdsOwned = user.Groups.Select(g => g.GroupId).ToList();
 
-            files = (await _textFileRepository.FindAsync(
-                t => t.AccessRule.AvailableGroups.Any(ag => userGroupsIds.Contains(ag.GroupId)),
-                includes
-                )).DistinctBy(f => f.TextFileId).ToList();
+            var userGroupsIds = groupIdsConfirmed.Concat(groupIdsOwned).Distinct().ToList();
+
+            // Получаем IQueryable файлов
+            IQueryable<TextFile> filesQuery = await _textFileRepository.GetAllAsync(); /
+
+            foreach (var include in includes)
+            {
+                filesQuery = filesQuery.Include(include);
+            }
+
+            // Фильтруем файлы по доступным группам
+            var files = await filesQuery
+                .Where(t => t.AccessRule.AvailableGroups
+                    .Any(ag => userGroupsIds.Contains(ag.GroupId)))
+                .Distinct()
+                .ToListAsync();
 
             return files;
         }

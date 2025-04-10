@@ -98,6 +98,18 @@ app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
 
 app.UseHttpsRedirection();
+
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.StartsWithSegments("/TextFiles"))
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+        context.Items["ErrorMessage"] = "Ах ты хитрюга, этот способ не работает";
+        return;
+    }
+    await next();
+});
+
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();

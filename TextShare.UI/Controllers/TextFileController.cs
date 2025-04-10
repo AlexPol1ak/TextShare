@@ -309,6 +309,7 @@ namespace TextShare.UI.Controllers
             if (!isAdmin)
             {
                 var hasAccess = await _accessСontrolService.CheckTextFileAccess(currentUser, textFile);
+                DebugHelper.ShowData(hasAccess);
                 if (hasAccess != true)
                 {
                     HttpContext.Items["ErrorMessage"] = "У вас нет доступа к этому файлу";
@@ -412,6 +413,37 @@ namespace TextShare.UI.Controllers
 
             return View(filesModel.ToPagedList(page, 5));
         }
+
+        [Authorize]
+        [HttpGet("shared-from-users")]
+        public async Task<IActionResult> AvUserFromFriends(int page = 1)
+        {
+
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+
+            List<TextFile> avFiles = await _accessСontrolService.AvailableFilesFromUsers(currentUser.Id,
+                f => f.Owner
+                );
+
+            List<TextFileDetailShortModel> avvFilesModel = await TextFileDetailShortModel.FromTextFiles(avFiles);
+            return View(avvFilesModel.ToPagedList(page, _fileUploadSettings.FilesPerPage));
+        }
+
+        [Authorize]
+        [HttpGet("shared-from-groups")]
+        public async Task<IActionResult> AvUserFromGroups(int page = 1)
+        {
+            User currentUser = (await _userManager.GetUserAsync(User))!;
+
+            List<TextFile> avFiles = await _accessСontrolService.AvailableFilesFromGroups(currentUser.Id,
+               f => f.Owner
+               );
+
+            List<TextFileDetailShortModel> avvFilesModel = await TextFileDetailShortModel.FromTextFiles(avFiles);
+            return View(avvFilesModel.ToPagedList(page, _fileUploadSettings.FilesPerPage));
+
+        }
+
 
         /// <summary>
         /// Проверяет загружаемый файл в систему
