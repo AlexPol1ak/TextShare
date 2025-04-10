@@ -33,29 +33,29 @@
                                 break;
                         case FriendStatus.Accepted:
                                 <a href="@Url.Action("DeleteFriend", "Friends", new { username = user.UserName, returnUrl = retrunUrl})"
-                                   class="btn btn-danger btn-sm">Удалить</a>
+                                   class="btn btn-outline-danger btn-sm2">Удалить</a>
                                 break;
 
                         case FriendStatus.Pending:
                         <a href="@Url.Action("AcceptFriendRequest", "Friends", new { username = user.UserName, returnUrl = retrunUrl })"
-                               class="btn btn-success btn-sm">✅Принять</a>
+                               class="btn btn-outline-success btn-sm2">✅Принять</a>
                         <a href="@Url.Action("DeleteFriend", "Friends", new { username = user.UserName, returnUrl = retrunUrl })"
-                               class="btn btn-danger btn-sm">Удалить</a>
+                               class="btn btn-outline-danger btn-sm2">Удалить</a>
                             break;
 
                         case FriendStatus.Requested:
                         <a href="@Url.Action("DeleteFriend", "Friends", new { username = user.UserName, returnUrl = retrunUrl })"
-                               class="btn btn-warning btn-sm">Отменить</a>
+                               class="btn btn-outline-warning btn-sm2">Отменить</a>
                             break;
 
                         case FriendStatus.None:
                         <a href="@Url.Action("SendFriendRequest", "Friends", new { username = user.UserName, returnUrl = retrunUrl })"
-                               class="btn btn-primary btn-sm">➕ Добавить</a>
+                               class="btn btn-outline-primary btn-sm2">➕ Добавить</a>
                             break;
 
                         default:
                         <a href="@Url.Action("SendFriendRequest", "Friends", new { username = user.UserName, returnUrl = retrunUrl })"
-                               class="btn btn-primary btn-sm"> Добавить</a>
+                               class="btn btn-outline-primary btn-sm2"> Добавить</a>
                             break;
                }
             </div>

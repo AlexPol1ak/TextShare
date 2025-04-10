@@ -18,6 +18,7 @@ header {
 main {
     flex: 1; /* Основной контент занимает всё доступное пространство */
     padding-bottom: 20px;
+    background-color: #edeff2;
 }
 
 footer {
@@ -49,3 +50,5 @@ footer {
     padding-left: 15px;
     padding-right: 15px;
 }
+
+

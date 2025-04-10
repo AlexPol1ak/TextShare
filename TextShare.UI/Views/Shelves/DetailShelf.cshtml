@@ -35,13 +35,13 @@
 {
     <a asp-controller="TextFile" asp-action="Upload" asp-route-shelfId="@Model.ShelfId" 
     class="btn btn-outline-success mt-3">Добавить файл</a>
-    <a asp-action="EditShelf" asp-route-id="@Model.ShelfId" class="btn btn-primary mt-3">Редактировать</a>
+    <a asp-action="EditShelf" asp-route-id="@Model.ShelfId" class="btn btn-outline-primary mt-3">Редактировать</a>
     <a asp-action="ShelfAccessRuleEdit" asp-controller="AccessControl" 
-    asp-route-shelfId="@Model.ShelfId" class="btn btn-warning mt-3">Управление доступом</a>
-    <a asp-action="DeleteShelf" asp-controller="Shelves" asp-route-id="@Model.ShelfId" class="btn btn-danger mt-3">Удалить</a>
+    asp-route-shelfId="@Model.ShelfId" class="btn btn-outline-warning mt-3">Управление доступом</a>
+    <a asp-action="DeleteShelf" asp-controller="Shelves" asp-route-id="@Model.ShelfId" class="btn btn-outline-danger mt-3">Удалить</a>
 }
 else
 {
-    <a class="btn btn-danger mt-3"
+    <a class="btn btn-outline-danger mt-3"
        asp-action="Add" asp-controller="Complaint" asp-route-shelfId="@Model.ShelfId">Пожаловаться</a>
 }

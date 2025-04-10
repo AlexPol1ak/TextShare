@@ -34,7 +34,7 @@
                         <form asp-action="LeaveGroup" asp-controller="Groups" asp-route-groupId="@group.GroupId"
                             method="post" class="d-inline">
                             <input type="hidden" name="returnUrl" value="@returnUrl" />
-                            <button type="submit" class="btn btn-danger btn-sm">Покинуть</button>
+                            <button type="submit" class="btn btn-outline-danger btn-sm2">Покинуть</button>
                         </form>
                         break;
 
@@ -43,7 +43,7 @@
                         <form asp-action="LeaveGroup" asp-controller="Groups" asp-route-groupId="@group.GroupId"
                             method="post" class="d-inline">
                             <input type="hidden" name="returnUrl" value="@returnUrl" />
-                            <button type="submit" class="btn btn-warning btn-sm">Отменить</button>
+                            <button type="submit" class="btn btn-outline-warning btn-sm2">Отменить</button>
                         </form>
                         break;
 
@@ -51,13 +51,13 @@
                         <form asp-action="JoinGroup" asp-controller="Groups" method="post" class="d-inline">
                             <input type="hidden" name="groupId" value="@group.GroupId" />
                             <input type="hidden" name="returnUrl" value="@returnUrl" />
-                            <button type="submit" class="btn btn-primary btn-sm">Вступить</button>
+                            <button type="submit" class="btn btn-outline-primary btn-sm2">Вступить</button>
                         </form>
                         break;
                 }
 
                 <a asp-action="DetailGroup" asp-controller="Groups" asp-route-groupId="@group.GroupId"
-                   class="btn btn-primary btn-sm" target="_blank">Открыть</a>
+                   class="btn btn-outline-primary btn-sm2" target="_blank">Открыть</a>
 
             </div>
         </li>

@@ -1,47 +1,60 @@
-﻿@{
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-            @if (User.Identity.IsAuthenticated)
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<User> UserManager
+
+<div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav ms-auto">
+        @if (User.Identity.IsAuthenticated)
+        {
+            // Проверка, является ли пользователь админом
+            var isAdmin = User.IsInRole("Admin");
+
+            if (isAdmin)
             {
                 <li class="nav-item">
-                    <a class="nav-link" asp-controller="User" asp-action="DetailsUser">
-                        <i class="fas fa-user"></i> Моя страница
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Shelves" asp-action="MyShelves">
-                        <i class="fas fa-book"></i> Полки
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Friends" asp-action="MyFriends">
-                        <i class="fas fa-users"></i> Друзья
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Groups" asp-action="MyGroups">
-                        <i class="fa fa-street-view"></i> Группы
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Account" asp-action="Logout">
-                        <i class="fas fa-sign-out-alt"></i> Выход
+                    <a class="nav-link" asp-controller="Complaint" asp-action="ViewComplaints">
+                        <i class="fas fa-tools"></i> Панель администратора
                     </a>
                 </li>
             }
-            else
-            {
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Account" asp-action="Login">
-                        <i class="fas fa-sign-in-alt"></i> Войти
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Account" asp-action="Register">
-                        <i class="fas fa-user-plus"></i> Регистрация
-                    </a>
-                </li>
-            }
-        </ul>
-    </div>
-}
+
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="User" asp-action="DetailsUser">
+                    <i class="fas fa-user"></i> Моя страница
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Shelves" asp-action="MyShelves">
+                    <i class="fas fa-book"></i> Полки
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Friends" asp-action="MyFriends">
+                    <i class="fas fa-users"></i> Друзья
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Groups" asp-action="MyGroups">
+                    <i class="fa fa-street-view"></i> Группы
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Account" asp-action="Logout">
+                    <i class="fas fa-sign-out-alt"></i> Выход
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Account" asp-action="Login">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Account" asp-action="Register">
+                    <i class="fas fa-user-plus"></i> Регистрация
+                </a>
+            </li>
+        }
+    </ul>
+</div>

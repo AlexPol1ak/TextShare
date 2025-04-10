@@ -42,7 +42,7 @@
 
             if (Model.UserGroupRelationStatus == UserGroupRelationStatus.Member)
             {
-                <a class="btn btn-danger mt-3"
+                <a class="btn btn-outline-danger mt-3"
                    asp-action="Add" asp-controller="Complaint" asp-route-groupId="@Model.GroupId">Пожаловаться</a>
                 
             }         
@@ -55,7 +55,7 @@
             <form asp-action="JoinGroup" asp-controller="Groups" method="post" class="d-inline">
                 <input type="hidden" name="groupId" value="@Model.GroupId" />
                 <input type="hidden" name="returnUrl" value="@returnUrl" />
-                <button type="submit" class="btn btn-primary btn-sm3">Подать заявку</button>
+                <button type="submit" class="btn btn-outline-primary btn-sm23">Подать заявку</button>
             </form>
         }
         else if (Model.UserGroupRelationStatus == UserGroupRelationStatus.Requsted)
@@ -64,7 +64,7 @@
             <form asp-controller="Groups" asp-action="LeaveGroup" asp-route-groupId="@Model.GroupId"
             class="d-inline" method="post">
                 <input type="hidden" name="returnUrl" value="@returnUrl" />
-                <button type="submit" class="btn btn-danger">Отменить заявку</button>
+                <button type="submit" class="btn btn-outline-danger">Отменить заявку</button>
             </form>
         }
 

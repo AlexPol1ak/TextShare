@@ -38,24 +38,25 @@
 
         <div class="mt-3">
             <a asp-action="Download" asp-controller="TextFile"
-            asp-route-uniquename="@Model.UniqueFileNameWithoutExtension" class="btn btn-primary">Скачать</a>
+            asp-route-uniquename="@Model.UniqueFileNameWithoutExtension" class="btn btn-outline-primary btn-sm22">Скачать</a>
 
             @if (Model.CurrentUserId != null && Model.CurrentUserId == Model.Owner.Id)
             {
-                <a asp-action="EditDescription" asp-controller="TextFile" asp-route-id="@Model.TextFileId" class="btn btn-secondary">Изменить описание</a>
+                <a asp-action="EditDescription" asp-controller="TextFile" asp-route-id="@Model.TextFileId" 
+                class="btn btn-outline-info btn-sm22">Изменить описание</a>
                 <a asp-action="TextFileAccessRuleEdit" asp-controller="AccessControl"
-                asp-route-uniqueName="@Model.UniqueFileNameWithoutExtension" class="btn btn-warning">Управление доступом</a>
+                asp-route-uniqueName="@Model.UniqueFileNameWithoutExtension" class="btn btn-outline-warning btn-sm22">Управление доступом</a>
                 <p></p>
                 <form asp-action="Delete" asp-controller="TextFile"
                 asp-route-uniquename="@Model.UniqueFileNameWithoutExtension"
                 method="post"
                 onsubmit="return confirm('Вы уверены, что хотите удалить этот файл?');">
-                    <button type="submit" class="btn btn-danger">Удалить</button>
+                    <button type="submit" class="btn btn-outline-danger bt-sm2">Удалить</button>
                 </form>
             }
             else
             {
-                <a class="btn btn-danger mt-3"
+                <a class="btn btn-outline-danger bt-sm2"
                    asp-action="Add" asp-controller="Complaint" asp-route-uniquename="@Model.UniqueFileNameWithoutExtension">Пожаловаться</a>
             }
         </div>

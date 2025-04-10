@@ -30,7 +30,7 @@
                             <option value="@friend.Id">@friend.UserName</option>
                         }
                     </select>
-                    <button type="button" class="btn btn-primary mt-2" id="addUserBtn">Добавить</button>
+                    <button type="button" class="btn btn-outline-primary mt-2" id="addUserBtn">Добавить</button>
                 </div>
 
                 <div class="w-50 ms-3">
@@ -41,7 +41,7 @@
                             <option value="@user.Id" selected>@user.UserName</option>
                         }
                     </select>
-                    <button type="button" class="btn btn-danger mt-2" id="removeUserBtn">Удалить</button>
+                    <button type="button" class="btn btn-outline-danger mt-2" id="removeUserBtn">Удалить</button>
                 </div>
             </div>
         </div>
@@ -57,7 +57,7 @@
                             <option value="@group.GroupId">@group.Name</option>
                         }
                     </select>
-                    <button type="button" class="btn btn-primary mt-2" id="addGroupBtn">Добавить</button>
+                    <button type="button" class="btn btn-outline-primary mt-2" id="addGroupBtn">Добавить</button>
                 </div>
 
                 <div class="w-50 ms-3">
@@ -68,7 +68,7 @@
                             <option value="@group.GroupId">@group.Name</option>
                         }
                     </select>
-                    <button type="button" class="btn btn-danger mt-2" id="removeGroupBtn">Удалить</button>
+                    <button type="button" class="btn btn-outline-danger mt-2" id="removeGroupBtn">Удалить</button>
                 </div>
             </div>
         </div>
@@ -80,9 +80,9 @@
     </div>
 
     <div class="mt-4">
-        <button type="submit" class="btn btn-success">Сохранить</button>
+        <button type="submit" class="btn btn-outline-success">Сохранить</button>
         <a href="@Url.Action("DetailTextFile", "TextFile", 
-            new { uniquename = Model.UniqueFileNameWithoutExtension})" class="btn btn-secondary">Отмена</a>
+            new { uniquename = Model.UniqueFileNameWithoutExtension})" class="btn btn-outline-secondary">Отмена</a>
     </div>
 </form>
 

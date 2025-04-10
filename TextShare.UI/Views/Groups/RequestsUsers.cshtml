@@ -38,13 +38,13 @@
                                 <form asp-controller="Groups" asp-action="AcceptRequest" asp-route-groupId="@Model.Group.GroupId"
                                       asp-route-username="@member.UserName" asp-route-returnUrl="@Context.Request.Path"
                                       method="post">
-                                    <button type="submit" class="btn btn-success btn-sm">Принять</button>
+                                    <button type="submit" class="btn btn-outline-success btn-sm2">Принять</button>
                                 </form>
 
                                 <form asp-controller="Groups" asp-action="DeleteMember" asp-route-groupId="@Model.Group.GroupId"
                                       asp-route-username="@member.UserName" asp-route-returnUrl="@Context.Request.Path"
                                       method="post">
-                                    <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                                    <button type="submit" class="btn btn-outline-danger btn-sm2">Удалить</button>
                                 </form>
                             </div>
 

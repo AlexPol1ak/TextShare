@@ -18,7 +18,7 @@
 
             <form asp-action="UploadAvatar" asp-controller="User" method="post" enctype="multipart/form-data">
                 <input type="file" name="avatar" id="avatarInput" class="form-control mb-2" accept="image/*" onchange="previewAvatar(event)">
-                <button type="submit" id="uploadButton" class="btn btn-outline-primary btn-sm" disabled>Загрузить фото</button>
+                <button type="submit" id="uploadButton" class="btn btn-outline-primary btn-sm22" disabled>Загрузить фото</button>
             </form>
 
             <script>
@@ -81,8 +81,8 @@
 
                 <!-- Кнопки -->
                 <div class="d-flex justify-content-between mt-4">
-                    <a asp-action="DetailsUser" asp-controller="User" class="btn btn-secondary">Отмена</a>
-                    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    <a asp-action="DetailsUser" asp-controller="User" class="btn btn-outline-secondary bt-sm2">Отмена</a>
+                    <button type="submit" class="btn btn-outline-primary btn-sm22">Сохранить изменения</button>
                 </div>
             </form>
         </div>

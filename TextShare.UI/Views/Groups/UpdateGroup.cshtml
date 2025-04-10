@@ -44,12 +44,12 @@
 
     <!-- Кнопки -->
     <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-primary">Сохранить</button>
-        <a asp-action="DetailGroup" asp-controller="Groups" asp-route-groupId="@Model.GroupId" class="btn btn-secondary">Отмена</a>
+        <button type="submit" class="btn btn-outline-primary">Сохранить</button>
+        <a asp-action="DetailGroup" asp-controller="Groups" asp-route-groupId="@Model.GroupId" class="btn btn-outline-secondary">Отмена</a>
     </div>
 </form>
 <br />
-<a asp-action="DeleteGroup" asp-controller="Groups" asp-route-groupId="@Model.GroupId" class="btn btn-danger">Удалить группу</a>
+<a asp-action="DeleteGroup" asp-controller="Groups" asp-route-groupId="@Model.GroupId" class="btn btn-outline-danger">Удалить группу</a>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
