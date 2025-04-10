@@ -414,6 +414,16 @@ namespace TextShare.UI.Controllers
             return View(filesModel.ToPagedList(page, 5));
         }
 
+
+        /// <summary>
+        /// Получает список файлов, доступных от друзей текущего пользователя.
+        /// </summary>
+        /// <param name="page">Номер страницы для пагинации (по умолчанию 1).</param>
+        /// <returns>Представление с файлами, доступными от друзей, с пагинацией.</returns>
+        /// <remarks>
+        /// Метод использует сервис для получения файлов, доступных от пользователей, являющихся друзьями текущего пользователя.
+        /// Файлы передаются в модель, которая используется для отображения на странице с пагинацией.
+        /// </remarks>
         [Authorize]
         [HttpGet("shared-from-users")]
         public async Task<IActionResult> AvUserFromFriends(int page = 1)
@@ -429,6 +439,15 @@ namespace TextShare.UI.Controllers
             return View(avvFilesModel.ToPagedList(page, _fileUploadSettings.FilesPerPage));
         }
 
+        /// <summary>
+        /// Получает список файлов, доступных от групп, в которых состоит текущий пользователь.
+        /// </summary>
+        /// <param name="page">Номер страницы для пагинации (по умолчанию 1).</param>
+        /// <returns>Представление с файлами, доступными от групп, с пагинацией.</returns>
+        /// <remarks>
+        /// Метод использует сервис для получения файлов, доступных от групп, в которых состоит текущий пользователь.
+        /// Файлы передаются в модель, которая используется для отображения на странице с пагинацией.
+        /// </remarks>
         [Authorize]
         [HttpGet("shared-from-groups")]
         public async Task<IActionResult> AvUserFromGroups(int page = 1)

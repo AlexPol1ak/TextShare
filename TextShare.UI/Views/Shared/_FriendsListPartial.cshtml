@@ -2,7 +2,7 @@
 @model List<FriendshipSatusModel>
 
 @{
-    var retrunUrl = Context.Request.Path;
+    var retrunUrl = Context.Request.Path + Context.Request.QueryString;
 }
 
 <ul class="list-group">

@@ -70,7 +70,7 @@ namespace TextShare.Business.Services
             var userGroupsIds = groupIdsConfirmed.Concat(groupIdsOwned).Distinct().ToList();
 
             // Получаем IQueryable файлов
-            IQueryable<TextFile> filesQuery = await _textFileRepository.GetAllAsync(); /
+            IQueryable<TextFile> filesQuery = await _textFileRepository.GetAllAsync(); 
 
             foreach (var include in includes)
             {

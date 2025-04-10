@@ -2,7 +2,7 @@
 @model List<GroupDetailModel>
 
 @{
-    var returnUrl = Context.Request.Path;
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
 }
 
 <ul class="list-group">

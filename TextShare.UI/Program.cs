@@ -13,6 +13,7 @@ using Microsoft.DotNet.Scaffolding.Shared;
 using TextShare.UI.Data;
 using Microsoft.AspNetCore.DataProtection.KeyManagement.Internal;
 using System;
+using TextShare.UI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +53,12 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+// Фильтр разлогирует пользователей с старыми куками
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<EnsureUserExistsFilter>();
+});
 
 builder.Services.Configure<ImageUploadSettings>(builder.Configuration.GetSection("ImageUploadSettings"));
 builder.Services.Configure<ShelvesSettings>(builder.Configuration.GetSection("ShelvesSettings"));
@@ -99,16 +106,9 @@ app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
 app.UseHttpsRedirection();
 
-app.Use(async (context, next) =>
-{
-    if (context.Request.Path.StartsWithSegments("/TextFiles"))
-    {
-        context.Response.StatusCode = StatusCodes.Status403Forbidden;
-        context.Items["ErrorMessage"] = "Ах ты хитрюга, этот способ не работает";
-        return;
-    }
-    await next();
-});
+
+//  Блокировка доступа к /TextFiles извне
+app.UseBlockTextFiles();
 
 app.UseStaticFiles();
 app.UseRouting();
@@ -122,7 +122,7 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 
-//DbInitData initData = new(app);
-//await initData.SeedData();
+DbInitData initData = new(app);
+await initData.SeedData();
 
 app.Run();
