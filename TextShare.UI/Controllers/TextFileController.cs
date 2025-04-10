@@ -34,6 +34,7 @@ namespace TextShare.UI.Controllers
         private readonly IAccessСontrolService _accessСontrolService;
         private readonly IAccessRuleService _accessRuleService;
         private readonly ITextFileService _textFileService;
+        private readonly ILogger<TextFileController> _logger;
         public TextFileController(
             IPhysicalFile physicalFile,
             IOptions<ImageUploadSettings> imageUploadSettingsOptions,
@@ -45,7 +46,8 @@ namespace TextShare.UI.Controllers
             ICategoryService categoryService,
             IAccessСontrolService accessСontrolService,
             IAccessRuleService accessRuleService,
-            ITextFileService textFileService
+            ITextFileService textFileService,
+            ILogger<TextFileController> logger
             ) 
             : base(physicalFile, imageUploadSettingsOptions)
         {
@@ -58,6 +60,7 @@ namespace TextShare.UI.Controllers
             _accessСontrolService = accessСontrolService;
             _accessRuleService = accessRuleService;
             _textFileService = textFileService;
+            _logger = logger;
                
         }
 
@@ -211,30 +214,58 @@ namespace TextShare.UI.Controllers
         /// </summary>
         /// <param name="uniquename"></param>
         /// <returns></returns>
-
         [HttpGet("{uniquename}")]
         public async Task<IActionResult> DetailTextFile(string uniquename)
         {
+            // Получение файла с загрузкой связанных сущностей
             TextFile? textFile = (await _textFileService.FindTextFilesAsync(
                 t => t.UniqueFileNameWithoutExtension == uniquename,
-                t=>t.Owner, t=>t.TextFileCategories, t=>t.Shelf
-                )).FirstOrDefault();          
+                t => t.Owner,
+                t => t.TextFileCategories,
+                t => t.Shelf,
+                t => t.AccessRule,
+                t => t.AccessRule.AvailableUsers,
+                t => t.AccessRule.AvailableGroups
+            )).FirstOrDefault();
 
-            if(textFile == null)
+            if (textFile == null)
             {
                 HttpContext.Items["ErrorMessage"] = "Файл не найден";
                 return BadRequest();
             }
 
-            List<int> fileCategoriesIds = textFile.TextFileCategories.Select(c => c.CategoryId).ToList();
+            // Получаем текущего пользователя (может быть null)
+            User? currentUser = await _userManager.GetUserAsync(User);
+
+            // Проверка: если не админ, проверяем доступ по правилам
+            bool isAdmin = false;
+            if (currentUser != null)
+            {
+                isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
+            }
+
+            if (!isAdmin)
+            {
+                var hasAccess = await _accessСontrolService.CheckTextFileAccess(currentUser, textFile);
+                if (hasAccess != true)
+                {
+                    HttpContext.Items["ErrorMessage"] = "У вас нет доступа к этому файлу";
+                    return BadRequest();
+                }
+            }
+
+            // Категории файла
+            List<int> fileCategoriesIds = textFile.TextFileCategories
+                .Select(c => c.CategoryId)
+                .ToList();
+
             List<Category> fileCategories = await _categoryService.FindCategoriesAsync(
-                cat => fileCategoriesIds.Any(id => id == cat.CategoryId)
-                );
+                cat => fileCategoriesIds.Contains(cat.CategoryId)
+            );
 
-            User? currentUser  = await _userManager.GetUserAsync(User);
-            TextFileDetailModel model = TextFileDetailModel.FromTextFile(textFile, currentUser?.Id ?? null );
+            // Формируем модель представления
+            TextFileDetailModel model = TextFileDetailModel.FromTextFile(textFile, currentUser?.Id);
             model.Categories = fileCategories;
-
 
             return View(model);
         }
@@ -247,38 +278,61 @@ namespace TextShare.UI.Controllers
         [HttpGet("download/{uniquename}")]
         public async Task<IActionResult> Download(string uniquename)
         {
+            // Получение файла и связанных данных
             List<TextFile> textFiles = await _textFileService.FindTextFilesAsync(
                 t => t.UniqueFileNameWithoutExtension == uniquename,
-                t => t.AccessRule, t => t.AccessRule.AvailableGroups, t => t.AccessRule.AvailableUsers,
+                t => t.AccessRule,
+                t => t.AccessRule.AvailableGroups,
+                t => t.AccessRule.AvailableUsers,
                 t => t.Owner
-                );
-            if(textFiles.Count < 0)
+            );
+            // Если файл не найден
+            if (textFiles.Count == 0)
             {
                 HttpContext.Items["ErrorMessage"] = "Файл не найден";
                 return BadRequest();
-
             }
+
             TextFile textFile = textFiles[0];
+
+            // Получаем текущего пользователя (может быть null, если не авторизован)
             User? currentUser = await _userManager.GetUserAsync(User);
-            var result = await _accessСontrolService.CheckTextFileAccess(currentUser, textFile);
-            if(result != true)
+
+            // Если пользователь не авторизован или не является админом — проверяем доступ по правилам
+            bool isAdmin = false;
+            if (currentUser != null)
             {
-                HttpContext.Items["ErrorMessage"] = "У вас нет доступа к этому файлу";
-                return BadRequest();
+                isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
             }
 
+            // Если не admin проверяем правила доступа к файлу.
+            if (!isAdmin)
+            {
+                var hasAccess = await _accessСontrolService.CheckTextFileAccess(currentUser, textFile);
+                if (hasAccess != true)
+                {
+                    HttpContext.Items["ErrorMessage"] = "У вас нет доступа к этому файлу";
+                    return BadRequest();
+                }
+            }
+
+            // Путь к файлу
             Dictionary<string, string?> filePaths = await _physicalFile.GetFile(
                 textFile.UniqueFileName, "TextFiles"
-                );
-            string? relativePath = filePaths.GetValueOrDefault("relativePath");
+            );
 
-            if(relativePath == null)
+            // Если не найден физический файл
+            string? relativePath = filePaths.GetValueOrDefault("relativePath");
+            if (relativePath == null)
             {
                 HttpContext.Items["ErrorMessage"] = "Файл не найден!";
                 return BadRequest();
             }
-            return new VirtualFileResult(relativePath, textFile.ContentType) 
-            { FileDownloadName = textFile.OriginalFileName };
+
+            return new VirtualFileResult(relativePath, textFile.ContentType)
+            {
+                FileDownloadName = textFile.OriginalFileName
+            };
         }
 
         /// <summary>
@@ -322,8 +376,6 @@ namespace TextShare.UI.Controllers
             // Перенаправление после удаления
             return RedirectToAction("DetailShelf", "Shelves", new { id = shelfId });
         }
-
-
 
         /// <summary>
         /// Отображает страницу с файлами доступными всем.
