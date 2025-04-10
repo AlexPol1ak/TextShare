@@ -5,17 +5,16 @@
 
     string Title = "Полученные запросы в друзья";
     ViewData["Title"] = Title;
-
 }
 
-<div class="d-flex align-items-start">
+<div class="row">
     <!-- Ссылки слева -->
-    <div class="w-20 ms-0 ps-2">
+    <div class="col-12 col-md-2 mb-3">
         <partial name="_FriendsLinksPartial" />
     </div>
 
     <!-- результат справа -->
-    <div class="w-50 border rounded p-3 overflow-auto ms-3">
+    <div class="col-12 col-md-9 border rounded p-3">
         <h2>@Title</h2>
 
         @if (Model.Any())
@@ -26,16 +25,10 @@
                      page => Url.Action("FriendsInRequests", new { page }),
                      PagedListRenderOptions.OnlyShowFivePagesAtATime
                      )
-
         }
         else
         {
-            <p>
-                Нет входящих запросов
-            </p>
-
-
+            <p>Нет входящих запросов</p>
         }
-
     </div>
 </div>

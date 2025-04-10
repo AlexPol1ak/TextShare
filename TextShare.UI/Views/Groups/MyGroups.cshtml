@@ -1,41 +1,35 @@
 ﻿@using TextShare.Domain.Models.EntityModels.GroupModels
 
-
 @{
     @model IPagedList<GroupDetailModel>
     string Title = "Группы";
     ViewData["Title"] = Title;
-
 }
 
-<div class="d-flex align-items-start">
+<div class="row g-3">
     <!-- Ссылки слева -->
-    <div class="w-20 ms-0 ps-2">
+    <div class="col-12 col-md-4 col-lg-2">
         <partial name="_GroupsLinksPartial" />
     </div>
 
-    <!-- результат справа -->
-    <div class="w-50 rounded p-3 overflow-auto ms-3">
-        <h2>@Title</h2>
+    <!-- Результат справа -->
+    <div class="col-12 col-md-8 col-lg-9">
+        <div class="rounded p-3">
+            <h2>@Title</h2>
 
-        @if (Model.Any())
-        {
-            await Html.RenderPartialAsync("_GroupsListPartial", Model.ToList());
-            @Html.PagedListPager(
-                              Model,
-                              page => Url.Action("MyGroups", new { page }),
-                              PagedListRenderOptions.OnlyShowFivePagesAtATime
-                              )
-
-        }
-        else
-        {
-                <p>Вы не состоите в группах.
-                    
-                </p>
-
-
-        }
-
+            @if (Model.Any())
+            {
+                await Html.RenderPartialAsync("_GroupsListPartial", Model.ToList());
+                @Html.PagedListPager(
+                         Model,
+                         page => Url.Action("MyGroups", new { page }),
+                         PagedListRenderOptions.OnlyShowFivePagesAtATime
+                         )
+            }
+            else
+            {
+                <p>Вы не состоите в группах.</p>
+            }
+        </div>
     </div>
 </div>

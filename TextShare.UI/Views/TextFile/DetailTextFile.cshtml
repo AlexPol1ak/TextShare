@@ -42,8 +42,8 @@
 
             @if (Model.CurrentUserId != null && Model.CurrentUserId == Model.Owner.Id)
             {
-                <a asp-action="EditDescription" asp-controller="TextFile" asp-route-id="@Model.TextFileId" 
-                class="btn btn-outline-info btn-sm22">Изменить описание</a>
+                @* <a asp-action="EditDescription" asp-controller="TextFile" asp-route-id="@Model.TextFileId" 
+                class="btn btn-outline-info btn-sm22">Изменить описание</a> *@
                 <a asp-action="TextFileAccessRuleEdit" asp-controller="AccessControl"
                 asp-route-uniqueName="@Model.UniqueFileNameWithoutExtension" class="btn btn-outline-warning btn-sm22">Управление доступом</a>
                 <p></p>

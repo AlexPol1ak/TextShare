@@ -6,14 +6,14 @@
     ViewData["Title"] = $"Участники группы \"{Model.Group.Name}\"";
 }
 
-<div class="d-flex align-items-start">
+<div class="row">
     <!-- Ссылки справа -->
-    <div class="w-25 border-start p-3 ms-3">
+    <div class="col-12 col-md-4 border-start p-3">
         <partial name="_GroupDetailLinksPartial" model="Model.Group" />
     </div>
 
     <!-- Список участников слева -->
-    <div class="w-75 p-3">
+    <div class="col-12 col-md-8 p-3">
         <h2>@ViewData["Title"]</h2>
 
         @if (Model.Members.Any())
@@ -23,8 +23,8 @@
                 {
                     <li class="list-group-item d-flex align-items-center justify-content-between">
                         <div class="d-flex align-items-center">
-                            <img src="@(member.AvatarUri ?? "/Images/default_user.png")" 
-                                alt="Avatar" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+                            <img src="@(member.AvatarUri ?? "/Images/default_user.png")"
+                                 alt="Avatar" class="rounded-circle me-3" style="width: 50px; height: 50px;">
                             <div>
                                 <strong>@member.FirstName @member.LastName</strong>
                                 <br>

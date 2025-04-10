@@ -9,14 +9,14 @@
     ViewData["Title"] = "Результаты поиска групп";
 }
 
-<div class="d-flex align-items-start">
+<div class="row">
     <!-- Ссылки слева -->
-    <div class="w-20 ms-0 ps-2">
+    <div class="col-12 col-md-2">
         <partial name="_GroupsLinksPartial" />
     </div>
 
     <!-- Результаты поиска справа -->
-    <div class="w-50 rounded p-3 overflow-auto ms-3">
+    <div class="col-12 col-md-9 offset-md-1 rounded p-3">
         <h2>@ViewData["Title"]</h2>
 
         <!-- Форма поиска -->
@@ -26,11 +26,13 @@
         {
             await Html.RenderPartialAsync("_GroupsListPartial", Model.ToList());
 
-            @Html.PagedListPager(
-                     Model,
-                     page => Url.Action("SearchGroups", new { groupName = Context.Request.Query["groupName"], page }),
-                     PagedListRenderOptions.OnlyShowFivePagesAtATime
-                     )
+            <div class="mt-3">
+                @Html.PagedListPager(
+                         Model,
+                         page => Url.Action("SearchGroups", new { groupName = Context.Request.Query["groupName"], page }),
+                         PagedListRenderOptions.OnlyShowFivePagesAtATime
+                         )
+            </div>
         }
         else
         {

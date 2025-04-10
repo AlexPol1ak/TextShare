@@ -8,19 +8,18 @@
     var returnUrl = Context.Request.Path;
 }
 
-<div class="d-flex align-items-start">
+<div class="row">
     <!-- Ссылки слева -->
-    @if (Model.UserGroupRelationStatus == UserGroupRelationStatus.Member || 
-       Model.UserGroupRelationStatus == UserGroupRelationStatus.Creator
-    )
+    @if (Model.UserGroupRelationStatus == UserGroupRelationStatus.Member ||
+    Model.UserGroupRelationStatus == UserGroupRelationStatus.Creator)
     {
-        <div class="w-25 me-3">
+        <div class="col-12 col-md-3 mb-3 mb-md-0">
             <partial name="_GroupDetailLinksPartial" model="Model" />
-        </div>       
+        </div>
     }
 
     <!-- Информация о группе справа -->
-    <div class="w-50 p-3 border rounded">
+    <div class="col-12 col-md-8 offset-md-1 border rounded p-3">
         <h2>@Model.Name</h2>
 
         @if (!string.IsNullOrEmpty(Model.ImageUri))
@@ -29,23 +28,22 @@
         }
 
         @if (Model.UserGroupRelationStatus == UserGroupRelationStatus.Member ||
-          Model.UserGroupRelationStatus == UserGroupRelationStatus.Creator
-        )
+        Model.UserGroupRelationStatus == UserGroupRelationStatus.Creator)
         {
             <p><strong>Описание:</strong> @Model.Description</p>
             <p><strong>Создана:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy")</p>
-            <p><strong>Владелец:</strong>
+            <p>
+                <strong>Владелец:</strong>
                 <a asp-controller="User" asp-action="DetailsUserByUserName" asp-route-username="@Model.Creator.UserName">
                     @Model.Creator.UserName
                 </a>
             </p>
 
-            if (Model.UserGroupRelationStatus == UserGroupRelationStatus.Member)
+            @if (Model.UserGroupRelationStatus == UserGroupRelationStatus.Member)
             {
                 <a class="btn btn-outline-danger mt-3"
                    asp-action="Add" asp-controller="Complaint" asp-route-groupId="@Model.GroupId">Пожаловаться</a>
-                
-            }         
+            }
         }
 
         @if (Model.UserGroupRelationStatus == UserGroupRelationStatus.NotMember)
@@ -62,11 +60,10 @@
         {
             <p class="text-warning">Заявка отправлена</p>
             <form asp-controller="Groups" asp-action="LeaveGroup" asp-route-groupId="@Model.GroupId"
-            class="d-inline" method="post">
+                  class="d-inline" method="post">
                 <input type="hidden" name="returnUrl" value="@returnUrl" />
                 <button type="submit" class="btn btn-outline-danger">Отменить заявку</button>
             </form>
         }
-
     </div>
 </div>

@@ -4,23 +4,22 @@
 @{
     string Title = "Поиск людей";
     ViewData["Title"] = Title;
-    
 }
 
-<div class="d-flex align-items-start">
+<div class="row">
     <!-- Ссылки слева -->
-    <div class="w-40 align-content-lg-start ms-0 ps-2">
+    <div class="col-12 col-md-2 mb-3">
         <partial name="_FriendsLinksPartial" />
     </div>
 
     <!-- Основной контент -->
-    <div class="w-75 ms-5">
+    <div class="col-12 col-md-10">
         <h2>@Title</h2>
 
         <!-- Контейнер для формы и результатов -->
-        <div class="d-flex justify-content-between align-items-start">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start">
             <!-- Форма поиска -->
-            <div class="w-50">
+            <div class="w-100 w-md-50 mb-3 mb-md-0">
                 <form method="get" asp-controller="Friends" asp-action="FriendsSearch" class="mb-3">
                     <div class="input-group">
                         <input type="text" name="search" class="form-control" placeholder="Введите имя пользователя">
@@ -30,15 +29,15 @@
                 @if (Model.Any())
                 {
                     @Html.PagedListPager(
-                                      Model,
-                                      page => Url.Action("FriendsSearch", new { search = Context.Request.Query["search"], page }),
-                                      PagedListRenderOptions.OnlyShowFivePagesAtATime
-                                      )
+                             Model,
+                             page => Url.Action("FriendsSearch", new { search = Context.Request.Query["search"], page }),
+                             PagedListRenderOptions.OnlyShowFivePagesAtATime
+                             )
                 }
             </div>
 
             <!-- Результаты поиска -->
-            <div class="w-75 border rounded p-3 overflow-auto ms-3" style="max-height: 400px;">
+            <div class="w-100 w-md-50 border rounded p-3 overflow-auto ms-3" style="max-height: 400px;">
                 @if (Model.Any())
                 {
                     <h5>Результаты поиска:</h5>
@@ -46,7 +45,7 @@
                 }
                 else if (!string.IsNullOrEmpty(Context.Request.Query["search"]))
                 {
-                    <p >Пользователи не найден. Попробуйте изменить условия поиска</p>
+                    <p>Пользователи не найдены. Попробуйте изменить условия поиска</p>
                 }
             </div>
         </div>

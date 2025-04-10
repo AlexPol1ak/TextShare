@@ -3,42 +3,37 @@
 @{
     @model IPagedList<FriendshipSatusModel>
 
-    string Title = " Мои Друзья";
+    string Title = "Мои Друзья";
     ViewData["Title"] = Title;
-
 }
 
-<div class="d-flex align-items-start">
+<div class="row">
     <!-- Ссылки слева -->
-    <div class="w-20 ms-0 ps-2">
+    <div class="col-12 col-md-2 mb-3">
         <partial name="_FriendsLinksPartial" />
     </div>
 
-    <!-- результат справа -->
-    <div class="w-50 border rounded p-3 overflow-auto ms-3">
+    <!-- Результат справа -->
+    <div class="col-12 col-md-9 border rounded p-3">
         <h2>@Title</h2>
 
-        @if(Model.Any())
+        @if (Model.Any())
         {
             await Html.RenderPartialAsync("_FriendsListPartial", Model.ToList());
             @Html.PagedListPager(
                      Model,
-                     page => Url.Action("MyFriends", new {  page }),
+                     page => Url.Action("MyFriends", new { page }),
                      PagedListRenderOptions.OnlyShowFivePagesAtATime
                      )
-
         }
         else
         {
-            <p>У вас пока нет друзей, но мы можете поискать их
-                <a asp-controller="Friends" asp-action="FriendsSearch" class="btn btn-link align-center text-start">
+            <p>
+                У вас пока нет друзей, но вы можете поискать их
+                <a asp-controller="Friends" asp-action="FriendsSearch" class="btn btn-link text-start">
                     здесь
                 </a>
-
             </p>
-            
-
         }
-
     </div>
 </div>

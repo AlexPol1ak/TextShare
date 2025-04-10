@@ -1,42 +1,33 @@
 ﻿@using TextShare.Domain.Models.EntityModels.FriendsModels
+@model IPagedList<FriendshipSatusModel>
 
 @{
-    @model IPagedList<FriendshipSatusModel>
-
-    string Title = " Мои Друзья";
+    string Title = "Мои Друзья";
     ViewData["Title"] = Title;
-
-    string? viewedUsername = (ViewData["viewedUsername"]).ToString();
-
+    string? viewedUsername = ViewData["viewedUsername"]?.ToString();
 }
 
-<div class="d-flex align-items-start">
-
-
-    <!-- результат справа -->
-    <div class="w-50 border rounded p-3 overflow-auto ms-3">
-        <h2>Друзья 
+<div class="row">
+    <!-- Контент (результаты друзей) -->
+    <div class="col-12 col-md-8 offset-md-2 border rounded p-3 mt-3">
+        <h2 class="h5">
+            Друзья
             <a href="@Url.Action("DetailsUserByUserName", "User", new { username = viewedUsername })">@viewedUsername</a>
         </h2>
 
         @if (Model.Any())
         {
             await Html.RenderPartialAsync("_FriendsListPartial", Model.ToList());
+
             @Html.PagedListPager(
                      Model,
                      page => Url.Action("MyFriends", new { page }),
                      PagedListRenderOptions.OnlyShowFivePagesAtATime
                      )
-
         }
         else
         {
-            <p>
-                У пользователя на данный момент нет друзей.
-            </p>
-
-
+            <p>У пользователя на данный момент нет друзей.</p>
         }
-
     </div>
 </div>

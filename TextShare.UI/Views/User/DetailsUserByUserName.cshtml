@@ -8,22 +8,20 @@
 }
 
 <div class="container mt-4">
-    <div class="d-flex align-items-start">
-        <!-- Левая колонка: Аватар -->
-        <div class="me-4">
+    <div class="row g-4">
+        <!-- Аватар -->
+        <div class="col-12 col-md-3 text-center text-md-start">
             <img src="@(Model.AvatarUri ?? "/DefaultImages/default_user.png")"
-                 class="img-fluid border"
+                 class="img-fluid border rounded"
                  alt="Аватар"
-                 style="width: 240px; height: 280px; object-fit: cover;">
+                 style="max-width: 100%; height: auto; max-height: 380px; object-fit: cover;">
         </div>
 
-        <!-- Правая колонка: Информация + кнопки -->
-        <div class="flex-grow-1">
-            <!-- Юзернейм (жирный) -->
+        <!-- Информация + действия -->
+        <div class="col-12 col-md-8">
             <h3 class="mb-1">@Model.UserName</h3>
-
-            <!-- Имя, Отчество, Фамилия -->
             <p class="fw-bold mb-2">@Model.FirstName @Model.Patronymic @Model.LastName</p>
+
             <div class="mb-3">
                 <a asp-action="UserShelvesAvAll" asp-controller="Shelves" asp-route-username="@Model.UserName"
                    class="d-block text-decoration-none text-primary">
@@ -33,50 +31,48 @@
                    class="d-block text-decoration-none text-primary">
                     📄 Общедоступные файлы (@Model.CountAvailableTextFiles)
                 </a>
-                <!-- только при Iam и Accepted -->
+
                 @if (Model.RelationshipTocurrentUser == FriendStatus.Iam || Model.RelationshipTocurrentUser == FriendStatus.Accepted)
                 {
                     <a asp-action="UserFriends" asp-controller="Friends" asp-route-username="@Model.UserName"
                        class="d-block text-decoration-none text-primary">
                         👥 Друзья (@Model.CountFriends)
                     </a>
-
-                }          
+                }
             </div>
 
-            <!-- Кнопки взаимодействия (выравниваем справа) -->
-            <div class="text-end mb-3">
+            <!-- Кнопки -->
+            <div class="mb-3 d-flex flex-wrap gap-2 justify-content-md-end justify-content-start">
                 @if (Model.RelationshipTocurrentUser == FriendStatus.Iam)
                 {
                     <a asp-action="UpdateUser" asp-controller="User"
-                       class="btn btn-outline-primary btn-sm22">Изменить данные</a>
+                       class="btn btn-outline-primary btn-sm2">Изменить данные</a>
                 }
                 else if (Model.RelationshipTocurrentUser == FriendStatus.Accepted)
                 {
-                    <a href="@Url.Action("DeleteFriend", "Friends", new { username =Model.UserName, returnUrl = retrunUrl})"
-                       class="btn btn-outline-danger btn-sm22">Удалить из друзей</a>
+                    <a href="@Url.Action("DeleteFriend", "Friends", new { username = Model.UserName, returnUrl = retrunUrl })"
+                       class="btn btn-outline-danger btn-sm2">Удалить из друзей</a>
                 }
                 else if (Model.RelationshipTocurrentUser == FriendStatus.Requested)
                 {
                     <a href="@Url.Action("DeleteFriend", "Friends", new { username = Model.UserName, returnUrl = retrunUrl })"
-                       class="btn btn-outline-warning btn-sm22">Отменить</a>
+                       class="btn btn-outline-warning btn-sm2">Отменить</a>
                 }
                 else if (Model.RelationshipTocurrentUser == FriendStatus.Pending)
                 {
-                    <a href="@Url.Action("AcceptFriendRequest", "Friends", new { username =Model.UserName, returnUrl = retrunUrl })"
-                       class="btn btn-outline-success btn-sm22">✅Принять</a>
+                    <a href="@Url.Action("AcceptFriendRequest", "Friends", new { username = Model.UserName, returnUrl = retrunUrl })"
+                       class="btn btn-outline-success btn-sm2">✅ Принять</a>
                     <a href="@Url.Action("DeleteFriend", "Friends", new { username = Model.UserName, returnUrl = retrunUrl })"
                        class="btn btn-outline-danger btn-sm2">Удалить</a>
                 }
                 else if (Model.RelationshipTocurrentUser == FriendStatus.None)
                 {
                     <a href="@Url.Action("SendFriendRequest", "Friends", new { username = Model.UserName, returnUrl = retrunUrl })"
-                       class="btn btn-outline-primary btn-sm22">➕ Добавить в друзья</a>
-                   
+                       class="btn btn-outline-primary btn-sm2">➕ Добавить в друзья</a>
                 }
             </div>
 
-            <!-- Информация о себе (если статус Iam или Accepted) -->
+            <!-- О себе -->
             @if (Model.RelationshipTocurrentUser == FriendStatus.Iam || Model.RelationshipTocurrentUser == FriendStatus.Accepted)
             {
                 <div class="p-3 border rounded bg-light">

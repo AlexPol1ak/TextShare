@@ -6,14 +6,14 @@
     ViewData["Title"] = $"Заявки в группу \"{Model.Group.Name}\"";
 }
 
-<div class="d-flex align-items-start">
-    <!-- Ссылки справа -->
-    <div class="w-25 border-start p-3 ms-3">
+<div class="row">
+    <!-- Ссылки справа (для больших экранов, на мобильных устройствах будет снизу) -->
+    <div class="col-12 col-md-3 border-start p-3 mb-3 mb-md-0">
         <partial name="_GroupDetailLinksPartial" model="Model.Group" />
     </div>
 
-    <!-- Список участников слева -->
-    <div class="w-75 p-3">
+    <!-- Список участников слева (для больших экранов, на мобильных устройствах будет сверху) -->
+    <div class="col-12 col-md-9 p-3">
         <h2>@ViewData["Title"]</h2>
 
         @if (Model.Members.Any())
@@ -38,16 +38,15 @@
                                 <form asp-controller="Groups" asp-action="AcceptRequest" asp-route-groupId="@Model.Group.GroupId"
                                       asp-route-username="@member.UserName" asp-route-returnUrl="@Context.Request.Path"
                                       method="post">
-                                    <button type="submit" class="btn btn-outline-success btn-sm2">Принять</button>
+                                    <button type="submit" class="btn btn-outline-success btn-sm">Принять</button>
                                 </form>
 
                                 <form asp-controller="Groups" asp-action="DeleteMember" asp-route-groupId="@Model.Group.GroupId"
                                       asp-route-username="@member.UserName" asp-route-returnUrl="@Context.Request.Path"
                                       method="post">
-                                    <button type="submit" class="btn btn-outline-danger btn-sm2">Удалить</button>
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Удалить</button>
                                 </form>
                             </div>
-
                         }
                     </li>
                 }

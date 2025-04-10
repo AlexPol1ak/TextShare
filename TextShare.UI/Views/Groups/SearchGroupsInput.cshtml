@@ -2,15 +2,17 @@
     ViewData["Title"] = "Поиск групп";
 }
 
-<div class="d-flex align-items-start">
+<div class="row">
     <!-- Ссылки слева -->
-    <div class="w-20 ms-0 ps-2">
+    <div class="col-12 col-md-2">
         <partial name="_GroupsLinksPartial" />
     </div>
 
     <!-- Форма поиска в центре -->
-    <div class="w-50 rounded p-3 overflow-auto ms-3">
-        <h2>Поиск групп</h2>
-        <partial name="_SearchGroupFormPartial" />
+    <div class="col-12 col-md-9 offset-md-1">
+        <div class="rounded p-3">
+            <h2>Поиск групп</h2>
+            <partial name="_SearchGroupFormPartial" />
+        </div>
     </div>
 </div>
