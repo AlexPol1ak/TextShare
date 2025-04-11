@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TextShare.Domain.Entities.TextFiles
+﻿namespace TextShare.Domain.Entities.TextFiles
 {
     /// <summary>
     /// Класс  категории.
     /// </summary>
     public class Category
     {
-        public int CategoryId {  get; set; }
-        public string Name { get; set; }    
+        public int CategoryId { get; set; }
+        public string Name { get; set; }
         public string Description { get; set; }
 
         // Текстовые файлы.

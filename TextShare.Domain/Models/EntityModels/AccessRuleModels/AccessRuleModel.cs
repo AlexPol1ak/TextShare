@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using TextShare.Domain.Entities.AccessRules;
+﻿using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Models.EntityModels.GroupModels;
 using TextShare.Domain.Models.EntityModels.UserModels;
 
@@ -14,7 +11,7 @@ namespace TextShare.Domain.Models.EntityModels.AccessRuleModels
     public class AccessRuleModel
     {
         public int AccessRuleId { get; set; }
-        public bool AvailableAll { get; set; }   
+        public bool AvailableAll { get; set; }
         public int? TextFileId { get; set; }
         public int? ShelfId { get; set; }
 

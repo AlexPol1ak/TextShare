@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TextShare.Domain.Entities.TextFiles;
+﻿using TextShare.Domain.Entities.TextFiles;
 
 namespace TextShare.Domain.Models.EntityModels.TextFileModels
 {
@@ -31,7 +26,7 @@ namespace TextShare.Domain.Models.EntityModels.TextFileModels
         {
             List<TextFileDetailShortModel> models = new();
             var tasks = textFiles.Select(async t => await FromTextFile(t));
-            models = (await Task.WhenAll(tasks)).ToList();             
+            models = (await Task.WhenAll(tasks)).ToList();
             return models;
         }
     }

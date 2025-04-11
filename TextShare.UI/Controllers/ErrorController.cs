@@ -15,13 +15,13 @@ namespace TextShare.UI.Controllers
 
             ViewData["StatusCode"] = statusCode;
             ViewData["ErrorMessage"] = null;
-          
-            if (HttpContext.Items.TryGetValue("ErrorMessage", out var  errorMessage) && errorMessage is string e)
+
+            if (HttpContext.Items.TryGetValue("ErrorMessage", out var errorMessage) && errorMessage is string e)
             {
                 ViewData["ErrorMessage"] = e;
             }
 
-            return View("ErrorView");                                 
+            return View("ErrorView");
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Domain.Models.EntityModels.FriendsModels
@@ -17,12 +16,12 @@ namespace TextShare.Domain.Models.EntityModels.FriendsModels
 
         [Display(Name = "Заявка отправлена")]
         Requested = 2,
-             
+
         [Display(Name = "Заявка получена")]
         Pending = 3,
 
         [Display(Name = "Не друзья")]
-        None = 4             
+        None = 4
     }
 
     /// <summary>
@@ -65,7 +64,7 @@ namespace TextShare.Domain.Models.EntityModels.FriendsModels
             List<FriendshipSatusModel> friendshipSatusModels = new();
 
             var tasks = users.Select(async user => await FromUser(user));
-            friendshipSatusModels =  (await Task.WhenAll(tasks)).ToList();
+            friendshipSatusModels = (await Task.WhenAll(tasks)).ToList();
             return friendshipSatusModels;
 
 

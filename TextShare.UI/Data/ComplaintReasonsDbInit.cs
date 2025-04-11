@@ -26,17 +26,17 @@ namespace TextShare.UI.Data
             return categoryComplaintReasons > 0;
         }
 
-        public async Task<int> installComplaintReasons() 
+        public async Task<int> installComplaintReasons()
         {
             int counter = 0;
             List<ComplaintReasons> reasons = await createComplaintReasons();
-            foreach(ComplaintReasons reason in reasons)
+            foreach (ComplaintReasons reason in reasons)
             {
-                if(!(await complaintReasonService.ContainsComplaintReasonAsync(reason)))
+                if (!(await complaintReasonService.ContainsComplaintReasonAsync(reason)))
                 {
                     await complaintReasonService.CreateComplaintReasonAsync(reason);
                     await complaintReasonService.SaveAsync();
-                    counter ++;
+                    counter++;
                 }
             }
             return counter;

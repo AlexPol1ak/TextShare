@@ -1,18 +1,14 @@
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
-using TextShare.DAL.Data;
-using TextShare.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
 using TextShare.Business.Interfaces;
 using TextShare.Business.Services;
+using TextShare.DAL.Data;
 using TextShare.DAL.Interfaces;
 using TextShare.DAL.Repositories;
+using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Settings;
-using Microsoft.DotNet.Scaffolding.Shared;
 using TextShare.UI.Data;
-using Microsoft.AspNetCore.DataProtection.KeyManagement.Internal;
-using System;
 using TextShare.UI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -82,7 +78,7 @@ builder.Services.AddScoped<IPhysicalFile, PhysicalFileService>
         var env = provider.GetRequiredService<IWebHostEnvironment>();
         return new PhysicalFileService(env.WebRootPath);
     }
-       
+
 );
 builder.Services.AddScoped<IAccessÑontrolService, AccessÑontrolService>();
 builder.Services.AddScoped<ITextFileService, TextFileService>();

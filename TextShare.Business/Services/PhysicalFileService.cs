@@ -1,6 +1,4 @@
-﻿using System.IO;
-using TextShare.Business.Interfaces;
-using TextShare.Domain.Utils;
+﻿using TextShare.Business.Interfaces;
 
 namespace TextShare.Business.Services
 {
@@ -28,19 +26,19 @@ namespace TextShare.Business.Services
         /// </returns>
         public async Task<Dictionary<string, string?>> GetFile(string fileName, string? directoryName = null)
         {
-            Dictionary<string, string?> result = new() { 
+            Dictionary<string, string?> result = new() {
                 {"relativePath", null},
                 {"fullPath", null }
             };
-            if(await FileExist(fileName, directoryName))
+            if (await FileExist(fileName, directoryName))
             {
-                if(directoryName != null)
+                if (directoryName != null)
                     result["relativePath"] = Path.Combine(directoryName, fileName);
                 else
                     result["relativePath"] = Path.Combine(fileName);
             }
             string? fullPath = await GetFullPath(fileName, directoryName);
-            if(fullPath != null)
+            if (fullPath != null)
                 result["fullPath"] = fullPath;
 
             return result;
@@ -55,7 +53,7 @@ namespace TextShare.Business.Services
         public async Task<string?> GetFullPath(string fileName, string? directoryName = null)
         {
             string? filePath = null;
-            if(await FileExist(fileName, directoryName))
+            if (await FileExist(fileName, directoryName))
             {
                 if (!string.IsNullOrEmpty(directoryName))
                     filePath = Path.Combine(_root, directoryName, fileName);

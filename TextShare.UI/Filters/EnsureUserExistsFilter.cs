@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
-using TextShare.Domain.Models.EntityModels.UserModels;
 using TextShare.Domain.Entities.Users;
 
 /// <summary>

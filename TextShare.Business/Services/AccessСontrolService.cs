@@ -1,19 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using TextShare.Business.Interfaces;
 using TextShare.DAL.Interfaces;
-using TextShare.DAL.Repositories;
 using TextShare.Domain.Entities.AccessRules;
-using TextShare.Domain.Entities.Complaints;
 using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
-using TextShare.Domain.Utils;
 
 namespace TextShare.Business.Services
 {
@@ -70,7 +62,7 @@ namespace TextShare.Business.Services
             var userGroupsIds = groupIdsConfirmed.Concat(groupIdsOwned).Distinct().ToList();
 
             // Получаем IQueryable файлов
-            IQueryable<TextFile> filesQuery = await _textFileRepository.GetAllAsync(); 
+            IQueryable<TextFile> filesQuery = await _textFileRepository.GetAllAsync();
 
             foreach (var include in includes)
             {
@@ -274,7 +266,7 @@ namespace TextShare.Business.Services
             if (shelf.CreatorId == user.Id) return true;
 
             // Если у пользователя не загружены группы, загружаем их
-            if (user.Groups == null || user.GroupMemberships == null || user.Groups.Count <1 || user.GroupMemberships.Count<1)
+            if (user.Groups == null || user.GroupMemberships == null || user.Groups.Count < 1 || user.GroupMemberships.Count < 1)
             {
                 user = await _userRepository.GetAsync(user.Id, u => u.Groups, u => u.GroupMemberships);
                 if (user == null) return null;
@@ -289,7 +281,7 @@ namespace TextShare.Business.Services
             );
 
             // Проверяем, есть ли пользователь в списке разрешённых
-            if (shelf.AccessRule.AvailableUsers.Any(u => u.Id == user.Id)) return true;           
+            if (shelf.AccessRule.AvailableUsers.Any(u => u.Id == user.Id)) return true;
 
             // Проверяем, пересекаются ли группы пользователя с доступными группами
             if (shelf.AccessRule.AvailableGroups.Any(g => userGroupsIds.Contains(g.GroupId))) return true;

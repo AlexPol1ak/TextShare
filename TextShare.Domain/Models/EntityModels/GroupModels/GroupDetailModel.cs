@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.Users;
 
@@ -52,9 +47,9 @@ namespace TextShare.Domain.Models.EntityModels.GroupModels
             groupDetailModel.ImageUri = group.ImageUri;
             groupDetailModel.Creator = group.Creator;
 
-            if(group.Members != null && group.Members.Count > 0)
+            if (group.Members != null && group.Members.Count > 0)
             {
-                groupDetailModel.CountRequests = group.Members.Where(m=>m.IsConfirmed ==false).Count();
+                groupDetailModel.CountRequests = group.Members.Where(m => m.IsConfirmed == false).Count();
             }
 
             return groupDetailModel;

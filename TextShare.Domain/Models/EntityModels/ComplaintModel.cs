@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Entities.Complaints;
 
 namespace TextShare.Domain.Models.EntityModels
@@ -34,14 +33,14 @@ namespace TextShare.Domain.Models.EntityModels
             complaintModel.ComplaintReasonsId = complaint.ComplaintReasonsId;
             complaintModel.AuthorId = complaint.AuthorId;
 
-            if(complaint.TextFile != null) 
+            if (complaint.TextFile != null)
                 complaintModel.TextFileId = complaint.TextFileId;
-            else if(complaint.ShelfId != null)
+            else if (complaint.ShelfId != null)
                 complaintModel.ShelfId = complaint.ShelfId;
-            else if(complaintModel.GroupId != null)
-                complaint.GroupId = complaintModel.GroupId; 
+            else if (complaintModel.GroupId != null)
+                complaint.GroupId = complaintModel.GroupId;
 
-                return complaintModel;
+            return complaintModel;
         }
 
         public Complaint ToComplaint()

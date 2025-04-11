@@ -33,17 +33,17 @@ namespace TextShare.Business.Services
             return await _repositoryTextFiles.DeleteAsync(id);
         }
 
-        public async Task<List<TextFile>> FindTextFilesAsync(Expression<Func<TextFile, bool>> predicate, 
+        public async Task<List<TextFile>> FindTextFilesAsync(Expression<Func<TextFile, bool>> predicate,
             params Expression<Func<TextFile, object>>[] includes)
         {
             var query = await _repositoryTextFiles.FindAsync(predicate, includes);
-            return await query.ToListAsync() ;
+            return await query.ToListAsync();
         }
 
         public async Task<List<TextFile>> GetAllTextFilesAsync(params Expression<Func<TextFile, object>>[] includes)
         {
             var query = await _repositoryTextFiles.GetAllAsync(includes);
-            return await query.ToListAsync() ;
+            return await query.ToListAsync();
         }
 
         public async Task<TextFile?> GetTextFileByIdAsync(int id, params Expression<Func<TextFile, object>>[] includes)

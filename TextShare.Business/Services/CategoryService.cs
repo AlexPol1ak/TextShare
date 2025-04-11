@@ -37,8 +37,8 @@ namespace TextShare.Business.Services
         public async Task<List<Category>> FindCategoriesAsync(Expression<Func<Category,
             bool>> predicate, params Expression<Func<Category, object>>[] includes)
         {
-            var query = await _repositoryCategories.FindAsync(predicate, includes); 
-            return await query.ToListAsync() ;
+            var query = await _repositoryCategories.FindAsync(predicate, includes);
+            return await query.ToListAsync();
         }
 
         public async Task<List<Category>> GetAllCategoriesAsync(params Expression<Func<Category, object>>[] includes)

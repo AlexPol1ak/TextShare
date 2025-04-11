@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Business.Interfaces
@@ -87,7 +86,7 @@ namespace TextShare.Business.Interfaces
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<List<User>> GetOutFriendRequestsUsers(int userId, 
+        Task<List<User>> GetOutFriendRequestsUsers(int userId,
             params Expression<Func<User, object>>[] includes);
 
         /// <summary>

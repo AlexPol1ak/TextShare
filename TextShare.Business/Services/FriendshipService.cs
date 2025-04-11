@@ -37,23 +37,23 @@ namespace TextShare.Business.Services
         {
             return await _repositoryFriendships.DeleteAsync(id);
         }
-      
+
         public async Task<Friendship?> GetFriendshipByIdAsync(int id,
             params Expression<Func<Friendship, object>>[] includes)
         {
             return await _repositoryFriendships.GetAsync(id, includes);
         }
 
-        public async Task<List<Friendship>> GetAllUserAcceptedFriendshipAsync(int userId, 
+        public async Task<List<Friendship>> GetAllUserAcceptedFriendshipAsync(int userId,
             params Expression<Func<Friendship, object>>[] includes)
         {
             List<Friendship> friendships = (await FindFriendshipsAsync(
-                f =>(f.UserId == userId || f.FriendId == userId) && f.IsConfirmed == true, includes
+                f => (f.UserId == userId || f.FriendId == userId) && f.IsConfirmed == true, includes
                 ));
 
             return friendships;
         }
-             
+
         public async Task<Friendship> UpdateFriendshipAsync(Friendship friendship)
         {
             return await _repositoryFriendships.UpdateAsync(friendship);
@@ -91,8 +91,8 @@ namespace TextShare.Business.Services
                 f => f.UserId == userId && f.IsConfirmed == false, f => f.Friend
                 );
             IQueryable<User> usersQuery = outRequestsQuery.Select(f => f.Friend);
-            
-            foreach(var include in includes)
+
+            foreach (var include in includes)
             {
                 usersQuery = usersQuery.Include(include);
             }
@@ -116,7 +116,7 @@ namespace TextShare.Business.Services
             return await usersQuery.ToListAsync();
         }
 
-        public async Task<List<User>>GetFriendsUser(int userId, params Expression<Func<User, object>>[] includes)
+        public async Task<List<User>> GetFriendsUser(int userId, params Expression<Func<User, object>>[] includes)
         {
             IQueryable<Friendship> friendshipsQuery = await _repositoryFriendships.FindAsync(
                 f => (f.UserId == userId || f.FriendId == userId) && f.IsConfirmed == true,

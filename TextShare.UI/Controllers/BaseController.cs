@@ -107,7 +107,7 @@ namespace TextShare.UI.Controllers
         {
             ResponseData<string> validateImageData = await validateImage(imageFormFile);
             ResponseData<Dictionary<string, string>> saveImageData = new();
-       
+
             if (validateImageData.Success == false)
             {
                 saveImageData.Data = null;

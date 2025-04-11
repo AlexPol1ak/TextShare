@@ -1,21 +1,17 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Options;
 using TextShare.Business.Interfaces;
-using TextShare.Business.Services;
 using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
-using TextShare.Domain.Models.EntityModels.ShelfModels;
 using TextShare.Domain.Models.EntityModels.TextFileModels;
 using TextShare.Domain.Settings;
 using TextShare.Domain.Utils;
 using TextShare.UI.Models;
 using X.PagedList.Extensions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TextShare.UI.Controllers
 {
@@ -48,7 +44,7 @@ namespace TextShare.UI.Controllers
             IAccessRuleService accessRuleService,
             ITextFileService textFileService,
             ILogger<TextFileController> logger
-            ) 
+            )
             : base(physicalFile, imageUploadSettingsOptions)
         {
             _fileUploadSettings = fileUploadSettings.Value;
@@ -61,7 +57,7 @@ namespace TextShare.UI.Controllers
             _accessRuleService = accessRuleService;
             _textFileService = textFileService;
             _logger = logger;
-               
+
         }
 
         /// <summary>
@@ -75,7 +71,7 @@ namespace TextShare.UI.Controllers
         {
             // Найти полку
             Shelf? shelf = await _shelfService.GetShelfByIdAsync(shelfId,
-                s=>s.TextFiles, s=>s.Creator
+                s => s.TextFiles, s => s.Creator
                 );
 
             //Проверяет доступна ли загрузка файла на эту полку
@@ -112,8 +108,8 @@ namespace TextShare.UI.Controllers
         {
             // Получить полку
             Shelf? shelf = await _shelfService.GetShelfByIdAsync(shelfId,
-                s => s.TextFiles, s => s.Creator, s=>s.AccessRule,
-                s=>s.AccessRule.AvailableUsers, s=>s.AccessRule.AvailableGroups
+                s => s.TextFiles, s => s.Creator, s => s.AccessRule,
+                s => s.AccessRule.AvailableUsers, s => s.AccessRule.AvailableGroups
                 );
             User currentUser = (await _userManager.GetUserAsync(User))!;
 
@@ -127,7 +123,7 @@ namespace TextShare.UI.Controllers
 
             // Если в случае ошибок форма будет возращена клиенту -заполнить категории заново
             filesUploadModel.Categories = await _categoryService.GetAllCategoriesAsync();
-            
+
             if (!ModelState.IsValid)
             {
                 return View(filesUploadModel);
@@ -149,7 +145,7 @@ namespace TextShare.UI.Controllers
             }
 
             // Проверка выбора категории
-            if(filesUploadModel.SelectedCategoryIds ==null || !filesUploadModel.SelectedCategoryIds.Any())
+            if (filesUploadModel.SelectedCategoryIds == null || !filesUploadModel.SelectedCategoryIds.Any())
             {
                 ModelState.AddModelError("SelectedCategoryIds", "Выберите хотя бы одну категорию.");
                 return View(filesUploadModel);
@@ -157,7 +153,7 @@ namespace TextShare.UI.Controllers
 
             // Проверка допустимости файла
             ResponseData<string> validateResponseData = await validateFile(filesUploadModel.File);
-            if(!validateResponseData.Success && validateResponseData.Data != null)
+            if (!validateResponseData.Success && validateResponseData.Data != null)
             {
                 ModelState.AddModelError("File", validateResponseData.ErrorMessage);
                 return View(filesUploadModel);
@@ -166,7 +162,7 @@ namespace TextShare.UI.Controllers
             // Сохранение файла на сервере.
             ResponseData<Dictionary<string, string>> saveResponseData = new();
             saveResponseData = await saveFile(filesUploadModel.File);
-            if(saveResponseData.Success == false || saveResponseData.Data == null)
+            if (saveResponseData.Success == false || saveResponseData.Data == null)
             {
                 ModelState.AddModelError("File", saveResponseData.ErrorMessage);
                 return View(filesUploadModel);
@@ -180,7 +176,7 @@ namespace TextShare.UI.Controllers
             textFile.UniqueFileName = fileData["uniqueFileName"];
             textFile.UniqueFileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileData["uniqueFileName"]);
             textFile.Extention = fileData["type"];
-            textFile.Description = filesUploadModel.Description;     
+            textFile.Description = filesUploadModel.Description;
             textFile.ContentType = filesUploadModel.File.ContentType;
             textFile.Size = filesUploadModel.File.Length;
             textFile.Uri = fileData["uri"];
@@ -189,11 +185,11 @@ namespace TextShare.UI.Controllers
             textFile.Shelf = shelf;
             textFile.ShelfId = shelf.ShelfId;
 
-            List<Category> categories =await _categoryService.FindCategoriesAsync(
+            List<Category> categories = await _categoryService.FindCategoriesAsync(
                 f => filesUploadModel.SelectedCategoryIds.Any(id => id == f.CategoryId)
                 );
             textFile.TextFileCategories = categories.Select(
-                c=> new TextFileCategory() { Category = c, TextFile = textFile }
+                c => new TextFileCategory() { Category = c, TextFile = textFile }
                 ).ToList();
 
             // Правило доступа для файла копируется от правила доступа для полки.
@@ -484,7 +480,7 @@ namespace TextShare.UI.Controllers
             if (!_fileUploadSettings.AllowedExtensions.Contains(ext))
             {
                 responseData.Success = false;
-                responseData.ErrorMessage = $"Неверное расширение.";              
+                responseData.ErrorMessage = $"Неверное расширение.";
                 return responseData;
             }
             if (size > _fileUploadSettings.MaxFileSize)
@@ -515,7 +511,7 @@ namespace TextShare.UI.Controllers
         /// </returns>
         private async Task<ResponseData<Dictionary<string, string>>> saveFile(IFormFile file)
         {
-            ResponseData<Dictionary<string, string>> responseData = new();           
+            ResponseData<Dictionary<string, string>> responseData = new();
 
             Dictionary<string, string> dataDict = new();
             try

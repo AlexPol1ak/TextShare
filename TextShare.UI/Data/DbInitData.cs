@@ -2,7 +2,7 @@
 
 namespace TextShare.UI.Data
 {
-    public class DbInitData 
+    public class DbInitData
     {
         private UserDbInit userDbInit;
         public bool InstallUsers
@@ -38,8 +38,8 @@ namespace TextShare.UI.Data
 
             if (InstallUsers)
             {
-               var res =  await userDbInit.SeedData();
-               flags.Add(res);
+                var res = await userDbInit.SeedData();
+                flags.Add(res);
             }
 
             if (InstallCategories)

@@ -45,7 +45,7 @@ namespace TextShare.Business.Services
             params Expression<Func<ComplaintReasons, object>>[] includes)
         {
             var query = await _repositoryComplaintReasons.GetAllAsync(includes);
-            return await query.ToListAsync() ;
+            return await query.ToListAsync();
         }
 
         public async Task<ComplaintReasons?> GetComplaintReasonByIdAsync(int id,

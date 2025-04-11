@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using TextShare.Domain.Entities.AccessRules;
+﻿using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 

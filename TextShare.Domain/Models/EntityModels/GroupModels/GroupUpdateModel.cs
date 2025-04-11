@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TextShare.Domain.Entities.Groups;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace TextShare.Domain.Models.EntityModels.GroupModels
 {

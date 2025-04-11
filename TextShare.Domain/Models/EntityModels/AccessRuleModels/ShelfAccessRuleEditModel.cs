@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TextShare.Domain.Entities.Groups;
-using TextShare.Domain.Entities.TextFiles;
+﻿using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Domain.Models.EntityModels.AccessRuleModels
@@ -12,11 +6,11 @@ namespace TextShare.Domain.Models.EntityModels.AccessRuleModels
     /// <summary>
     /// Модель изменения правила доступа для полки
     /// </summary>
-    public  class ShelfAccessRuleEditModel
+    public class ShelfAccessRuleEditModel
     {
 
         public int ShelfId { get; set; }
-        public string ShelfName {  get; set; } = string.Empty;
+        public string ShelfName { get; set; } = string.Empty;
 
         public int AccessRuleId { get; set; }
 
@@ -44,7 +38,7 @@ namespace TextShare.Domain.Models.EntityModels.AccessRuleModels
         /// <summary>
         /// Список Group для отображения в представлении
         /// </summary>
-        public List<Group> AvailableGroups { get; set; } = new(); 
+        public List<Group> AvailableGroups { get; set; } = new();
 
         public bool AvailableAll { get; set; }
 

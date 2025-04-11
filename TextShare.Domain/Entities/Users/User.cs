@@ -42,7 +42,7 @@ namespace TextShare.Domain.Entities.Users
         public ICollection<AccessRule> AccessRules { get; set; } = new List<AccessRule>();
 
         // Жалобы
-        public ICollection<Complaint> MyComplaints {  get; set; } = new  List<Complaint>(); 
+        public ICollection<Complaint> MyComplaints { get; set; } = new List<Complaint>();
 
         public override string ToString()
         {
@@ -72,7 +72,7 @@ namespace TextShare.Domain.Entities.Users
             info += $"Number text files: {TextFiles.Count.ToString()}.\n";
             info += $"Number complaints: {MyComplaints.Count.ToString()}.\n";
 
-            return info ;
+            return info;
         }
     }
 

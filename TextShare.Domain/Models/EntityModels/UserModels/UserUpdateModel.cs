@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Domain.Models.EntityModels.UserModels
@@ -28,7 +27,7 @@ namespace TextShare.Domain.Models.EntityModels.UserModels
         [RegularExpression(@"^[a-zA-Zа-яА-Я\s]+$",
                     ErrorMessage = "Отчество  может содержать только буквы (латинские или русские) и пробелы.")]
 
-        public string? AvatarUri {  get; set; }
+        public string? AvatarUri { get; set; }
         public string? Patronymic { get; set; }
 
         public string? OldPassword { get; set; }
@@ -38,7 +37,7 @@ namespace TextShare.Domain.Models.EntityModels.UserModels
         [StringLength(500, ErrorMessage = "Описание не должно превышать 500 символов.")]
         public string? SelfDescription { get; set; }
 
-     
+
         /// <summary>
         /// Создает `UserUpdate` из объекта `User`.
         /// </summary>

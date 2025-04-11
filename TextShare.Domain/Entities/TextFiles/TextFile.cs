@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.Complaints;
 using TextShare.Domain.Entities.Users;
@@ -22,7 +18,7 @@ namespace TextShare.Domain.Entities.TextFiles
         public string? Tags { get; set; }
         public string Extention { get; set; }
         public string ContentType { get; set; }
-        public long Size {  get; set; }
+        public long Size { get; set; }
         public string Uri { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

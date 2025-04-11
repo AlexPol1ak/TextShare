@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TextShare.Domain.Entities.Groups;
+﻿using TextShare.Domain.Entities.Groups;
 
 namespace TextShare.Domain.Models.EntityModels.GroupModels
 {
@@ -31,7 +26,7 @@ namespace TextShare.Domain.Models.EntityModels.GroupModels
             if (group.Members != null)
                 groupDeleteModel.CountMembers = group.Members.Count;
 
-                return groupDeleteModel;
+            return groupDeleteModel;
         }
     }
 }

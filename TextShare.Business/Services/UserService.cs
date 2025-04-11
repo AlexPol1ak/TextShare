@@ -37,13 +37,13 @@ namespace TextShare.Business.Services
             params Expression<Func<User, object>>[] includes)
         {
             var query = await _repositoryUsers.FindAsync(predicate, includes);
-            return await query.ToListAsync() ;
+            return await query.ToListAsync();
         }
 
         public async Task<List<User>> GetAllUsersAsync(params Expression<Func<User, object>>[] includes)
         {
             var query = await _repositoryUsers.GetAllAsync(includes);
-            return await query.ToListAsync() ;
+            return await query.ToListAsync();
         }
 
         public async Task<User?> GetUserByIdAsync(int id, params Expression<Func<User, object>>[] includes)
@@ -53,7 +53,7 @@ namespace TextShare.Business.Services
 
         public async Task<User?> GetUserByUsernameAsync(string username, params Expression<Func<User, object>>[] includes)
         {
-            List<User> users = await  (await _repositoryUsers.FindAsync(u => u.UserName == username, includes)).ToListAsync();       
+            List<User> users = await (await _repositoryUsers.FindAsync(u => u.UserName == username, includes)).ToListAsync();
             return users.FirstOrDefault();
         }
 

@@ -2,7 +2,6 @@
 
 using System.Text.Json;
 using TextShare.Business.Interfaces;
-using TextShare.Business.Services;
 using TextShare.Domain.Entities.TextFiles;
 
 namespace TextShare.UI.Data
@@ -32,17 +31,17 @@ namespace TextShare.UI.Data
         {
             int counter = 0;
 
-            List<Category> categories = await  createCategories();
+            List<Category> categories = await createCategories();
 
-            foreach(Category cat in categories)
+            foreach (Category cat in categories)
             {
-                if(!(await categoryService.ContainsCategoryAsync(cat)))
+                if (!(await categoryService.ContainsCategoryAsync(cat)))
                 {
                     await categoryService.CreateCategoryAsync(cat);
                     await categoryService.SaveAsync();
                     counter++;
                 }
-            }                   
+            }
             return counter;
         }
 
@@ -63,6 +62,6 @@ namespace TextShare.UI.Data
 
             return categories ?? new List<Category>();
         }
-        
+
     }
 }

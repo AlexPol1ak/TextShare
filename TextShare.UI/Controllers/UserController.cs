@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using TextShare.Business.Interfaces;
-using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
 using TextShare.Domain.Models.EntityModels.FriendsModels;
@@ -36,9 +35,9 @@ namespace TextShare.UI.Controllers
             IPhysicalFile physicalFile,
             IOptions<ImageUploadSettings> imageUploadSettings,
             IAccessСontrolService accessСontrolService
-            
 
-            ): base(physicalFile, imageUploadSettings)
+
+            ) : base(physicalFile, imageUploadSettings)
         {
             _userManager = userManager;
             _textFileService = textFileService;
@@ -53,7 +52,7 @@ namespace TextShare.UI.Controllers
         public async Task<IActionResult> DetailsUserByUserName(string username)
         {
             User? viewedUser = await _userService.GetUserByUsernameAsync(username);
-            if(viewedUser == null)
+            if (viewedUser == null)
             {
                 HttpContext.Items["ErrorMessage"] = $"Пользователь \"{username}\" не найден";
                 return NotFound();
@@ -89,18 +88,18 @@ namespace TextShare.UI.Controllers
 
             int countViewedUserFriends = (await _friendshipService.GetFriendsUser(viewedUser.Id)).Count();
             int countViewedUserAvvShelf = (await _shelfService.FindShelvesAsync(
-                s=> s.CreatorId == viewedUser.Id && s.AccessRule.AvailableAll == true
+                s => s.CreatorId == viewedUser.Id && s.AccessRule.AvailableAll == true
                 )
                 ).Count();
-            int countViewedUserAvvTextFiles = ( await _textFileService.FindTextFilesAsync(
-                t=>t.OwnerId == viewedUser.Id && t.AccessRule.AvailableAll == true
+            int countViewedUserAvvTextFiles = (await _textFileService.FindTextFilesAsync(
+                t => t.OwnerId == viewedUser.Id && t.AccessRule.AvailableAll == true
                 )
                 ).Count();
 
             modelViewedUser.CountAvailableShelves = countViewedUserAvvShelf;
             modelViewedUser.CountAvailableTextFiles = countViewedUserAvvTextFiles;
             modelViewedUser.CountFriends = countViewedUserFriends;
-                
+
             return View(modelViewedUser);
         }
 
@@ -116,7 +115,7 @@ namespace TextShare.UI.Controllers
             User currentUser = (await _userManager.GetUserAsync(User))!;
             //UserModel userModel = UserModel.FromUser(currentUser);           
             //return View(userModel);
-            return RedirectToAction("DetailsUserByUserName", new { username = currentUser.UserName});
+            return RedirectToAction("DetailsUserByUserName", new { username = currentUser.UserName });
         }
 
         /// <summary>
@@ -220,11 +219,11 @@ namespace TextShare.UI.Controllers
 
             if (!string.IsNullOrEmpty(avatarUri))
             {
-                if(user.AvatarUri != null)
+                if (user.AvatarUri != null)
                 {
                     await DeleteImageByUri(user.AvatarUri);
 
-                }             
+                }
                 user.AvatarUri = avatarUri;
                 user.AvatarMimeType = avatar.ContentType;
                 await _userManager.UpdateAsync(user);

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TextShare.Domain.Entities.AccessRules;
+﻿using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.Complaints;
 using TextShare.Domain.Entities.Users;
 

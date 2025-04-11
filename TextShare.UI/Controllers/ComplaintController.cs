@@ -1,17 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Xml.Linq;
-using System;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using TextShare.Business.Interfaces;
+using TextShare.Domain.Entities.Complaints;
+using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
-using TextShare.Domain.Entities.Groups;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using TextShare.Domain.Entities.Complaints;
-using TextShare.Domain.Utils;
-using Microsoft.CodeAnalysis.Text;
 using X.PagedList.Extensions;
 
 namespace TextShare.UI.Controllers
@@ -231,11 +227,11 @@ namespace TextShare.UI.Controllers
             await _complaintService.CreateComplaintAsync(complaint);
             await _complaintService.SaveAsync();
 
-            if(shelfId != null)
+            if (shelfId != null)
                 return RedirectToAction("DetailShelf", "Shelves", new { Id = shelfId });
-            if(groupId != null)
+            if (groupId != null)
                 return RedirectToAction("DetailGroup", "Groups", new { groupId = groupId });
-            if(uniquename != null)
+            if (uniquename != null)
                 return RedirectToAction("DetailTextFile", "TextFile",
                    new { uniquename = uniquename });
 
@@ -254,22 +250,22 @@ namespace TextShare.UI.Controllers
         /// <returns>Представление со списком объектов и жалобами на них.</returns>
         [Authorize(Roles = "Admin")]
         [HttpGet("complaints/view")]
-        public async Task<IActionResult> ViewComplaints(string type = "shelves", int page =1)
+        public async Task<IActionResult> ViewComplaints(string type = "shelves", int page = 1)
         {
             List<object> objList = new();
 
-            if(string.IsNullOrEmpty(type)) return BadRequest();
-            if(type == "shelves")
+            if (string.IsNullOrEmpty(type)) return BadRequest();
+            if (type == "shelves")
             {
                 List<Shelf> shelves = (await _shelfService.FindShelvesAsync(
                     s => s.Complaints.Count() > 0,
                     s => s.Complaints,
-                    s => s.Creator)).OrderByDescending(s=>s.Complaints.Count()).ToList();
+                    s => s.Creator)).OrderByDescending(s => s.Complaints.Count()).ToList();
 
                 objList.AddRange(shelves);
 
             }
-            else if(type == "groups")
+            else if (type == "groups")
             {
                 List<Group> groups = (await _groupService.FindGroupsAsync(
                     s => s.Complaints.Count() > 0,
@@ -277,7 +273,7 @@ namespace TextShare.UI.Controllers
                     s => s.Creator)).OrderByDescending(s => s.Complaints.Count()).ToList();
 
                 objList.AddRange(groups);
-                
+
             }
             else if (type == "files")
             {
@@ -293,7 +289,7 @@ namespace TextShare.UI.Controllers
                 HttpContext.Items["ErrorMessage"] = "Неверная категория";
                 return BadRequest();
             }
-            
+
             ViewBag.ObjPageList = objList.ToPagedList(page, 10);
 
             return View();

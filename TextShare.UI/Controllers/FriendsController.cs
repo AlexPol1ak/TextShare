@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using System.Linq;
 using TextShare.Business.Interfaces;
 using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
@@ -48,7 +46,8 @@ namespace TextShare.UI.Controllers
             IEnumerable<User> friends = await _friendshipService.GetFriendsUser(currentUser.Id);
 
             IEnumerable<FriendshipSatusModel> friendModels = (await FriendshipSatusModel.FromUsers(friends))
-                .Select(model => {
+                .Select(model =>
+                {
                     model.FriendStatus = FriendStatus.Accepted;
                     return model;
                 }).OrderBy(user => user.UserName);
@@ -67,7 +66,7 @@ namespace TextShare.UI.Controllers
         public async Task<IActionResult> UserFriends(string username, int page = 1)
         {
             // Просматриваемый поль-ль
-            User? viewedUser = await _userService.GetUserByUsernameAsync(username, u=>u.Friendships);
+            User? viewedUser = await _userService.GetUserByUsernameAsync(username, u => u.Friendships);
             if (viewedUser == null)
             {
                 HttpContext.Items["ErrorMessage"] = $"Пользователь \"{username}\" не найден";
@@ -77,7 +76,7 @@ namespace TextShare.UI.Controllers
             // Текущий поль-ль
             User currentUser = (await _userManager.GetUserAsync(User))!;
             List<int> currentUserFriends = (await _friendshipService.GetFriendsUser(currentUser.Id))
-                .Select(u=>u.Id).ToList();
+                .Select(u => u.Id).ToList();
             List<int> currentUserOutRequestFrineds = (await _friendshipService.GetOutFriendRequestsUsers(currentUser.Id))
                 .Select(u => u.Id).ToList();
             List<int> currentUserInRequestFrineds = (await _friendshipService.GetInFriendRequestsUsers(currentUser.Id))
@@ -91,21 +90,21 @@ namespace TextShare.UI.Controllers
                 && fr.IsConfirmed == true
                 )).FirstOrDefault();
             DebugHelper.ShowData(frViewedUser);
-            if(frViewedUser == null && currentUser.Id != viewedUser.Id)
+            if (frViewedUser == null && currentUser.Id != viewedUser.Id)
             {
                 HttpContext.Items["ErrorMessage"] = $"Вы не можете просматривать эту страницу";
                 return BadRequest();
             }
-            
+
             // Друзья просматриваемого по-ля.
-            List<User> friendsViewedUser = await _friendshipService.GetFriendsUser(viewedUser.Id, u=>u.Friendships);
+            List<User> friendsViewedUser = await _friendshipService.GetFriendsUser(viewedUser.Id, u => u.Friendships);
             List<FriendshipSatusModel> friendsModels = new();
-            
+
             // Перебор друзей просматриваемого пользователя и формирование моделей.
-            foreach(var friend in friendsViewedUser)
+            foreach (var friend in friendsViewedUser)
             {
                 FriendshipSatusModel friendModel = await FriendshipSatusModel.FromUser(friend);
-                
+
                 int frindId = friend.Id;
                 // Определение отношения текущего пользователя к другу просмтариваемого пользователя
                 if (frindId == currentUser.Id)
@@ -123,7 +122,7 @@ namespace TextShare.UI.Controllers
 
             }
 
-            ViewData["viewedUsername"] = viewedUser.UserName;          
+            ViewData["viewedUsername"] = viewedUser.UserName;
             return View(friendsModels.ToPagedList(page, 5));
 
         }
@@ -143,9 +142,10 @@ namespace TextShare.UI.Controllers
             IEnumerable<User> inRequests = await _friendshipService.GetInFriendRequestsUsers(currentUser.Id);
 
             IEnumerable<FriendshipSatusModel> FriendModels = (await FriendshipSatusModel.FromUsers(inRequests))
-                .Select(model=> { 
-                    model.FriendStatus = FriendStatus.Pending; 
-                    return model; 
+                .Select(model =>
+                {
+                    model.FriendStatus = FriendStatus.Pending;
+                    return model;
                 });
 
             return View(FriendModels.ToPagedList(page, 5));
@@ -159,13 +159,14 @@ namespace TextShare.UI.Controllers
         /// <remarks>GET /friends/out-requests?page=1</remarks>
         [Authorize]
         [HttpGet("out-requests")]
-        public async Task<IActionResult>FriendsOutRequests(int page = 1)
+        public async Task<IActionResult> FriendsOutRequests(int page = 1)
         {
             User currentUser = (await _userManager.GetUserAsync(User))!;
             IEnumerable<User> outRequests = await _friendshipService.GetOutFriendRequestsUsers(currentUser.Id);
 
             IEnumerable<FriendshipSatusModel> FriendOutRequestsModels = (await FriendshipSatusModel.FromUsers(outRequests))
-                .Select(model => {
+                .Select(model =>
+                {
                     model.FriendStatus = FriendStatus.Requested;
                     return model;
                 });
@@ -196,16 +197,16 @@ namespace TextShare.UI.Controllers
                 f => f.Friend
                 );
             var friends = friendships.Select(f => f.Friend).ToList();
-                
+
             // Входящие заявки в друзья
             var inFriendRequests = (await _friendshipService.FindFriendshipsAsync(
-                f => f.FriendId == currentUser.Id && !f.IsConfirmed, f=>f.User))  
-                .Select(f => f.User)  
+                f => f.FriendId == currentUser.Id && !f.IsConfirmed, f => f.User))
+                .Select(f => f.User)
                 .ToList();
 
             // Исходящие заявки (текущий пользователь отправил запрос другим)
             var outFriendRequests = (await _friendshipService.FindFriendshipsAsync(
-                f => f.UserId == currentUser.Id && !f.IsConfirmed, f => f.Friend)) 
+                f => f.UserId == currentUser.Id && !f.IsConfirmed, f => f.Friend))
                 .Select(f => f.Friend)  // Тот, кому отправлен запрос
                 .ToList();
 
@@ -236,14 +237,14 @@ namespace TextShare.UI.Controllers
             List<FriendshipSatusModel> friendshipSatusModels = (await FriendshipSatusModel.FromUsers(resultSearch))
                 .Select(model =>
                 {
-                    model.FriendStatus = model.Id == currentUser.Id? FriendStatus.Iam:
+                    model.FriendStatus = model.Id == currentUser.Id ? FriendStatus.Iam :
                                          friendIds.Contains(model.Id) ? FriendStatus.Accepted :
                                          inRequestIds.Contains(model.Id) ? FriendStatus.Pending :
                                          outRequestIds.Contains(model.Id) ? FriendStatus.Requested :
                                          FriendStatus.None;
                     return model;
                 })
-                .OrderBy(model=>model.FriendStatus)
+                .OrderBy(model => model.FriendStatus)
                 .ToList();
 
             return View(friendshipSatusModels.ToPagedList(page, 5));
@@ -269,11 +270,11 @@ namespace TextShare.UI.Controllers
             User currentUser = (await _userManager.GetUserAsync(User))!;
             User requestedUser = result.Data;
 
-            Friendship? friendship =( await _friendshipService.FindFriendshipsAsync(
+            Friendship? friendship = (await _friendshipService.FindFriendshipsAsync(
                 f => f.FriendId == currentUser.Id && f.UserId == requestedUser.Id && f.IsConfirmed == false
                 )).FirstOrDefault();
-            
-            if(friendship == null)
+
+            if (friendship == null)
             {
                 HttpContext.Items["ErrorMessage"] = "Заявки не найдено";
                 return BadRequest();
@@ -300,7 +301,7 @@ namespace TextShare.UI.Controllers
         public async Task<IActionResult> SendFriendRequest(string username, string? returnUrl = null)
         {
             var result = await verifyUsername(username);
-            if(result.Success == false || result.Data == null)
+            if (result.Success == false || result.Data == null)
             {
                 HttpContext.Items["ErrorMessage"] = result.ErrorMessage;
                 return BadRequest();
@@ -308,12 +309,12 @@ namespace TextShare.UI.Controllers
 
             User user = (await _userManager.GetUserAsync(User))!;
             User requestedUser = result.Data;
-            
-            var fs = await _friendshipService.FindFriendshipsAsync(f => 
+
+            var fs = await _friendshipService.FindFriendshipsAsync(f =>
             (f.UserId == user.Id && f.FriendId == requestedUser.Id) ||
             (f.UserId == requestedUser.Id && f.FriendId == user.Id)
             );
-            if(fs.Count < 1)
+            if (fs.Count < 1)
             {
                 Friendship friendship = new()
                 {
@@ -356,7 +357,7 @@ namespace TextShare.UI.Controllers
            (f.UserId == requestedUser.Id && f.FriendId == user.Id)
            );
 
-            if(fs.Count > 0)
+            if (fs.Count > 0)
             {
                 Friendship friendship = fs.First();
                 await _friendshipService.DeleteFriendshipAsync(friendship.Id);
@@ -389,7 +390,7 @@ namespace TextShare.UI.Controllers
             }
 
             User? requestedUser = await _userService.GetUserByUsernameAsync(username);
-            if(requestedUser == null)
+            if (requestedUser == null)
             {
                 responseData.Success = false;
                 responseData.ErrorMessage = "Такого пользователя не существует.";

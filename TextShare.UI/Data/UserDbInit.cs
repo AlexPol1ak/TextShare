@@ -2,7 +2,6 @@
 
 using Microsoft.AspNetCore.Identity;
 using TextShare.Business.Interfaces;
-using TextShare.Business.Services;
 using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
@@ -28,7 +27,7 @@ namespace TextShare.UI.Data
 
         }
 
-        public override  async Task<bool> SeedData()
+        public override async Task<bool> SeedData()
         {
             if (!InstallUsers) return false;
 
@@ -36,11 +35,11 @@ namespace TextShare.UI.Data
             return userNumber > 0;
 
         }
-        
+
         private async Task<int> installUser()
         {
             int userCount = 0;
-            for(int i = 1; i<11; i++)
+            for (int i = 1; i < 11; i++)
             {
                 User newUser = new();
                 newUser.UserName = $"User{i}";
@@ -58,7 +57,7 @@ namespace TextShare.UI.Data
 
                 await userManager.CreateAsync(newUser, "123456");
                 await createBaseShelf(newUser);
-                userCount++;            
+                userCount++;
             }
 
             //Admin
@@ -81,7 +80,7 @@ namespace TextShare.UI.Data
 
             if (res.Count < 1)
             {
-                await userManager.CreateAsync(admin,"123456");
+                await userManager.CreateAsync(admin, "123456");
                 await createBaseShelf(admin);
                 await userManager.AddToRoleAsync(admin, "Admin");
             }

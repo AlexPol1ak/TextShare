@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Models;
-using TextShare.Domain.Models.EntityModels.ShelfModels;
 
 namespace TextShare.UI.Models
 {

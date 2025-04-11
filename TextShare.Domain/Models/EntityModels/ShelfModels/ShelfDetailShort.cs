@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TextShare.Domain.Entities.TextFiles;
+﻿using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Domain.Models.EntityModels.ShelfModels
@@ -19,7 +14,7 @@ namespace TextShare.Domain.Models.EntityModels.ShelfModels
 
         public User Creator { get; set; }
 
-        public async static Task<ShelfDetailShort> FromShelf( Shelf shelf)
+        public async static Task<ShelfDetailShort> FromShelf(Shelf shelf)
         {
             await Task.CompletedTask;
             ShelfDetailShort sh = new();
@@ -29,11 +24,11 @@ namespace TextShare.Domain.Models.EntityModels.ShelfModels
             sh.Creator = shelf.Creator;
             return sh;
         }
-        
+
         public async static Task<List<ShelfDetailShort>> FromShelves(IEnumerable<Shelf> shelves)
         {
-            var tasks = shelves.Select(s=> FromShelf(s)).ToList();
-            var shelvesModels =  await Task.WhenAll(tasks);
+            var tasks = shelves.Select(s => FromShelf(s)).ToList();
+            var shelvesModels = await Task.WhenAll(tasks);
             return shelvesModels.ToList();
         }
     }

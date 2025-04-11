@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace TextShare.Domain.Settings
+﻿namespace TextShare.Domain.Settings
 {
     /// <summary>
     /// Класс для настроек загрузки файлов.

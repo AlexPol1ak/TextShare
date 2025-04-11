@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TextShare.Domain.Entities.TextFiles;
-using TextShare.Domain.Entities.Users;
+﻿using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models.EntityModels.FriendsModels;
 
 namespace TextShare.Domain.Models.EntityModels.UserModels
 {
-    public class UserDetailModel :UserModel
+    public class UserDetailModel : UserModel
     {
-        public int CountAvailableShelves { get; set; } 
+        public int CountAvailableShelves { get; set; }
         public int CountAvailableTextFiles { get; set; }
-        public int CountFriends { get; set; } 
+        public int CountFriends { get; set; }
 
         public FriendStatus? RelationshipTocurrentUser { get; set; } = null;
 

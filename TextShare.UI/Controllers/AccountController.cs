@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Options;
 using Microsoft.Extensions.Options;
 using TextShare.Business.Interfaces;
 using TextShare.Domain.Entities.AccessRules;
@@ -9,8 +8,6 @@ using TextShare.Domain.Entities.Users;
 using TextShare.Domain.Models;
 using TextShare.Domain.Models.EntityModels.UserModels;
 using TextShare.Domain.Settings;
-using TextShare.Domain.Utils;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TextShare.UI.Controllers
 {
@@ -28,12 +25,12 @@ namespace TextShare.UI.Controllers
         private readonly IAccessRuleService _accessRuleService;
 
         public AccountController(UserManager<User> userManager,
-            SignInManager<User> signInManager, 
+            SignInManager<User> signInManager,
             IShelfService shelfService,
             IAccessRuleService accessRuleService,
             IPhysicalFile physicalFile,
             IOptions<ImageUploadSettings> imageUploadOptions
-            ): base(physicalFile, imageUploadOptions)
+            ) : base(physicalFile, imageUploadOptions)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -64,9 +61,9 @@ namespace TextShare.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(UserLoginModel model)
         {
-            
+
             if (!ModelState.IsValid)
-            {               
+            {
                 return View(model);
             }
 
@@ -85,9 +82,9 @@ namespace TextShare.UI.Controllers
                     return View(model);
 
                 }
-               
+
                 // Вход
-                var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);                 
+                var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                     return RedirectToAction("DetailsUser", "User");
             }
@@ -120,10 +117,10 @@ namespace TextShare.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(UserRegisterModel model, IFormFile? AvatarFile)
         {
-            
+
             if (!ModelState.IsValid)
             {
-                              
+
                 return View(model);
             }
 
@@ -140,10 +137,10 @@ namespace TextShare.UI.Controllers
             }
 
             string? avatarUri = null;
-            if(AvatarFile != null)
+            if (AvatarFile != null)
             {
-                ResponseData<Dictionary<string,string>> data =  await SaveImage(AvatarFile);
-                if(data.Success == false)
+                ResponseData<Dictionary<string, string>> data = await SaveImage(AvatarFile);
+                if (data.Success == false)
                 {
                     ViewData["AvatarError"] = data.ErrorMessage;
                     return View(model);

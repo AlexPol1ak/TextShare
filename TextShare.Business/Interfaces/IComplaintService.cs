@@ -26,7 +26,7 @@ namespace TextShare.Business.Interfaces
         /// </summary>
         /// <param name="predicate">Условие поиска</param>
         /// <returns>Список найденных жалоб</returns>
-        Task<List<Complaint>> FindComplaintsAsync(Expression<Func<Complaint, bool>> predicate, 
+        Task<List<Complaint>> FindComplaintsAsync(Expression<Func<Complaint, bool>> predicate,
             params Expression<Func<Complaint, object>>[] includes);
 
         /// <summary>

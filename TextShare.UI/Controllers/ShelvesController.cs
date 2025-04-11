@@ -1,18 +1,8 @@
-﻿using Humanizer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
-using System.Drawing;
-using System.IO;
-using System.Net;
-using System.Runtime.CompilerServices;
 using TextShare.Business.Interfaces;
-using TextShare.Business.Services;
 using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.TextFiles;
@@ -22,10 +12,8 @@ using TextShare.Domain.Models.EntityModels.ShelfModels;
 using TextShare.Domain.Models.EntityModels.TextFileModels;
 using TextShare.Domain.Settings;
 using TextShare.Domain.Utils;
-using TextShare.UI.Models;
 using X.PagedList;
 using X.PagedList.Extensions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TextShare.UI.Controllers
 {
@@ -36,7 +24,7 @@ namespace TextShare.UI.Controllers
     public class ShelvesController : BaseController
     {
         private readonly IShelfService _shelfService;
-        private readonly IAccessRuleService _accessRuleService;       
+        private readonly IAccessRuleService _accessRuleService;
         private readonly IUserService _userService;
         private readonly IFriendshipService _friendshipService;
         private readonly IGroupService _groupService;
@@ -55,17 +43,17 @@ namespace TextShare.UI.Controllers
             // В базовый контроллер
             IPhysicalFile physicalFile,
             IOptions<ImageUploadSettings> imageUploadSettingsOptions
-            ) :base(physicalFile, imageUploadSettingsOptions)
+            ) : base(physicalFile, imageUploadSettingsOptions)
         {
             _shelfService = shelfService;
             _userManager = userManager;
-            _accessRuleService = accessRuleService; 
+            _accessRuleService = accessRuleService;
             _userService = userService;
             _shelvesSettings = shelvesSettingsOptions.Value;
             _friendshipService = friendshipService;
             _groupService = groupService;
             _accessСontrolService = accessСontrolService;
-                     
+
         }
 
         #region Actions
@@ -81,9 +69,9 @@ namespace TextShare.UI.Controllers
         {
 
             int pageSize = _shelvesSettings.MaxNumberShelvesInPage;
-            User user = (await _userManager.GetUserAsync(User))!;           
+            User user = (await _userManager.GetUserAsync(User))!;
             List<Shelf> userShelvesAll = await _shelfService.GetAllUserShelvesAsync(user.Id);
-            
+
             IPagedList<Shelf> shelvesPart = userShelvesAll.ToPagedList(page, pageSize);
 
             AvailableShelvesModel<User, IPagedList<Shelf>> responseModel = new();
@@ -135,7 +123,7 @@ namespace TextShare.UI.Controllers
         /// <remarks>GET shelves/friends-shared?page=1</remarks>
         [Authorize]
         [HttpGet("friends-shared")]
-        public async Task<IActionResult> AvailableFromFriends(int page=1)
+        public async Task<IActionResult> AvailableFromFriends(int page = 1)
         {
 
             User user = (await _userManager.GetUserAsync(User))!;
@@ -144,7 +132,7 @@ namespace TextShare.UI.Controllers
             responseModel.User = user;
 
             // Получаем список друзей
-            List <Friendship> userFriendships = await _friendshipService.GetAllUserAcceptedFriendshipAsync(user.Id);
+            List<Friendship> userFriendships = await _friendshipService.GetAllUserAcceptedFriendshipAsync(user.Id);
 
             if (userFriendships.Count == 0)
             {
@@ -180,12 +168,12 @@ namespace TextShare.UI.Controllers
         /// <remarks>GET shelves/shared-from-groups?page=1</remarks>
         [Authorize]
         [HttpGet("shared-from-groups")]
-        public async Task<IActionResult> AvailableFromGroups(int page=1)
+        public async Task<IActionResult> AvailableFromGroups(int page = 1)
         {
             int pageSize = _shelvesSettings.MaxNumberShelvesInPage;
 
             User user = (await _userManager.GetUserAsync(User))!;
-            User userDb = (await _userService.GetUserByIdAsync(user.Id, u=>u.GroupMemberships))!;
+            User userDb = (await _userService.GetUserByIdAsync(user.Id, u => u.GroupMemberships))!;
 
             // Группы ,в которых состоит пользователь.
             List<Group> userGroups = await _groupService.FindGroupsAsync(
@@ -198,7 +186,7 @@ namespace TextShare.UI.Controllers
             AvailableShelvesModel<User, IPagedList<Shelf>> responseModel = new();
             responseModel.User = userDb;
             responseModel.AvailableShelves = availableShelves.ToPagedList(page, pageSize);
-          
+
             return View(responseModel);
         }
 
@@ -210,10 +198,10 @@ namespace TextShare.UI.Controllers
         /// <returns>Результат поиска</returns>
         /// <remarks>GET shelves/search?page=1</remarks>
         [HttpGet("search")]
-        public async Task<IActionResult> Search([FromQuery] ShelvesSearchModel? shelvesSearchModel = null, int page= 1)
+        public async Task<IActionResult> Search([FromQuery] ShelvesSearchModel? shelvesSearchModel = null, int page = 1)
         {
-            
-            if (shelvesSearchModel == null || 
+
+            if (shelvesSearchModel == null ||
                 (string.IsNullOrEmpty(shelvesSearchModel.Name) && string.IsNullOrEmpty(shelvesSearchModel.Description)))
             {
                 return View("SearchInput");
@@ -230,15 +218,15 @@ namespace TextShare.UI.Controllers
             bool onlyAvailableMe = shelvesSearchModel.OnlyAvailableMe;
             List<Shelf> shelvesResult = new(); // Результат всего поиска
             List<Shelf> shelvesResponse = new(); // Результат фильтрации и ответ пользователю
-            
+
 
             // Если указано имя и описание
             if ((!string.IsNullOrEmpty(name)) && (!string.IsNullOrEmpty(description)))
             {
                 shelvesResult = await _shelfService.FindShelvesAsync(
                     s => s.Name.Contains(name) && s.Description.Contains(description),
-                    s=>s.AccessRule.AvailableGroups,
-                    s=>s.AccessRule.AvailableUsers
+                    s => s.AccessRule.AvailableGroups,
+                    s => s.AccessRule.AvailableUsers
                     );
             }
 
@@ -264,10 +252,10 @@ namespace TextShare.UI.Controllers
 
             // Если пользователь не авторизован или авторизован но поиск указан по общедоступным полкам
             // Фильтруем только общедоступные полки
-            if ((!User.Identity.IsAuthenticated ) || (User.Identity.IsAuthenticated && (onlyAvailableMe == false)))
+            if ((!User.Identity.IsAuthenticated) || (User.Identity.IsAuthenticated && (onlyAvailableMe == false)))
             {
                 shelvesResponse = shelvesResult.Where(s => s.AccessRule.AvailableAll == true).ToList();
-                
+
             }
 
             // Если пользователь авторизован и указан поиск по доступным ему полкам.
@@ -280,7 +268,7 @@ namespace TextShare.UI.Controllers
                 shelvesResponse = shelvesResult
                     .Where(s => s.AccessRule.AvailableUsers.Any(u => u.Id == userDb.Id) ||
                                 s.AccessRule.AvailableGroups.Any(group => userGroupIds.Contains(group.GroupId)))
-                    .DistinctBy(s=>s.ShelfId)
+                    .DistinctBy(s => s.ShelfId)
                     .ToList();
             }
             return View("SearchOutput", shelvesResponse.ToPagedList(page, pageSize));
@@ -301,11 +289,11 @@ namespace TextShare.UI.Controllers
             var shelf = await _shelfService.GetAllUserShelvesAsync(user.Id);
             if (shelf.Count >= _shelvesSettings.MaxNumberUserShelves)
             {
-                HttpContext.Items["ErrorMessage"] = 
+                HttpContext.Items["ErrorMessage"] =
                     $"Вы достигли максимального количества полок.\nМаксимум {_shelvesSettings.MaxNumberUserShelves}.";
                 return BadRequest();
             }
-               
+
             return View();
         }
 
@@ -328,21 +316,21 @@ namespace TextShare.UI.Controllers
             AccessRule shelfAccessRule = new();
             var taskCreateAccessRule = _accessRuleService.CreateAccessRuleAsync(shelfAccessRule);
 
-            Shelf shelf = shelfCreateModel.ToShelf();        
+            Shelf shelf = shelfCreateModel.ToShelf();
             shelf.Creator = user;
             shelf.CreatorId = user.Id;
-            if(avatarFile != null)
+            if (avatarFile != null)
             {
                 ResponseData<Dictionary<string, string>> data = new();
                 data = await SaveImage(avatarFile);
-                if(data.Success == false && data.ErrorMessage != null)
+                if (data.Success == false && data.ErrorMessage != null)
                 {
                     ModelState.AddModelError("AvatarFile", data.ErrorMessage);
                     return View(shelfCreateModel);
                 }
                 string? avatarUri = data.Data.GetValueOrDefault("uri", null);
                 shelf.ImageUri = avatarUri;
-                shelf.MimeType = avatarFile.ContentType;                                          
+                shelf.MimeType = avatarFile.ContentType;
             }
             shelfAccessRule = await taskCreateAccessRule;
             await _accessRuleService.SaveAsync();
@@ -369,21 +357,22 @@ namespace TextShare.UI.Controllers
                 s => s.Creator,
                 s => s.TextFiles,
                 s => s.AccessRule.AvailableGroups,
-                s=>s.AccessRule.AvailableUsers);
-            
+                s => s.AccessRule.AvailableUsers);
+
             // Если полка не найдена
             if (shelf == null) return NotFound();
             User? currentUser = await _userManager.GetUserAsync(User);
             bool isAdmin = User.IsInRole("Admin");
 
             var result = await _accessСontrolService.CheckShelfAccess(currentUser, shelf);
-            if (result == true || isAdmin ==true)
+            if (result == true || isAdmin == true)
             {
                 ShelfDetailModel shelfDetailModel = ShelfDetailModel.FromShelf(shelf);
                 shelfDetailModel.CurrentUserId = currentUser?.Id ?? null;
                 return View(shelfDetailModel);
 
-            }else if(currentUser == null)
+            }
+            else if (currentUser == null)
             {
                 return RedirectToAction("Login", "Account");
             }
@@ -404,14 +393,14 @@ namespace TextShare.UI.Controllers
         {
 
             Shelf? updateShelf = await _shelfService.GetShelfByIdAsync(id);
-            if(updateShelf == null)
+            if (updateShelf == null)
             {
                 HttpContext.Items["ErrorMessage"] = "Такая полка не найдена";
                 return NotFound();
             }
 
             User user = (await _userManager.GetUserAsync(User))!;
-            if(updateShelf.CreatorId != user.Id)
+            if (updateShelf.CreatorId != user.Id)
             {
                 HttpContext.Items["ErrorMessage"] = "Недостаточно прав";
                 return NotFound();
@@ -455,7 +444,7 @@ namespace TextShare.UI.Controllers
             updateShelf.Name = shelfCreateModel.Name;
             updateShelf.Description = shelfCreateModel.Description;
 
-            if(AvatarFile != null)
+            if (AvatarFile != null)
             {
                 var result = await validateImage(AvatarFile);
                 if (!result.Success)
@@ -463,7 +452,7 @@ namespace TextShare.UI.Controllers
                     ModelState.AddModelError("AvatarFile", result.ErrorMessage);
                     return View(shelfCreateModel);
                 }
-              
+
                 ResponseData<Dictionary<string, string>> data = await SaveImage(AvatarFile);
                 if (data.Success && data.Data != null)
                 {
@@ -474,7 +463,7 @@ namespace TextShare.UI.Controllers
                     }
                     updateShelf.MimeType = AvatarFile.ContentType;
                     updateShelf.ImageUri = data.Data["uri"];
-                }                           
+                }
             }
             await _shelfService.UpdateShelfAsync(updateShelf);
             await _shelfService.SaveAsync();
@@ -487,7 +476,7 @@ namespace TextShare.UI.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize]     
+        [Authorize]
         [HttpGet("delete/{id}")]
         [HttpPost("delete/{id}")]
         public async Task<IActionResult> DeleteShelf(int id)
@@ -562,10 +551,10 @@ namespace TextShare.UI.Controllers
         public async Task<IActionResult> FilesInShelf(int shelfId, int page = 1)
         {
             Shelf? shelf = await _shelfService.GetShelfByIdAsync(shelfId,
-                s=>s.TextFiles, s=>s.Creator,
-                s=>s.AccessRule, s=>s.AccessRule.AvailableGroups, s=>s.AccessRule.AvailableUsers);
+                s => s.TextFiles, s => s.Creator,
+                s => s.AccessRule, s => s.AccessRule.AvailableGroups, s => s.AccessRule.AvailableUsers);
 
-            if(shelf == null)
+            if (shelf == null)
             {
                 HttpContext.Items["ErrorMessage"] = "Полка не найдена";
                 return BadRequest();
@@ -574,9 +563,9 @@ namespace TextShare.UI.Controllers
             User? user = await _userManager.GetUserAsync(User);
 
             var result = await _accessСontrolService.CheckShelfAccess(user, shelf);
-            if(result != true)
+            if (result != true)
             {
-                if(user == null)
+                if (user == null)
                 {
                     return Challenge();
                 }
@@ -599,7 +588,7 @@ namespace TextShare.UI.Controllers
 
             return View(models.ToPagedList(page, 5));
         }
-     
-        #endregion       
+
+        #endregion
     }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TextShare.Domain.Models
+﻿namespace TextShare.Domain.Models
 {
     /// <summary>
     /// Класс для размещения данных.
@@ -18,7 +12,7 @@ namespace TextShare.Domain.Models
 
         public ResponseData() { }
 
-        public ResponseData(T data, bool success  = true, string? errorMessage = null) :this()
+        public ResponseData(T data, bool success = true, string? errorMessage = null) : this()
         {
             Data = data;
             Success = success;
@@ -30,7 +24,7 @@ namespace TextShare.Domain.Models
             string info = $"Response data type: {(Data == null ? "Null" : Data.GetType().ToString())}\n";
             info += $"Success: {Success}\n";
             if (ErrorMessage != null) info += $"Error message: {ErrorMessage}";
-            return info ;
+            return info;
         }
     }
 }

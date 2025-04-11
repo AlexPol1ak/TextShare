@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TextShare.Domain.Entities.TextFiles;
+﻿using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 
 namespace TextShare.Domain.Models.EntityModels.TextFileModels
@@ -26,7 +21,7 @@ namespace TextShare.Domain.Models.EntityModels.TextFileModels
         public List<Category> Categories { get; set; }
         public Shelf Shelf { get; set; }
 
-        public static TextFileDetailModel FromTextFile(TextFile textFile, int?  currentUserId = null)
+        public static TextFileDetailModel FromTextFile(TextFile textFile, int? currentUserId = null)
         {
             TextFileDetailModel model = new();
             model.CurrentUserId = currentUserId;

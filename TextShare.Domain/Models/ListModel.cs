@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TextShare.Domain.Models
+﻿namespace TextShare.Domain.Models
 {
     /// <summary>
     /// Класс для коллекции ответов.
@@ -16,7 +10,7 @@ namespace TextShare.Domain.Models
         public int CurrentPage { get; set; } = 1;
         public int TotalPages { get; set; } = 1;
 
-        public ListModel () { }
+        public ListModel() { }
         public ListModel(List<T> items, int currentPage, int totalPages)
         {
             Items = items;

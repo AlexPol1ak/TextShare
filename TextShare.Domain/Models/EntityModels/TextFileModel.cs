@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using TextShare.Domain.Entities.TextFiles;
 
 namespace TextShare.Domain.Models.EntityModels

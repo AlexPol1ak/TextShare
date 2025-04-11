@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TextShare.Domain.Entities.Groups;
+﻿using TextShare.Domain.Entities.Groups;
 using TextShare.Domain.Entities.TextFiles;
 using TextShare.Domain.Entities.Users;
 
@@ -35,7 +30,7 @@ namespace TextShare.Domain.Entities.Complaints
         public ComplaintReasons ComplaintReasons { get; set; }
 
         // Автор
-        public int AuthorId { get; set; } 
+        public int AuthorId { get; set; }
         public User Author { get; set; }
 
         public override string ToString()

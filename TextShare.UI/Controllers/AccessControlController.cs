@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.ComponentModel.Design;
 using TextShare.Business.Interfaces;
 using TextShare.Domain.Entities.AccessRules;
 using TextShare.Domain.Entities.Groups;
@@ -65,7 +63,7 @@ namespace TextShare.UI.Controllers
             ResponseData<ShelfAccessRuleEditModel?> responseData = await CreateAccessRuleEditModel(
                 currentUser.Id, shelfId
                 );
-            if(responseData.Success == false || responseData.Data == null )
+            if (responseData.Success == false || responseData.Data == null)
             {
                 HttpContext.Items["ErrorMessage"] = responseData.ErrorMessage;
                 return BadRequest();
@@ -84,9 +82,9 @@ namespace TextShare.UI.Controllers
         [HttpGet("file-{uniqueName}/edit")]
         public async Task<IActionResult> TextFileAccessRuleEdit(string uniqueName)
         {
-            User currentUser = (await _userManager.GetUserAsync(User))!;    
+            User currentUser = (await _userManager.GetUserAsync(User))!;
             // Создать модель для представления. Осуществить проверку 
-            ResponseData<TextFileAccessRuleEditModel?>  responseData = await CreateAccessRuleEditFileModel(
+            ResponseData<TextFileAccessRuleEditModel?> responseData = await CreateAccessRuleEditFileModel(
                 currentUser.Id, uniqueName);
 
             if (responseData.Success == false || responseData.Data == null)
@@ -148,8 +146,8 @@ namespace TextShare.UI.Controllers
             {
                 HttpContext.Items["ErrorMessage"] = "Полка не найдена.";
                 return NotFound();
-            }         
-        
+            }
+
             if (shelf.CreatorId != currentUser.Id)
             {
                 HttpContext.Items["ErrorMessage"] = "У вас нет прав для управления доступом этой полки.";
@@ -187,7 +185,7 @@ namespace TextShare.UI.Controllers
                     t => t.AccessRule
                     )).ToList();
 
-                foreach(TextFile file in files)
+                foreach (TextFile file in files)
                 {
                     int oldAccessRule = file.AccessRule.AccessRuleId;
 
@@ -197,7 +195,7 @@ namespace TextShare.UI.Controllers
                     await _accessRuleService.CreateAccessRuleAsync(accessRuleShelfCopy);
                     await _accessRuleService.SaveAsync();
 
-                    file.AccessRule = accessRuleShelfCopy; 
+                    file.AccessRule = accessRuleShelfCopy;
                     file.AccessRuleId = accessRuleShelfCopy.AccessRuleId;
                     await _textFileService.UpdateTextFileAsync(file);
                     await _accessRuleService.DeleteAccessRuleAsync(oldAccessRule);
@@ -205,7 +203,7 @@ namespace TextShare.UI.Controllers
                 await _textFileService.SaveAsync();
             }
 
-            return RedirectToAction("DetailShelf","Shelves", new { id=shelf.ShelfId});
+            return RedirectToAction("DetailShelf", "Shelves", new { id = shelf.ShelfId });
         }
 
         /// <summary>
@@ -216,7 +214,7 @@ namespace TextShare.UI.Controllers
         /// <param name="textFileAccessRuleEditModel">Модель, содержащая обновленные данные для правил доступа к файлу.</param>
         /// <returns>Реализация действий по обновлению и перенаправлению на страницу файла.</returns>
         [HttpPost("file-{uniqueName}/edit")]
-        public async Task<IActionResult> TextFileAccessRuleEdit(string uniqueName, 
+        public async Task<IActionResult> TextFileAccessRuleEdit(string uniqueName,
             TextFileAccessRuleEditModel textFileAccessRuleEditModel)
         {
             if (string.IsNullOrEmpty(uniqueName))
@@ -250,8 +248,8 @@ namespace TextShare.UI.Controllers
                 return View(textFileAccessRuleEditModelNew);
             }
 
-            TextFile? file =( await _textFileService.FindTextFilesAsync(
-                t=>t.UniqueFileNameWithoutExtension == uniqueName,
+            TextFile? file = (await _textFileService.FindTextFilesAsync(
+                t => t.UniqueFileNameWithoutExtension == uniqueName,
                 t => t.Owner,
                 t => t.AccessRule, t => t.AccessRule.AvailableUsers, t => t.AccessRule.AvailableGroups
                 )).FirstOrDefault();
@@ -292,7 +290,7 @@ namespace TextShare.UI.Controllers
             await _accessRuleService.UpdateAccessRuleAsync(accessRule);
             await _accessRuleService.SaveAsync();
 
-            return RedirectToAction("DetailTextFile", "TextFile", new { uniquename = uniqueName});
+            return RedirectToAction("DetailTextFile", "TextFile", new { uniquename = uniqueName });
         }
 
         /// <summary>
@@ -366,14 +364,14 @@ namespace TextShare.UI.Controllers
                 return responseData;
 
             }
-            
-            
+
+
             TextFile? file = (await _textFileService.FindTextFilesAsync(
-                t=>t.UniqueFileNameWithoutExtension == uniqueName,
-                t=>t.Owner, t=>t.AccessRule, t=>t.AccessRule.AvailableGroups, t=>t.AccessRule.AvailableUsers
+                t => t.UniqueFileNameWithoutExtension == uniqueName,
+                t => t.Owner, t => t.AccessRule, t => t.AccessRule.AvailableGroups, t => t.AccessRule.AvailableUsers
                 )).FirstOrDefault();
 
-            if( file == null )
+            if (file == null)
             {
                 responseData.Success = false;
                 responseData.Data = null;
