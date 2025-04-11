@@ -4,7 +4,6 @@ using TextShare.UI.Models;
 
 namespace TextShare.UI.Controllers
 {
-    [Route("home")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -20,6 +19,7 @@ namespace TextShare.UI.Controllers
             return View();
         }
 
+        [Route("/")]
         public async Task<IActionResult> Index()
         {
             return View();
