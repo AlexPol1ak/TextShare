@@ -19,7 +19,7 @@ namespace TextShare.UI.Controllers
         private readonly IUserService _userService;
         private readonly IGroupService _groupService;
         private readonly ITextFileService _textFileService;
-        private readonly IAccessСontrolService _accessControlService;
+        private readonly IAccessControlService _accessControlService;
         private readonly UserManager<User> _userManager;
         private readonly IComplaintService _complaintService;
         private readonly IComplaintReasonService _complaintReasonService;
@@ -28,7 +28,7 @@ namespace TextShare.UI.Controllers
             IUserService userService,
             IGroupService groupService,
             ITextFileService textFileService,
-            IAccessСontrolService accessControlService,
+            IAccessControlService accessControlService,
             UserManager<User> userManager,
             IComplaintService complaintService,
             IComplaintReasonService complaintReasonService)

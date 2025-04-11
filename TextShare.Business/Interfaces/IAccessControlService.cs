@@ -8,7 +8,7 @@ namespace TextShare.Business.Interfaces
     /// <summary>
     /// Интерфейс сервиса управления доступом к файлам  и полка.
     /// </summary>
-    public interface IAccessСontrolService
+    public interface IAccessControlService
     {
         /// <summary>
         /// Копирует и возвращает копию правила доступа

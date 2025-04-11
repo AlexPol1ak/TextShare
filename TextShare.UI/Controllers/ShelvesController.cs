@@ -30,7 +30,7 @@ namespace TextShare.UI.Controllers
         private readonly IGroupService _groupService;
         private readonly ShelvesSettings _shelvesSettings;
         private readonly UserManager<User> _userManager;
-        private readonly IAccessСontrolService _accessСontrolService;
+        private readonly IAccessControlService _accessСontrolService;
 
         public ShelvesController(IShelfService shelfService,
             UserManager<User> userManager,
@@ -39,7 +39,7 @@ namespace TextShare.UI.Controllers
             IOptions<ShelvesSettings> shelvesSettingsOptions,
             IFriendshipService friendshipService,
             IGroupService groupService,
-            IAccessСontrolService accessСontrolService,
+            IAccessControlService accessСontrolService,
             // В базовый контроллер
             IPhysicalFile physicalFile,
             IOptions<ImageUploadSettings> imageUploadSettingsOptions

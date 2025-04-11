@@ -1,56 +1,55 @@
-﻿
-@{
-    
+﻿@{
     @model AvailableShelvesModel<User, IPagedList<Shelf>>
     IPagedList<Shelf> shelves = Model.AvailableShelves;
 }
 
-<div class="d-flex align-items-start">
+<div class="row g-3">
     <!-- Ссылки слева -->
-    <div class="w-20 ms-0 ps-2">
+    <div class="col-12 col-md-4 col-lg-2">
         <partial name="_ShelvesLinksPartial" />
     </div>
 
     <!-- Полки справа -->
-    <div class="w-80 ms-5">
-        <h2>Мои полки</h2>
-        <p>
-            <a asp-controller="Shelves" asp-action="CreateShelf">
-                Создать новую полку
-            </a>
-        </p>
+    <div class="col-12 col-md-8 col-lg-9">
+        <div class="rounded p-3">
+            <h2>Мои полки</h2>
+            <p>
+                <a asp-controller="Shelves" asp-action="CreateShelf" class="btn btn-primary">
+                    Создать новую полку
+                </a>
+            </p>
 
-        @if (shelves.TotalItemCount > 0)
-        {
-
-            int shelfCounter = 1;
-            @foreach (var shelf in shelves)
+            @if (shelves.TotalItemCount > 0)
             {
-                <div class="d-flex align-items-center mb-2">
-                    <h4 class="mb-0 me-3">@shelfCounter. @shelf.Name</h4>
-                    <a href="@Url.Action("DetailShelf", "Shelves", new { id = shelf.ShelfId })"
-                       target="_blank"
-                       class="btn btn-outline-primary btn-sm2 me-2">
-                        Открыть
-                    </a>
+                int shelfCounter = 1;
+                @foreach (var shelf in shelves)
+                {
+                    <div class="d-flex align-items-center mb-2">
+                        <h4 class="mb-0 me-3">@shelfCounter. @shelf.Name</h4>
+                        <a href="@Url.Action("DetailShelf", "Shelves", new { id = shelf.ShelfId })"
+                           target="_blank"
+                           class="btn btn-outline-primary btn-sm me-2">
+                            Открыть
+                        </a>
 
-                    <a href="@Url.Action("EditShelf", "Shelves", new { id = shelf.ShelfId })"
-                       class="btn btn-outline-warning btn-sm2">
-                        Редактировать
-                    </a>                   
-                </div>
-                shelfCounter++;
+                        <a href="@Url.Action("EditShelf", "Shelves", new { id = shelf.ShelfId })"
+                           class="btn btn-outline-warning btn-sm">
+                            Редактировать
+                        </a>
+                    </div>
+                    shelfCounter++;
+                }
+
+                @Html.PagedListPager(
+                         shelves,
+                         page => Url.Action("MyShelves", new { page }),
+                         PagedListRenderOptions.OnlyShowFivePagesAtATime
+                         )
             }
-            
-            @Html.PagedListPager(
-                shelves,
-                page => Url.Action("MyShelves", new { page }),
-                PagedListRenderOptions.OnlyShowFivePagesAtATime
-                )
-        }
-        else
-        {
-            <p>У вас пока нет полок</p>
-        }
+            else
+            {
+                <p>У вас пока нет полок</p>
+            }
+        </div>
     </div>
 </div>

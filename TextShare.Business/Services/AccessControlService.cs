@@ -12,14 +12,14 @@ namespace TextShare.Business.Services
     /// <summary>
     /// Класс сервиса для управления доступом к файлам и полкам.
     /// </summary>
-    public class AccessСontrolService : BaseService, IAccessСontrolService
+    public class AccessControlService : BaseService, IAccessControlService
     {
         private readonly IRepository<AccessRule> _accessRuleRepository;
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<Group> _groupRepository;
         private readonly IRepository<TextFile> _textFileRepository;
         private readonly IRepository<Shelf> _shelfRepository;
-        public AccessСontrolService(IUnitOfWork unitOfWork) : base(unitOfWork)
+        public AccessControlService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _accessRuleRepository = unitOfWork.AccessRuleRepository;
             _userRepository = unitOfWork.UserRepository;

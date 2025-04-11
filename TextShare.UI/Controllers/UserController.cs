@@ -24,7 +24,7 @@ namespace TextShare.UI.Controllers
         private readonly ITextFileService _textFileService;
         private readonly IUserService _userService;
         private readonly IFriendshipService _friendshipService;
-        private readonly IAccessСontrolService _accessControlService;
+        private readonly IAccessControlService _accessControlService;
 
         public UserController(
             UserManager<User> userManager,
@@ -34,7 +34,7 @@ namespace TextShare.UI.Controllers
             IFriendshipService friendshipService,
             IPhysicalFile physicalFile,
             IOptions<ImageUploadSettings> imageUploadSettings,
-            IAccessСontrolService accessСontrolService
+            IAccessControlService accessСontrolService
 
 
             ) : base(physicalFile, imageUploadSettings)

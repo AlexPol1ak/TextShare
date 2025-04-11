@@ -32,7 +32,7 @@ namespace TextShare.UI.Controllers
         private readonly IFriendshipService _friendshipService;
         private readonly ITextFileService _textFileService;
         private readonly IShelfService _shelfService;
-        private readonly IAccessСontrolService _accessControlService;
+        private readonly IAccessControlService _accessControlService;
         public GroupsController(
             IPhysicalFile physicalFile,
             IOptions<ImageUploadSettings> imageUploadSettingsOptions,
@@ -43,7 +43,7 @@ namespace TextShare.UI.Controllers
             IFriendshipService friendshipService,
             ITextFileService textFileService,
             IShelfService shelfService,
-            IAccessСontrolService accessСontrolService
+            IAccessControlService accessСontrolService
             )
             : base(physicalFile, imageUploadSettingsOptions)
         {

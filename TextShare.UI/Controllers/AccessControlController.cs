@@ -25,7 +25,7 @@ namespace TextShare.UI.Controllers
         private readonly IGroupService _groupService;
         private readonly IFriendshipService _friendshipService;
         private readonly UserManager<User> _userManager;
-        private readonly IAccessСontrolService _accessСontrolService;
+        private readonly IAccessControlService _accessСontrolService;
         private readonly ITextFileService _textFileService;
 
         public AccessControlController(
@@ -35,7 +35,7 @@ namespace TextShare.UI.Controllers
             IGroupService groupService,
             IFriendshipService friendshipService,
             UserManager<User> userManager,
-            IAccessСontrolService accessСontrolService,
+            IAccessControlService accessСontrolService,
             ITextFileService textFileService
             )
         {

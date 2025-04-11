@@ -80,7 +80,7 @@ builder.Services.AddScoped<IPhysicalFile, PhysicalFileService>
     }
 
 );
-builder.Services.AddScoped<IAccessÑontrolService, AccessÑontrolService>();
+builder.Services.AddScoped<IAccessControlService, AccessControlService>();
 builder.Services.AddScoped<ITextFileService, TextFileService>();
 
 var app = builder.Build();

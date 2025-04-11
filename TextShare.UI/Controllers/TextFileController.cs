@@ -27,7 +27,7 @@ namespace TextShare.UI.Controllers
         private readonly IUserService _userService;
         private readonly IShelfService _shelfService;
         private readonly ICategoryService _categoryService;
-        private readonly IAccessСontrolService _accessСontrolService;
+        private readonly IAccessControlService _accessСontrolService;
         private readonly IAccessRuleService _accessRuleService;
         private readonly ITextFileService _textFileService;
         private readonly ILogger<TextFileController> _logger;
@@ -40,7 +40,7 @@ namespace TextShare.UI.Controllers
             UserManager<User> userManager,
             IUserService userService,
             ICategoryService categoryService,
-            IAccessСontrolService accessСontrolService,
+            IAccessControlService accessСontrolService,
             IAccessRuleService accessRuleService,
             ITextFileService textFileService,
             ILogger<TextFileController> logger
